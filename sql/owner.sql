@@ -1,0 +1,3 @@
+﻿CREATE USER btrack PASSWORD 'btrack';
+CREATE SCHEMA AUTHORIZATION btrack;
+CREATE DATABASE btrack OWNER btrack;

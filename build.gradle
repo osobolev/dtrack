@@ -1,0 +1,23 @@
+plugins {
+    id 'war'
+}
+
+group 'btrack'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.eclipse.jetty:jetty-servlet:9.4.19.v20190610'
+    compile 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20190610.1'
+    compile 'org.freemarker:freemarker:2.3.28'
+    compile 'commons-fileupload:commons-fileupload:1.4'
+    compile 'com.zaxxer:HikariCP:3.3.1'
+    compile 'com.h2database:h2:1.4.199'
+    runtime 'org.postgresql:postgresql:42.2.5'
+    runtime 'org.slf4j:slf4j-simple:1.7.26'
+}

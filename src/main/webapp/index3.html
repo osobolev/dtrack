@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Новый баг</title>
+  <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script> 
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script> 
+  <link href="summernote.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <script src="summernote.js"></script>
+  <script src="lang/summernote-ru-RU.js"></script>
+</head>
+<body>
+
+  <form method="post" action="/post">
+    <div class="form-row">
+      <div class="form-group col-md-10">
+        <label for="title">Краткое описание:</label>
+        <input type="text" class="form-control" id="title" name="title" placeholder="Краткое описание">
+      </div>
+      <div class="form-group col-md-2">
+        <label for="priority">Приоритет:</label>
+        <select name="priority" id="priority" class="form-control">
+            <option>Высокий</option>
+            <option>Средний</option>
+            <option>Низкий</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-12">
+        <label for="summernote">Полное описание:</label>
+        <textarea class="form-control" id="summernote" name="html"></textarea>
+        <button type="submit" class="btn btn-primary">Создать</button>
+      </div>
+    </div>
+  </form>
+
+<!--
+  <form method="post" action="/post" style="display: inline;">
+    <label for="title">Краткое описание:</label><input name="title" id="title">
+    <span style="position: relative; right: 5px;"><label for="priority">Приоритет:</label></span>
+    <select name="priority" id="priority" style="position: absolute; right: 5px;">
+        <option>Высокий</option>
+        <option>Средний</option>
+        <option>Низкий</option>
+    </select>
+    <br><label for="summernote">Полное описание:</label>
+    <textarea id="summernote" name="html"></textarea>
+    <input type="submit" value="Создать">
+  </form>
+-->
+
+  <script>
+    function sendHtml() {
+        var html = $('#summernote').summernote('code');
+        $.post("/post", { html: html });
+    }
+
+    $(document).ready(function() {
+      $('#summernote').summernote({
+        lang: 'ru-RU',
+        height: '300px'
+      });
+    });
+  </script>
+
+</body>
+</html>
