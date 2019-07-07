@@ -115,6 +115,10 @@ public final class BugBean {
         return AccessUtil.getItemUrl(projectBase, ProjectItem.BUG, bugNum, "comment.html");
     }
 
+    public String getAssignLink() {
+        return AccessUtil.getItemUrl(projectBase, ProjectItem.BUG, bugNum, "assign.html");
+    }
+
     public String getAttachmentLink(AttachmentBean attachment) {
         return AccessUtil.getItemUrl(projectBase, ProjectItem.FILE, attachment.getId(), attachment.getName());
     }

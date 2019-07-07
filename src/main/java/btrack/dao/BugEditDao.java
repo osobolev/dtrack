@@ -259,12 +259,6 @@ public final class BugEditDao extends BaseDao {
 
     public void changeAssignedUser(int bugId, int userId, Integer[] changeBox,
                                    Integer newAssignedUserId) throws SQLException {
-        if (newAssignedUserId != null) {
-//            if (!userHasAccess(projectId, newAssignedUserId.intValue())) {
-//                // todo: move outside of DAO
-//                throw new NoAccessException("No access", HttpServletResponse.SC_FORBIDDEN);
-//            }
-        }
         updateBugFields(
             bugId, userId, changeBox,
             Collections.singletonList(

@@ -103,6 +103,8 @@ public final class RouterServlet extends HttpServlet {
                         return new EditBugAction(projectId, projectName, bugId, num, userId);
                     } else if ("comment.html".equals(page)) {
                         return new AddCommentAction(projectName, bugId, num, userId);
+                    } else if ("assign.html".equals(page)) {
+                        return new AssignAction(projectId, projectName, bugId, userId);
                     }
                     return new ViewBugAction(projectId, projectName, bugId, num, userId);
                 case FILE:
@@ -145,12 +147,7 @@ public final class RouterServlet extends HttpServlet {
                 if (get) {
                     action.get(ctx, req, resp);
                 } else {
-                    String redirect = action.post(ctx, req);
-                    if (redirect == null) {
-                        resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    } else {
-                        resp.sendRedirect(redirect);
-                    }
+                    action.post(ctx, req, resp);
                 }
             }
         } catch (NoAccessException ex) {

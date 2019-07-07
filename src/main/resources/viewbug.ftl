@@ -30,7 +30,6 @@
             Приоритет: ${bug.priority}
             <a href="${bug.editLink}">Редактировать</a>
             Состояние: ${bug.state}
-            <#-- todo: assigned user dropdown -->
             <label for="assigned">Исполнитель:</label>
             <select name="assigned" id="assigned" onchange="onAssignedChange()">
                 <option value=""<#if bug.isNotAssigned()> selected</#if>>не выбран</option>
@@ -38,6 +37,8 @@
                     <option value="${u.id}"<#if bug.isAssigned(u)> selected</#if>>${u.login}</option>
                 </#list>
             </select>
+            <span id="assignResult"></span>
+            <br>
             <#list transitions as t>
                 <#-- todo: button action: -->
                 <button>${t.name}</button>
@@ -115,7 +116,23 @@
     }
 
     function onAssignedChange() {
-        // todo: call server & display callback status
+        var assignedUser = $('#assigned').val();
+        var res = $('#assignResult');
+        res.text('');
+        res.removeClass('text-danger');
+        res.removeClass('text-success');
+        $.ajax({
+            type: 'POST',
+            url: '${bug.assignLink}?assignedUserId=' + assignedUser,
+            success: function () {
+                res.addClass('text-success');
+                res.text('OK');
+            },
+            error: function () {
+                res.addClass('text-danger');
+                res.text('Ошибка');
+            }
+        });
     }
 </script>
 
