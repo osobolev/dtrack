@@ -1,7 +1,7 @@
 <#-- @ftlvariable name="priorities" type="java.util.List<btrack.dao.PriorityBean>" -->
 <#-- @ftlvariable name="project" type="java.lang.String" -->
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Новый баг</title>
@@ -25,12 +25,9 @@
             <div class="form-group col-md-2">
                 <label for="priority">Приоритет:</label>
                 <select name="priority" id="priority" class="form-control">
-              <#list priorities as p>
-              <option value="${p.id}"<#if p.isDefault()> selected</#if>>${p.name}</option>
-              </#list>
-                    <option>Высокий</option>
-                    <option>Средний</option>
-                    <option>Низкий</option>
+                    <#list priorities as p>
+                        <option value="${p.id}"<#if p.isDefault()> selected</#if>>${p.name}</option>
+                    </#list>
                 </select>
             </div>
         </div>

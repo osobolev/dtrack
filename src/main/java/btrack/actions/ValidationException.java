@@ -1,4 +1,4 @@
-package btrack.dao;
+package btrack.actions;
 
 public final class ValidationException extends Exception {
 

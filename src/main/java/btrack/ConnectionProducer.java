@@ -1,9 +1,9 @@
-package btrack.dao;
+package btrack;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public interface ConnectionProducer {
+interface ConnectionProducer {
 
     Connection getConnection() throws SQLException;
 }

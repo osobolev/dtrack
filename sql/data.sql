@@ -6,7 +6,7 @@ insert into users
 insert into projects
   (id, name)
   values
-  (1, 'Template');
+  (1, 'template');
 
 insert into user_access
   (project_id, user_id)
