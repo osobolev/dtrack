@@ -11,17 +11,12 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-final class TemplateUtil {
+public final class TemplateUtil {
 
     private static final Configuration CONFIGURATION = new Configuration(Configuration.VERSION_2_3_28);
 
-    static {
-        try {
-            CONFIGURATION.setTemplateLoader(new FileTemplateLoader(new File(".")));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            // todo: log
-        }
+    public static void init() throws IOException {
+        CONFIGURATION.setTemplateLoader(new FileTemplateLoader(new File(".")));
         CONFIGURATION.setOutputFormat(HTMLOutputFormat.INSTANCE);
         CONFIGURATION.setDefaultEncoding("UTF-8");
     }

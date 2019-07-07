@@ -48,7 +48,6 @@
                 </#list>
             </ul>
         </#if>
-        <#--  todo: list attached files & ability to remove them -->
         <div class="form-group">
             <div class="custom-file">
                 <input type="file" class="custom-file-input" id="files" name="files" onchange="onFileChange()" multiple>

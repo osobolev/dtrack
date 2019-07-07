@@ -47,6 +47,11 @@ public final class DaoTest {
             return new ByteArrayInputStream(new byte[] {1});
         } else if (OutputStream.class.isAssignableFrom(cls)) {
             return new ByteArrayOutputStream();
+        } else if (cls.isArray()) {
+            Class<?> componentType = cls.getComponentType();
+            Object array = Array.newInstance(componentType, 1);
+            Array.set(array, 0, generateTestObject(componentType));
+            return array;
         } else {
             throw new IllegalArgumentException("Cannot create parameter of type " + cls);
         }

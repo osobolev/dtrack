@@ -1,5 +1,6 @@
 package btrack;
 
+import btrack.actions.TemplateUtil;
 import btrack.dao.BugEditDao;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.pool.HikariPool;
@@ -15,6 +16,7 @@ import java.sql.SQLException;
 public final class Main {
 
     public static void main(String[] args) throws Exception {
+        TemplateUtil.init();
         Server server = new Server(8080);
         ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         HikariConfig config = new HikariConfig();
@@ -36,7 +38,7 @@ public final class Main {
             System.out.println(ex.getMessage());
         }
         handler.setResourceBase("src/main/webapp");
-        handler.addServlet(new ServletHolder(new RouterServlet(dataSource)), "/p/*"); // todo: ???
+        handler.addServlet(new ServletHolder(new RouterServlet(dataSource)), "/p/*");
         handler.addServlet(DefaultServlet.class, "/");
         server.setHandler(handler);
         server.start();

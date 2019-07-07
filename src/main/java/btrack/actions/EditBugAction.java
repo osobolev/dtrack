@@ -64,7 +64,7 @@ public final class EditBugAction extends Action {
                     if (!Boolean.parseBoolean(value)) {
                         int attachmentId = AccessUtil.parseInt(key.substring(FILE_KEY_START.length()));
                         int changeId = dao.getChangeId(bugId, userId, changeBox);
-                        dao.removeBugAttachment(changeId, attachmentId, userId);
+                        dao.removeBugAttachment(changeId, attachmentId);
                     }
                 }
             }

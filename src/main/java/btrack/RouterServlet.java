@@ -104,7 +104,9 @@ public final class RouterServlet extends HttpServlet {
                     } else if ("comment.html".equals(page)) {
                         return new AddCommentAction(projectName, bugId, num, userId);
                     } else if ("assign.html".equals(page)) {
-                        return new AssignAction(projectId, projectName, bugId, userId);
+                        return new AssignAction(projectId, projectName, bugId, num, userId);
+                    } else if ("move.html".equals(page)) {
+                        return new MoveStateAction(projectId, projectName, bugId, num, userId);
                     }
                     return new ViewBugAction(projectId, projectName, bugId, num, userId);
                 case FILE:

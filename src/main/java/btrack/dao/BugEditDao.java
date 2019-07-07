@@ -1,6 +1,5 @@
 package btrack.dao;
 
-import btrack.actions.ValidationException;
 import org.h2.util.ScriptReader;
 
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-// todo: move all validation outside of DAO!!!
 public final class BugEditDao extends BaseDao {
 
     public BugEditDao(Connection connection) {
@@ -138,21 +136,30 @@ public final class BugEditDao extends BaseDao {
         final String oldField;
         final String newField;
         final T newValue;
+        final boolean hasPrerequisite;
+        final T prerequisite;
         private T oldValue;
         final Getter<T> getter;
         final Setter<T> setter;
 
-        FieldUpdate(String field, String oldField, String newField, T newValue, Getter<T> getter, Setter<T> setter) {
+        FieldUpdate(String field, String oldField, String newField, T newValue,
+                    boolean hasPrerequisite, T prerequisite, Getter<T> getter, Setter<T> setter) {
             this.field = field;
             this.oldField = oldField;
             this.newField = newField;
             this.newValue = newValue;
+            this.hasPrerequisite = hasPrerequisite;
+            this.prerequisite = prerequisite;
             this.getter = getter;
             this.setter = setter;
         }
 
+        FieldUpdate(String field, T newValue, boolean hasPrerequisite, T prerequisite, Getter<T> getter, Setter<T> setter) {
+            this(field, "old_" + field, "new_" + field, newValue, hasPrerequisite, prerequisite, getter, setter);
+        }
+
         FieldUpdate(String field, T newValue, Getter<T> getter, Setter<T> setter) {
-            this(field, "old_" + field, "new_" + field, newValue, getter, setter);
+            this(field, newValue, false, null, getter, setter);
         }
 
         void get(ResultSet rs, int index) throws SQLException {
@@ -165,6 +172,10 @@ public final class BugEditDao extends BaseDao {
 
         void setOldValue(PreparedStatement stmt, int index) throws SQLException {
             setter.set(stmt, index, oldValue);
+        }
+
+        void setWhere(PreparedStatement stmt, int index) throws SQLException {
+            setter.set(stmt, index, prerequisite);
         }
 
         boolean isUpdated() {
@@ -182,19 +193,22 @@ public final class BugEditDao extends BaseDao {
         }
     }
 
-    private void updateBugFields(int bugId, int userId, Integer[] changeBox,
-                                 List<FieldUpdate<?>> fields) throws SQLException {
+    private boolean updateBugFields(int bugId, int userId, Integer[] changeBox,
+                                    List<FieldUpdate<?>> fields) throws SQLException {
         {
             String updateFields = fields.stream().map(uf -> uf.field + " = ?").collect(Collectors.joining(", "));
             String selectInternal = fields.stream().map(uf -> uf.field).collect(Collectors.joining(", "));
             String selectExternal = fields.stream().map(uf -> "ob." + uf.field).collect(Collectors.joining(", "));
-            try (PreparedStatement stmt = connection.prepareStatement(
-                "update bugs nb" +
-                "   set " + updateFields + ", modified = current_timestamp, modify_user_id = ?" +
-                "  from (select id, " + selectInternal + " from bugs where id = ? for update) ob" +
-                " where nb.id = ob.id" +
-                " returning " + selectExternal
-            )) {
+            String prerequisites = fields.stream()
+                .filter(uf -> uf.hasPrerequisite)
+                .map(uf -> " and nb." + uf.field + (uf.prerequisite != null ? " = ?" : " is null"))
+                .collect(Collectors.joining());
+            String sql = "update bugs nb" +
+                         "   set " + updateFields + ", modified = current_timestamp, modify_user_id = ?" +
+                         "  from (select id, " + selectInternal + " from bugs where id = ? for update) ob" +
+                         " where nb.id = ob.id" + prerequisites +
+                         " returning " + selectExternal;
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 {
                     int index = 1;
                     for (FieldUpdate<?> update : fields) {
@@ -202,6 +216,11 @@ public final class BugEditDao extends BaseDao {
                     }
                     stmt.setInt(index++, userId);
                     stmt.setInt(index++, bugId);
+                    for (FieldUpdate<?> update : fields) {
+                        if (update.prerequisite != null) {
+                            update.setWhere(stmt, index++);
+                        }
+                    }
                 }
                 stmt.execute();
                 try (ResultSet rs = stmt.getResultSet()) {
@@ -210,6 +229,8 @@ public final class BugEditDao extends BaseDao {
                         for (FieldUpdate<?> update : fields) {
                             update.get(rs, index++);
                         }
+                    } else {
+                        return false;
                     }
                 }
             }
@@ -234,20 +255,12 @@ public final class BugEditDao extends BaseDao {
                 executeUpdate(stmt);
             }
         }
+        return true;
     }
 
-    private <T> void updateBugField(int bugId, int userId, Integer[] changeBox,
-                                    String field, T newValue,
-                                    Getter<T> getter, Setter<T> setter) throws SQLException {
-        updateBugFields(
-            bugId, userId, changeBox,
-            Collections.singletonList(new FieldUpdate<>(field, newValue, getter, setter))
-        );
-    }
-
-    public void changeBug(int bugId, int userId, Integer[] changeBox,
-                          int newPriorityId, String shortText, String fullText) throws SQLException {
-        updateBugFields(
+    public boolean changeBug(int bugId, int userId, Integer[] changeBox,
+                             int newPriorityId, String shortText, String fullText) throws SQLException {
+        return updateBugFields(
             bugId, userId, changeBox,
             Arrays.asList(
                 new FieldUpdate<>("priority_id", newPriorityId, BaseDao::getInt, BaseDao::setInt),
@@ -257,42 +270,38 @@ public final class BugEditDao extends BaseDao {
         );
     }
 
-    public void changeAssignedUser(int bugId, int userId, Integer[] changeBox,
-                                   Integer newAssignedUserId) throws SQLException {
-        updateBugFields(
+    public boolean changeAssignedUser(int bugId, int userId, Integer[] changeBox,
+                                      Integer oldUserId, Integer newUserId) throws SQLException {
+        return updateBugFields(
             bugId, userId, changeBox,
             Collections.singletonList(
-                new FieldUpdate<>("assigned_user_id", newAssignedUserId, BaseDao::getInt, BaseDao::setInt)
+                new FieldUpdate<>("assigned_user_id", newUserId, true, oldUserId, BaseDao::getInt, BaseDao::setInt)
             )
         );
     }
 
-    // todo: make it boolean
-    private void validateState(int projectId, int stateId) throws SQLException, ValidationException {
+    public boolean validateTransition(int projectId, int fromId, int toId) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select id" +
-            "  from states" +
+            "select project_id" +
+            "  from transitions" +
             " where project_id = ?" +
-            "   and id = ?"
+            "   and from_id = ?" +
+            "   and to_id = ?"
         )) {
             stmt.setInt(1, projectId);
-            stmt.setInt(2, stateId);
+            stmt.setInt(2, fromId);
+            stmt.setInt(3, toId);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (!rs.next()) {
-                    throw new ValidationException("Неверно задано состояние");
-                }
+                return rs.next();
             }
         }
     }
 
-    public void changeBugState(int projectId, int bugId, int userId, Integer[] changeBox,
-                               int newStateId) throws SQLException, ValidationException {
-        validateState(projectId, newStateId); // todo: move outside of DAO
-        // todo: validate state transition validity
-        updateBugField(
+    public boolean changeBugState(int bugId, int userId, Integer[] changeBox,
+                                  int fromStateId, int toStateId) throws SQLException {
+        return updateBugFields(
             bugId, userId, changeBox,
-            "state_id", newStateId,
-            BaseDao::getInt, BaseDao::setInt
+            Collections.singletonList(new FieldUpdate<>("state_id", toStateId, true, fromStateId, BaseDao::getInt, BaseDao::setInt))
         );
     }
 
@@ -325,7 +334,7 @@ public final class BugEditDao extends BaseDao {
         }
     }
 
-    public void removeBugAttachment(int changeId, int attachmentId, int userId) throws SQLException {
+    public void removeBugAttachment(int changeId, int attachmentId) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "insert into changes_files" +
             " (change_id, old_attachment_id)" +
