@@ -1,7 +1,7 @@
 package btrack;
 
 import btrack.actions.*;
-import btrack.dao.BugsDao;
+import btrack.dao.BugViewDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,10 +22,6 @@ public final class RouterServlet extends HttpServlet {
         this.dataSource = dataSource;
     }
 
-    private enum ProjectItem {
-        BUG, REPORT
-    }
-
     private static final class PathInfo {
 
         static final PathInfo ROOT = new PathInfo(null, null, null, null);
@@ -44,12 +40,10 @@ public final class RouterServlet extends HttpServlet {
     }
 
     private static PathInfo parse(HttpServletRequest req) throws ValidationException {
-        String contextPath = req.getContextPath();
-        String uri = req.getRequestURI();
-        String path = uri.substring(contextPath.length());
-        if ("/".equals(path))
+        String path = req.getPathInfo();
+        if (path == null || path.isEmpty() || "/".equals(path))
             return PathInfo.ROOT;
-        String[] parts = path.split("/");
+        String[] parts = path.substring(1).split("/");
         if (parts.length <= 0)
             return PathInfo.ROOT;
         String projectName = parts[0];
@@ -81,11 +75,12 @@ public final class RouterServlet extends HttpServlet {
     private static Action getAction(Connection connection, PathInfo info, Integer maybeUserId) throws NoAccessException, SQLException {
         if (info.projectName != null) {
             if (maybeUserId == null) {
+                // todo: redirect to login page!!!
                 throw new NoAccessException("User not logged in", HttpServletResponse.SC_UNAUTHORIZED);
             }
             int userId = maybeUserId.intValue();
             String projectName = info.projectName;
-            BugsDao dao = new BugsDao(connection);
+            BugViewDao dao = new BugViewDao(connection);
             Integer maybeProjectId = dao.getProjectId(projectName);
             if (maybeProjectId == null) {
                 throw new NoAccessException("Project not found: " + projectName, HttpServletResponse.SC_NOT_FOUND);
@@ -105,9 +100,15 @@ public final class RouterServlet extends HttpServlet {
                     }
                     int bugId = maybeBugId.intValue();
                     if ("edit.html".equals(page)) {
-                        return null; // todo: edit bug action
+                        return new EditBugAction(projectId, projectName, bugId, num, userId);
+                    } else if ("comment.html".equals(page)) {
+                        return new AddCommentAction(projectName, bugId, num, userId);
                     }
-                    return new ViewBugAction(bugId);
+                    return new ViewBugAction(projectId, projectName, bugId, num, userId);
+                case FILE:
+                    return new AttachmentAction(false, num);
+                case CFILE:
+                    return new AttachmentAction(true, num);
                 case REPORT:
                     return null; // todo: view report action
                 }
@@ -128,6 +129,9 @@ public final class RouterServlet extends HttpServlet {
         try (Connection connection = dataSource.getConnection()) {
             PathInfo info = parse(req);
             Integer userId = (Integer) req.getSession().getAttribute("userId");
+            if (userId == null) {
+                userId = 1; // todo!!! remove later
+            }
             Action action = getAction(connection, info, userId);
             if (action == null) {
                 if (get) {
@@ -139,7 +143,7 @@ public final class RouterServlet extends HttpServlet {
             } else {
                 Context ctx = new Context(connection);
                 if (get) {
-                    action.get(ctx, req, resp.getWriter());
+                    action.get(ctx, req, resp);
                 } else {
                     String redirect = action.post(ctx, req);
                     if (redirect == null) {
@@ -161,7 +165,6 @@ public final class RouterServlet extends HttpServlet {
         }
     }
 
-    // todo: static assets???
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         perform(true, req, resp);

@@ -1,6 +1,6 @@
 package btrack;
 
-import btrack.dao.BugsDao;
+import btrack.dao.BugEditDao;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.pool.HikariPool;
 import org.eclipse.jetty.server.Server;
@@ -16,7 +16,7 @@ public final class Main {
 
     public static void main(String[] args) throws Exception {
         Server server = new Server(8080);
-        ServletContextHandler handler = new ServletContextHandler();
+        ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         HikariConfig config = new HikariConfig();
         config.setMaximumPoolSize(10);
         config.setDriverClassName("org.postgresql.Driver");
@@ -28,7 +28,7 @@ public final class Main {
         HikariPool pool = new HikariPool(config);
         ConnectionProducer dataSource = pool::getConnection;
         try (Connection connection = dataSource.getConnection()) {
-            BugsDao dao = new BugsDao(connection);
+            BugEditDao dao = new BugEditDao(connection);
             dao.runScript(Paths.get("sql/tables.sql"));
             dao.runScript(Paths.get("sql/data.sql"));
             connection.commit();

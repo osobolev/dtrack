@@ -30,6 +30,23 @@ insert into states
   values
   (4, 1, 4, 'Закрыт');
 
+insert into transitions
+  (project_id, from_id, to_id, name)
+  values
+  (1, 1, 2, 'Тестировать');
+insert into transitions
+  (project_id, from_id, to_id, name)
+  values
+  (1, 2, 3, 'На доработку');
+insert into transitions
+  (project_id, from_id, to_id, name)
+  values
+  (1, 2, 4, 'Закрыть');
+insert into transitions
+  (project_id, from_id, to_id, name)
+  values
+  (1, 3, 2, 'Тестировать');
+
 insert into priorities
   (id, project_id, order_num, name)
   values

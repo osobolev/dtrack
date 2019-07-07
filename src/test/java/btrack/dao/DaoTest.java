@@ -1,7 +1,9 @@
 package btrack.dao;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -10,7 +12,6 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class DaoTest {
@@ -44,6 +45,8 @@ public final class DaoTest {
             return Proxy.newProxyInstance(cls.getClassLoader(), new Class<?>[] {cls}, (proxy, method, args) -> generateTestObject(method.getReturnType()));
         } else if (InputStream.class.isAssignableFrom(cls)) {
             return new ByteArrayInputStream(new byte[] {1});
+        } else if (OutputStream.class.isAssignableFrom(cls)) {
+            return new ByteArrayOutputStream();
         } else {
             throw new IllegalArgumentException("Cannot create parameter of type " + cls);
         }
@@ -102,6 +105,6 @@ public final class DaoTest {
     }
 
     public static void main(String[] args) throws Throwable {
-        testDaos(Collections.singletonList(BugsDao.class));
+        testDaos(Arrays.asList(BugViewDao.class, BugEditDao.class));
     }
 }
