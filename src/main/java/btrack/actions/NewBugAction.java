@@ -24,8 +24,7 @@ public final class NewBugAction extends Action {
         BugViewDao dao = new BugViewDao(ctx.connection);
         List<PriorityBean> priorities = dao.listPriorities(common.projectId, null);
         Map<String, Object> params = new HashMap<>();
-        params.put("user", common.user);
-        params.put("project", common.projectName);
+        common.putAll(params);
         params.put("priorities", priorities);
         TemplateUtil.process("newbug.ftl", params, resp.getWriter());
     }

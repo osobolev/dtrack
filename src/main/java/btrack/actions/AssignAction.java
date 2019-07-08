@@ -45,7 +45,7 @@ public final class AssignAction extends Action {
             resp.sendRedirect(common.getBugUrl(bugNum));
         } else {
             String error = "Другой пользователь уже изменил исполнителя";
-            new ViewBugAction(bugId, bugNum, common).render(ctx, resp, error);
+            new ViewBugAction(bugId, common).render(ctx, resp, error);
         }
     }
 }

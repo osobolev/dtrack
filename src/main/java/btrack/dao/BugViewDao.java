@@ -78,6 +78,27 @@ public final class BugViewDao extends BaseDao {
         }
     }
 
+    public List<ProjectBean> listAvailableProjects(int userId, String projectRoot) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "select id, name, description " +
+            "  from projects" +
+            " where id in (select project_id from user_access where user_id = ?)" +
+            " order by name"
+        )) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<ProjectBean> result = new ArrayList<>();
+                while (rs.next()) {
+                    int id = rs.getInt(1);
+                    String name = rs.getString(2);
+                    String description = rs.getString(3);
+                    result.add(new ProjectBean(id, name, description, projectRoot));
+                }
+                return result;
+            }
+        }
+    }
+
     public List<PriorityBean> listPriorities(int projectId, Integer defaultId) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select id, name, is_default" +
@@ -104,9 +125,14 @@ public final class BugViewDao extends BaseDao {
         }
     }
 
-    public BugBean loadBug(int bugId, int bugNum, LinkFactory linkFactory) throws SQLException {
+    private interface Conditioner {
+
+        void addWhere(PreparedStatement stmt) throws SQLException;
+    }
+
+    private List<BugBean> listBugs(LinkFactory linkFactory, String where, String orderBy, Conditioner conditioner) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select b.created, b.modified, uc.login, um.login," +
+            "select b.visible_id, b.created, b.modified, uc.login, um.login," +
             "       b.state_id, s.name, b.priority_id, p.name, b.assigned_user_id, ua.login," +
             "       b.short_text, b.full_text" +
             "  from bugs b" +
@@ -115,32 +141,48 @@ public final class BugViewDao extends BaseDao {
             "       left join users ua on b.assigned_user_id = ua.id" +
             "       join states s on b.state_id = s.id" +
             "       join priorities p on b.priority_id = p.id" +
-            " where b.id = ?"
+            " where " + where +
+            " " + orderBy
         )) {
-            stmt.setInt(1, bugId);
+            conditioner.addWhere(stmt);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (!rs.next())
-                    return null;
-                Timestamp created = rs.getTimestamp(1);
-                Timestamp modified = rs.getTimestamp(2);
-                String createdBy = rs.getString(3);
-                String modifiedBy = rs.getString(4);
-                int stateId = rs.getInt(5);
-                String state = rs.getString(6);
-                int priorityId = rs.getInt(7);
-                String priority = rs.getString(8);
-                Integer assignedUserId = getInt(rs, 9);
-                String assigned = rs.getString(10);
-                String title = rs.getString(11);
-                String html = rs.getString(12);
-                return new BugBean(
-                    bugNum, title, html, priorityId, priority,
-                    created.toLocalDateTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)), createdBy,
-                    modified.toLocalDateTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)), modifiedBy,
-                    stateId, state, assignedUserId, assigned, linkFactory
-                );
+                List<BugBean> bugs = new ArrayList<>();
+                while (rs.next()) {
+                    int bugNum = rs.getInt(1);
+                    Timestamp created = rs.getTimestamp(2);
+                    Timestamp modified = rs.getTimestamp(3);
+                    String createdBy = rs.getString(4);
+                    String modifiedBy = rs.getString(5);
+                    int stateId = rs.getInt(6);
+                    String state = rs.getString(7);
+                    int priorityId = rs.getInt(8);
+                    String priority = rs.getString(9);
+                    Integer assignedUserId = getInt(rs, 10);
+                    String assigned = rs.getString(11);
+                    String title = rs.getString(12);
+                    String html = rs.getString(13);
+                    // todo: use client locale for date formatting!!!
+                    bugs.add(new BugBean(
+                        bugNum, title, html, priorityId, priority,
+                        created.toLocalDateTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)), createdBy,
+                        modified.toLocalDateTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)), modifiedBy,
+                        stateId, state, assignedUserId, assigned, linkFactory
+                    ));
+                }
+                return bugs;
             }
         }
+    }
+
+    public BugBean loadBug(int bugId, LinkFactory linkFactory) throws SQLException {
+        List<BugBean> bugs = listBugs(linkFactory, "b.id = ?", "", stmt -> stmt.setInt(1, bugId));
+        if (bugs.size() != 1)
+            return null;
+        return bugs.get(0);
+    }
+
+    public List<BugBean> listAllBugs(int projectId, LinkFactory linkFactory) throws SQLException {
+        return listBugs(linkFactory, "b.project_id = ?", "order by b.id", stmt -> stmt.setInt(1, projectId));
     }
 
     public List<AttachmentBean> listBugAttachments(int bugId) throws SQLException {

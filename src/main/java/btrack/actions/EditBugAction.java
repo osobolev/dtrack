@@ -17,26 +17,23 @@ public final class EditBugAction extends Action {
     private static final String FILE_KEY_START = "file_";
 
     private final int bugId;
-    private final int bugNum;
     private final CommonInfo common;
 
-    public EditBugAction(int bugId, int bugNum, CommonInfo common) {
+    public EditBugAction(int bugId, CommonInfo common) {
         this.bugId = bugId;
-        this.bugNum = bugNum;
         this.common = common;
     }
 
     @Override
     public void get(Context ctx, HttpServletResponse resp) throws SQLException, ValidationException, IOException, TemplateException, NoAccessException {
         BugViewDao dao = new BugViewDao(ctx.connection);
-        BugBean bug = dao.loadBug(bugId, bugNum, common);
+        BugBean bug = dao.loadBug(bugId, common);
         if (bug == null)
             throw new NoAccessException("Bug " + bugId + " not found", HttpServletResponse.SC_NOT_FOUND);
         List<AttachmentBean> attachments = dao.listBugAttachments(bugId);
         List<PriorityBean> priorities = dao.listPriorities(common.projectId, bug.getPriorityId());
         Map<String, Object> params = new HashMap<>();
-        params.put("user", common.user);
-        params.put("project", common.projectName);
+        common.putAll(params);
         params.put("bug", bug);
         params.put("attachments", attachments);
         params.put("priorities", priorities);
@@ -46,7 +43,7 @@ public final class EditBugAction extends Action {
     @Override
     public String post(Context ctx, HttpServletRequest req) throws Exception {
         BugViewDao vdao = new BugViewDao(ctx.connection);
-        BugBean bug = vdao.loadBug(bugId, bugNum, common);
+        BugBean bug = vdao.loadBug(bugId, common);
         if (bug == null)
             throw new NoAccessException("Bug " + bugId + " not found", HttpServletResponse.SC_NOT_FOUND);
         BugEditDao dao = new BugEditDao(ctx.connection);

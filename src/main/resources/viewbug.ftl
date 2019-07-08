@@ -1,4 +1,3 @@
-<#-- @ftlvariable name="project" type="java.lang.String" -->
 <#-- @ftlvariable name="bug" type="btrack.dao.BugBean" -->
 <#-- @ftlvariable name="transitions" type="java.util.List<btrack.dao.TransitionBean>" -->
 <#-- @ftlvariable name="attachments" type="java.util.List<btrack.dao.AttachmentBean>" -->
@@ -36,7 +35,7 @@
             </div>
             Приоритет: ${bug.priority}
             <a href="${bug.editLink}">Редактировать</a>
-            Состояние: ${bug.state}
+            Статус: ${bug.state}
             <form method="post" action="${bug.assignLink}" id="assignForm">
                 <#if bug.assignedUserId??>
                 <input type="hidden" value="${bug.assignedUserId}" name="oldUserId">

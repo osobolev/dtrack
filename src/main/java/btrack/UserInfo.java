@@ -13,8 +13,4 @@ public final class UserInfo implements Serializable {
         this.id = id;
         this.displayName = displayName;
     }
-
-    public String getDisplayName() {
-        return displayName;
-    }
 }

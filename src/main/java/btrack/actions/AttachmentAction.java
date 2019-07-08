@@ -2,7 +2,6 @@ package btrack.actions;
 
 import btrack.dao.BugViewDao;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public final class AttachmentAction extends Action {

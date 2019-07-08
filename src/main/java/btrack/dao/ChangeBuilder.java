@@ -204,6 +204,7 @@ final class ChangeBuilder {
                     if (change == null)
                         continue;
                     String user = rs.getString(2);
+                    // todo: use client locale for date formatting!!!
                     String ts = rs.getTimestamp(3).toLocalDateTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM));
                     List<ChangeDetailBean> details = new ArrayList<>();
                     for (Change c : change) {

@@ -35,7 +35,7 @@ public final class MoveStateAction extends Action {
             resp.sendRedirect(common.getBugUrl(bugNum));
         } else {
             String error = "Другой пользователь уже изменил состояние";
-            new ViewBugAction(bugId, bugNum, common).render(ctx, resp, error);
+            new ViewBugAction(bugId, common).render(ctx, resp, error);
         }
     }
 }

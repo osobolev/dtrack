@@ -3,7 +3,6 @@ package btrack.actions;
 import btrack.dao.*;
 import freemarker.template.TemplateException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -15,12 +14,10 @@ import java.util.Map;
 public final class ViewBugAction extends Action {
 
     private final int bugId;
-    private final int bugNum;
     private final CommonInfo common;
 
-    public ViewBugAction(int bugId, int bugNum, CommonInfo common) {
+    public ViewBugAction(int bugId, CommonInfo common) {
         this.bugId = bugId;
-        this.bugNum = bugNum;
         this.common = common;
     }
 
@@ -31,7 +28,7 @@ public final class ViewBugAction extends Action {
 
     void render(Context ctx, HttpServletResponse resp, String error) throws SQLException, NoAccessException, IOException, TemplateException {
         BugViewDao dao = new BugViewDao(ctx.connection);
-        BugBean bug = dao.loadBug(bugId, bugNum, common);
+        BugBean bug = dao.loadBug(bugId, common);
         if (bug == null)
             throw new NoAccessException("Bug " + bugId + " not found", HttpServletResponse.SC_NOT_FOUND);
         List<TransitionBean> transitions = dao.listTransitions(common.projectId, bug.getStateId());
@@ -47,8 +44,7 @@ public final class ViewBugAction extends Action {
         }
         dao.listPossibleAssignees(common.projectId, toSkip, users);
         Map<String, Object> params = new HashMap<>();
-        params.put("user", common.user);
-        params.put("project", common.projectName);
+        common.putAll(params);
         params.put("bug", bug);
         params.put("transitions", transitions);
         params.put("attachments", attachments);

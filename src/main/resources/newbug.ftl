@@ -1,5 +1,4 @@
 <#-- @ftlvariable name="priorities" type="java.util.List<btrack.dao.PriorityBean>" -->
-<#-- @ftlvariable name="project" type="java.lang.String" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>

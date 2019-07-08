@@ -2,11 +2,13 @@ package btrack;
 
 import btrack.actions.*;
 import btrack.dao.BugViewDao;
+import btrack.dao.ProjectBean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public final class RouterServlet extends BaseServlet {
 
@@ -65,18 +67,20 @@ public final class RouterServlet extends BaseServlet {
     }
 
     protected Action getAction(Connection connection, HttpServletRequest req, UserInfo user) throws NoAccessException, SQLException, ValidationException {
-        PathInfo info = parse(req);
-        if (info.projectName != null) {
-            if (user == null) {
-                StringBuffer url = req.getRequestURL();
-                String queryString = req.getQueryString();
-                if (queryString != null) {
-                    url.append('?').append(queryString);
-                }
-                return new LoginAction(url.toString());
+        if (user == null) {
+            StringBuffer url = req.getRequestURL();
+            String queryString = req.getQueryString();
+            if (queryString != null) {
+                url.append('?').append(queryString);
             }
+            return new LoginAction(url.toString());
+        }
+        PathInfo info = parse(req);
+        BugViewDao dao = new BugViewDao(connection);
+        String projectRoot = req.getServletPath();
+        List<ProjectBean> availableProjects = dao.listAvailableProjects(user.id, projectRoot);
+        if (info.projectName != null) {
             String projectName = info.projectName;
-            BugViewDao dao = new BugViewDao(connection);
             Integer maybeProjectId = dao.getProjectId(projectName);
             if (maybeProjectId == null) {
                 throw new NoAccessException("Project not found: " + projectName, HttpServletResponse.SC_NOT_FOUND);
@@ -85,8 +89,8 @@ public final class RouterServlet extends BaseServlet {
             if (!dao.userHasAccess(projectId, user.id)) {
                 throw new NoAccessException("User " + user.id + " has no access to project " + projectName, HttpServletResponse.SC_FORBIDDEN);
             }
-            String projectBase = req.getServletPath() + "/" + projectName;
-            CommonInfo common = new CommonInfo(projectId, projectName, projectBase, user);
+            String projectBase = ProjectBean.getProjectBase(projectRoot, projectName);
+            CommonInfo common = new CommonInfo(projectId, projectName, projectBase, user, availableProjects);
             String page = info.page;
             if (info.item != null && info.num != null) {
                 int num = info.num.intValue();
@@ -98,7 +102,7 @@ public final class RouterServlet extends BaseServlet {
                     }
                     int bugId = maybeBugId.intValue();
                     if ("edit.html".equals(page)) {
-                        return new EditBugAction(bugId, num, common);
+                        return new EditBugAction(bugId, common);
                     } else if ("comment.html".equals(page)) {
                         return new AddCommentAction(bugId, num, common);
                     } else if ("assign.html".equals(page)) {
@@ -107,22 +111,22 @@ public final class RouterServlet extends BaseServlet {
                         return new MoveStateAction(bugId, num, common);
                     }
                     // todo: удаление комментов
-                    return new ViewBugAction(bugId, num, common);
+                    return new ViewBugAction(bugId, common);
                 case FILE:
                     return new AttachmentAction(false, num);
                 case CFILE:
                     return new AttachmentAction(true, num);
                 case REPORT:
-                    return null; // todo: view report action
+                    return new ViewReportAction(common);
                 }
             } else {
                 if ("newbug.html".equals(page)) {
                     return new NewBugAction(common);
                 }
             }
-            return null; // todo: view project reports action
+            return new ReportListAction(common);
         } else {
-            return null;
+            return new ProjectListAction(availableProjects, user);
         }
     }
 }
