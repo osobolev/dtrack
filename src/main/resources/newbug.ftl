@@ -45,7 +45,7 @@
 
 <script>
     $(document).ready(function () {
-        configSummer($('#summernote', '300px'));
+        configSummer($('#summernote'), '300px');
         $('#title').focus();
     });
 

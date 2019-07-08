@@ -4,11 +4,13 @@ import btrack.ProjectItem;
 
 public final class ReportBean {
 
+    private final int id;
     private final int reportNum;
     private final String title;
     private final LinkFactory linkFactory;
 
-    public ReportBean(int reportNum, String title, LinkFactory linkFactory) {
+    public ReportBean(int id, int reportNum, String title, LinkFactory linkFactory) {
+        this.id = id;
         this.reportNum = reportNum;
         this.title = title;
         this.linkFactory = linkFactory;
@@ -20,10 +22,6 @@ public final class ReportBean {
 
     public String getTitle() {
         return title;
-    }
-
-    public LinkFactory getLinkFactory() {
-        return linkFactory;
     }
 
     public String getViewLink() {

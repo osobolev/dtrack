@@ -41,7 +41,7 @@
                 <#list attachments as a>
                     <li>
                         <input type="hidden" name="file_${a.id}" value="true">
-                        <span class="bugFile">${a.name}</span><button type="button" onclick="removeAttachment(event)">Удалить</button>
+                        <span class="bugFile"><a href="${bug.getAttachmentLink(a)}">${a.name}</a></span><button type="button" onclick="removeAttachment(event)">Удалить</button>
                     </li>
                 </#list>
             </ul>
@@ -59,7 +59,7 @@
 
 <script>
     $(document).ready(function () {
-        configSummer($('#summernote', '300px'));
+        configSummer($('#summernote'), '300px');
         $('#title').focus();
     });
 

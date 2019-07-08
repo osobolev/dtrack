@@ -104,7 +104,7 @@
 
 <script>
     $(document).ready(function () {
-        configSummer($('#summernote', '200px'));
+        configSummer($('#summernote'), '200px');
     });
 
     function onFileChange() {

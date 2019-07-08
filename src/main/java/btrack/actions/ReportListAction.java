@@ -1,9 +1,9 @@
 package btrack.actions;
 
 import btrack.dao.ReportBean;
+import btrack.dao.ReportDao;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,8 @@ public final class ReportListAction extends Action {
 
     @Override
     public void get(Context ctx, HttpServletResponse resp) throws Exception {
-        List<ReportBean> reports = Collections.singletonList(new ReportBean(1, "Все баги", request));
+        ReportDao dao = new ReportDao(ctx.connection);
+        List<ReportBean> reports = dao.listReports(request.projectId, request);
         Map<String, Object> params = new HashMap<>();
         request.putTo(params);
         params.put("reports", reports);

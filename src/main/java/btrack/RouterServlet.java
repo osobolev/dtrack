@@ -3,6 +3,8 @@ package btrack;
 import btrack.actions.*;
 import btrack.dao.BugViewDao;
 import btrack.dao.ProjectBean;
+import btrack.dao.ReportBean;
+import btrack.dao.ReportDao;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -120,7 +122,12 @@ public final class RouterServlet extends BaseServlet {
                 case CFILE:
                     return new AttachmentAction(true, num);
                 case REPORT:
-                    return new ViewReportAction(request);
+                    ReportDao rdao = new ReportDao(connection);
+                    ReportBean report = rdao.loadReport(projectId, num, request);
+                    if (report == null) {
+                        throw new NoAccessException("Report not found: " + projectName + "/" + num, HttpServletResponse.SC_NOT_FOUND);
+                    }
+                    return new ViewReportAction(report, request);
                 }
             } else {
                 if ("newbug.html".equals(page)) {

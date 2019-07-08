@@ -12,7 +12,7 @@
 <body>
 <#include "header.ftl">
 <div class="container">
-    <h2>Отчеты</h2>
+    <h2>Список отчетов</h2>
     <table id="reports" class="table table-bordered table-hover" style="width: 100%;">
         <thead>
         <tr>

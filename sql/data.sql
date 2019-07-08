@@ -59,3 +59,8 @@ insert into priorities
   (id, project_id, order_num, name)
   values
   (3, 1, 3, 'Низкий');
+
+insert into reports
+  (id, project_id, visible_id, name)
+  values
+  (1, 1, 1, 'Все баги');

@@ -1,3 +1,4 @@
+<#-- @ftlvariable name="report" type="btrack.dao.ReportBean" -->
 <#-- @ftlvariable name="bugs" type="java.util.List<btrack.dao.BugBean>" -->
 <!DOCTYPE html>
 <html lang="ru">
@@ -12,6 +13,7 @@
 <body>
 <#include "header.ftl">
 <div class="container">
+    <h2>Отчет #${report.reportNum}: ${report.title}</h2>
     <table id="bugs" class="table table-bordered table-hover" style="width: 100%;">
         <thead>
         <tr>
