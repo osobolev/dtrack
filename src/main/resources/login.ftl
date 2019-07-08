@@ -1,3 +1,5 @@
+<#-- @ftlvariable name="error" type="java.lang.String" -->
+<#-- @ftlvariable name="redirect" type="java.lang.String" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -8,19 +10,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 </head>
-
 <body>
 
 <div class="container">
-    <div class="col-xs-12 col-sm-8 col-md-4 col-lg-4" style="float: none; margin: 0 auto;">
+    <div class="col-md-6" style="float: none; margin: 0 auto;">
         <div>
             <h3>Вход</h3>
-            <form action="Dashboard.jsp">
+            <#if error??>
+                <h4 class="text-danger">${error}</h4>
+            </#if>
+            <form method="post" action="/login.html">
+                <#if redirect??>
+                    <input type="hidden" value="${redirect}" name="redirect">
+                </#if>
                 <div class="form-group">
-                    <input type="email" class="form-control" placeholder="Логин">
+                    <input class="form-control" placeholder="Логин" name="login">
                 </div>
                 <div class="form-group">
-                    <input type="password" class="form-control" placeholder="Пароль">
+                    <input type="password" class="form-control" placeholder="Пароль" name="password">
                 </div>
                 <button type="submit" class="btn-primary form-control">Вход</button>
             </form>

@@ -17,7 +17,7 @@
 <body>
 <div class="container">
     <h3>Проект ${bug.project} &ndash; баг #${bug.bugNum}</h3>
-    <form method="post" action="${bug.editLink}" enctype="multipart/form-data">
+    <form method="post" action="edit.html" enctype="multipart/form-data">
         <div class="form-row">
             <div class="form-group col-md-10">
                 <label for="title">Краткое описание:</label>

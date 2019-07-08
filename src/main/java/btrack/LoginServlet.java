@@ -1,19 +1,21 @@
 package btrack;
 
-import javax.servlet.http.HttpServlet;
+import btrack.actions.Action;
+import btrack.actions.LoginAction;
+import btrack.actions.NoAccessException;
+import btrack.actions.ValidationException;
+
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-public final class LoginServlet extends HttpServlet {
+public final class LoginServlet extends BaseServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // todo
+    public LoginServlet(ConnectionProducer dataSource) {
+        super(dataSource);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // todo
+    protected Action getAction(Connection connection, HttpServletRequest req, Integer maybeUserId) throws NoAccessException, SQLException, ValidationException {
+        return new LoginAction(null);
     }
 }

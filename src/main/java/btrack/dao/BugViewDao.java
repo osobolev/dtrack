@@ -15,6 +15,22 @@ public final class BugViewDao extends BaseDao {
         super(connection);
     }
 
+    // todo: use passHash!!!
+    public Integer checkLogin(String login, byte[] passHash) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "select id" +
+            "  from users" +
+            " where login = ?"
+        )) {
+            stmt.setString(1, login);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next())
+                    return null;
+                return rs.getInt(1);
+            }
+        }
+    }
+
     public Integer getProjectId(String projectName) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select p.id" +

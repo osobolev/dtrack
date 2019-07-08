@@ -2,24 +2,16 @@ package btrack;
 
 import btrack.actions.*;
 import btrack.dao.BugViewDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public final class RouterServlet extends HttpServlet {
-
-    private final Logger logger = LoggerFactory.getLogger(RouterServlet.class);
-
-    private final ConnectionProducer dataSource;
+public final class RouterServlet extends BaseServlet {
 
     public RouterServlet(ConnectionProducer dataSource) {
-        this.dataSource = dataSource;
+        super(dataSource);
     }
 
     private static final class PathInfo {
@@ -72,11 +64,16 @@ public final class RouterServlet extends HttpServlet {
         }
     }
 
-    private static Action getAction(Connection connection, PathInfo info, Integer maybeUserId) throws NoAccessException, SQLException {
+    protected Action getAction(Connection connection, HttpServletRequest req, Integer maybeUserId) throws NoAccessException, SQLException, ValidationException {
+        PathInfo info = parse(req);
         if (info.projectName != null) {
             if (maybeUserId == null) {
-                // todo: redirect to login page!!!
-                throw new NoAccessException("User not logged in", HttpServletResponse.SC_UNAUTHORIZED);
+                StringBuffer url = req.getRequestURL();
+                String queryString = req.getQueryString();
+                if (queryString != null) {
+                    url.append('?').append(queryString);
+                }
+                return new LoginAction(url.toString());
             }
             int userId = maybeUserId.intValue();
             String projectName = info.projectName;
@@ -125,52 +122,5 @@ public final class RouterServlet extends HttpServlet {
         } else {
             return null;
         }
-    }
-
-    private void perform(boolean get, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
-        try (Connection connection = dataSource.getConnection()) {
-            PathInfo info = parse(req);
-            Integer userId = (Integer) req.getSession().getAttribute("userId");
-            if (userId == null) {
-                userId = 1; // todo!!! remove later
-            }
-            Action action = getAction(connection, info, userId);
-            if (action == null) {
-                if (get) {
-                    // todo: show index page with login link
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-                } else {
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-                }
-            } else {
-                Context ctx = new Context(connection);
-                if (get) {
-                    action.get(ctx, req, resp);
-                } else {
-                    action.post(ctx, req, resp);
-                }
-            }
-        } catch (NoAccessException ex) {
-            logger.error(ex.getMessage());
-            resp.sendError(ex.code);
-        } catch (ValidationException ex) {
-            logger.error(ex.getMessage());
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-        } catch (Exception ex) {
-            logger.error("Error", ex);
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        perform(true, req, resp);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        perform(false, req, resp);
     }
 }
