@@ -15,12 +15,12 @@ import java.util.Map;
 
 public final class LoginAction extends Action {
 
-    private final String webRoot;
     private final String redirectTo;
+    private final RequestInfo request;
 
-    public LoginAction(String webRoot, String redirectTo) {
-        this.webRoot = webRoot;
+    public LoginAction(String redirectTo, RequestInfo request) {
         this.redirectTo = redirectTo;
+        this.request = request;
     }
 
     private void render(HttpServletResponse resp, String login, String error) throws IOException, TemplateException {
@@ -28,7 +28,7 @@ public final class LoginAction extends Action {
         params.put("redirect", redirectTo);
         params.put("error", error);
         params.put("login", login == null ? "" : login);
-        params.put("webRoot", webRoot);
+        request.putTo(params);
         TemplateUtil.process("login.ftl", params, resp.getWriter());
     }
 
@@ -57,7 +57,7 @@ public final class LoginAction extends Action {
             req.getSession().setAttribute(UserInfo.ATTRIBUTE, new UserInfo(userId.intValue(), login));
             String to;
             if (redirect == null) {
-                to = webRoot + "/";
+                to = request.getWebRoot() + "/";
             } else {
                 to = redirect;
             }

@@ -17,7 +17,7 @@ final class BugData {
         this.priorityId = priorityId;
     }
 
-    static BugData create(BugEditDao dao, CommonInfo common, Map<String, String> parameters) throws ValidationException, SQLException {
+    static BugData create(BugEditDao dao, ProjectInfo request, Map<String, String> parameters) throws ValidationException, SQLException {
         String title = parameters.get("title");
         if (title == null)
             throw new ValidationException("Missing 'title' parameter");
@@ -29,8 +29,8 @@ final class BugData {
             throw new ValidationException("Missing 'priority' parameter");
         String safeHtml = UploadUtil.POLICY.sanitize(untrustedHtml);
         int priorityId = Context.parseInt(priority);
-        if (!dao.validatePriority(common.projectId, priorityId)) {
-            throw new ValidationException("Wrong priority " + priorityId + " for project " + common.projectName);
+        if (!dao.validatePriority(request.projectId, priorityId)) {
+            throw new ValidationException("Wrong priority " + priorityId + " for project " + request.projectName);
         }
         return new BugData(title, safeHtml, priorityId);
     }

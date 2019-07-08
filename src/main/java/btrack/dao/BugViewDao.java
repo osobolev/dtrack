@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.*;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -161,11 +159,10 @@ public final class BugViewDao extends BaseDao {
                     String assigned = rs.getString(11);
                     String title = rs.getString(12);
                     String html = rs.getString(13);
-                    // todo: use client locale for date formatting!!!
                     bugs.add(new BugBean(
                         bugNum, title, html, priorityId, priority,
-                        created.toLocalDateTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)), createdBy,
-                        modified.toLocalDateTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)), modifiedBy,
+                        created.toLocalDateTime(), createdBy,
+                        modified.toLocalDateTime(), modifiedBy,
                         stateId, state, assignedUserId, assigned, linkFactory
                     ));
                 }
@@ -206,8 +203,8 @@ public final class BugViewDao extends BaseDao {
         }
     }
 
-    public List<ChangeBean> loadBugHistory(int bugId) throws SQLException {
-        return new ChangeBuilder(connection).loadBugHistory(bugId);
+    public List<ChangeBean> loadBugHistory(int bugId, LinkFactory linkFactory) throws SQLException {
+        return new ChangeBuilder(connection).loadBugHistory(bugId, linkFactory);
     }
 
     public void listPossibleAssignees(int projectId, Integer toSkip, List<UserBean> result) throws SQLException {

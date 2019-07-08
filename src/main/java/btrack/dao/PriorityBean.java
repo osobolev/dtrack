@@ -12,8 +12,8 @@ public final class PriorityBean {
         this.isDefault = isDefault;
     }
 
-    public int getId() {
-        return id;
+    public String getId() {
+        return String.valueOf(id);
     }
 
     public String getName() {

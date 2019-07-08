@@ -48,7 +48,7 @@ CREATE TABLE reports (
   project_id INT NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
   visible_id INT NOT NULL,
   name TEXT NOT NULL,
-  sql_query TEXT NOT NULL,
+  sql_query TEXT NOT NULL, -- order: visible_id, created, modified, state_id->order_num, priority_id->order_num, 
     UNIQUE (project_id, visible_id)
 );
 

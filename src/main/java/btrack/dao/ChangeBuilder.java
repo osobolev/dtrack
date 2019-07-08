@@ -4,8 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+import java.time.LocalDateTime;
 import java.util.*;
 
 final class ChangeBuilder {
@@ -56,7 +55,7 @@ final class ChangeBuilder {
         changes.computeIfAbsent(id, k -> new ArrayList<>()).add(change);
     }
 
-    List<ChangeBean> loadBugHistory(int bugId) throws SQLException {
+    List<ChangeBean> loadBugHistory(int bugId, LinkFactory linkFactory) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select cf.change_id," +
             "       au1.login, au2.login," +
@@ -204,8 +203,7 @@ final class ChangeBuilder {
                     if (change == null)
                         continue;
                     String user = rs.getString(2);
-                    // todo: use client locale for date formatting!!!
-                    String ts = rs.getTimestamp(3).toLocalDateTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM));
+                    LocalDateTime ts = rs.getTimestamp(3).toLocalDateTime();
                     List<ChangeDetailBean> details = new ArrayList<>();
                     for (Change c : change) {
                         ChangeDetailBean detail;
@@ -234,7 +232,7 @@ final class ChangeBuilder {
                     }
                     if (details.isEmpty())
                         continue;
-                    result.add(new ChangeBean(id, user, ts, details));
+                    result.add(new ChangeBean(id, user, ts, details, linkFactory));
                 }
             }
         }

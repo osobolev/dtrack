@@ -2,24 +2,26 @@ package btrack.dao;
 
 import btrack.ProjectItem;
 
+import java.time.LocalDateTime;
+
 public final class BugBean {
 
     private final int bugNum;
     private final String title;
     private final String html;
-    private final int priorityId;
+    public final int priorityId;
     private final String priority;
-    private final String created;
+    private final LocalDateTime created;
     private final String createdBy;
-    private final String lastUpdated;
+    private final LocalDateTime lastUpdated;
     private final String lastUpdatedBy;
-    private final int stateId;
+    public final int stateId;
     private final String state;
     private final Integer assignedUserId;
     private final String assignedUser;
     private final LinkFactory linkFactory;
 
-    public BugBean(int bugNum, String title, String html, int priorityId, String priority, String created, String createdBy, String lastUpdated, String lastUpdatedBy, int stateId, String state, Integer assignedUserId, String assignedUser, LinkFactory linkFactory) {
+    public BugBean(int bugNum, String title, String html, int priorityId, String priority, LocalDateTime created, String createdBy, LocalDateTime lastUpdated, String lastUpdatedBy, int stateId, String state, Integer assignedUserId, String assignedUser, LinkFactory linkFactory) {
         this.bugNum = bugNum;
         this.title = title;
         this.html = html;
@@ -36,8 +38,8 @@ public final class BugBean {
         this.linkFactory = linkFactory;
     }
 
-    public int getBugNum() {
-        return bugNum;
+    public String getBugNum() {
+        return String.valueOf(bugNum);
     }
 
     public String getTitle() {
@@ -48,16 +50,16 @@ public final class BugBean {
         return html;
     }
 
-    public int getPriorityId() {
-        return priorityId;
-    }
-
     public String getPriority() {
         return priority;
     }
 
     public String getCreated() {
-        return created;
+        return linkFactory.localDate(created);
+    }
+
+    public String getCreatedISO() {
+        return DateFormatter.isoDate(created);
     }
 
     public String getCreatedBy() {
@@ -65,15 +67,19 @@ public final class BugBean {
     }
 
     public String getLastUpdated() {
-        return lastUpdated;
+        return linkFactory.localDate(lastUpdated);
+    }
+
+    public String getLastUpdatedISO() {
+        return DateFormatter.isoDate(lastUpdated);
     }
 
     public String getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public int getStateId() {
-        return stateId;
+    public String getStateId() {
+        return String.valueOf(stateId);
     }
 
     public String getState() {
@@ -93,7 +99,7 @@ public final class BugBean {
     }
 
     public boolean isAssigned(UserBean user) {
-        return assignedUserId != null && assignedUserId.intValue() == user.getId();
+        return assignedUserId != null && assignedUserId.intValue() == user.id;
     }
 
     public String getViewLink() {
@@ -117,10 +123,10 @@ public final class BugBean {
     }
 
     public String getAttachmentLink(AttachmentBean attachment) {
-        return linkFactory.getItemUrl(ProjectItem.FILE, attachment.getId(), attachment.getName());
+        return linkFactory.getItemUrl(ProjectItem.FILE, attachment.id, attachment.getName());
     }
 
     public String getCommentAttachmentLink(AttachmentBean attachment) {
-        return linkFactory.getItemUrl(ProjectItem.CFILE, attachment.getId(), attachment.getName());
+        return linkFactory.getItemUrl(ProjectItem.CFILE, attachment.id, attachment.getName());
     }
 }

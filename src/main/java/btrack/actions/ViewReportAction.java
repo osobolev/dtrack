@@ -10,18 +10,18 @@ import java.util.Map;
 
 public final class ViewReportAction extends Action {
 
-    private final CommonInfo common;
+    private final ProjectInfo request;
 
-    public ViewReportAction(CommonInfo common) {
-        this.common = common;
+    public ViewReportAction(ProjectInfo request) {
+        this.request = request;
     }
 
     @Override
     public void get(Context ctx, HttpServletResponse resp) throws Exception {
         BugViewDao dao = new BugViewDao(ctx.connection);
-        List<BugBean> bugs = dao.listAllBugs(common.projectId, common);
+        List<BugBean> bugs = dao.listAllBugs(request.projectId, request);
         Map<String, Object> params = new HashMap<>();
-        common.putAll(params);
+        request.putTo(params);
         params.put("bugs", bugs);
         TemplateUtil.process("buglist.ftl", params, resp.getWriter());
     }

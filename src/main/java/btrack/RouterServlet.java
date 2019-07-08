@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 
 public final class RouterServlet extends BaseServlet {
 
@@ -67,14 +68,15 @@ public final class RouterServlet extends BaseServlet {
     }
 
     protected Action getAction(Connection connection, HttpServletRequest req, UserInfo user) throws NoAccessException, SQLException, ValidationException {
-        String webRoot = Context.getWebRoot(req);
+        String webRoot = RequestInfo.getWebRoot(req);
+        Locale clientLocale = RequestInfo.getClientLocale(req);
         if (user == null) {
             StringBuilder url = new StringBuilder(req.getRequestURI());
             String queryString = req.getQueryString();
             if (queryString != null) {
                 url.append('?').append(queryString);
             }
-            return new LoginAction(webRoot, url.toString());
+            return new LoginAction(url.toString(), new RequestInfo(webRoot, clientLocale));
         }
         PathInfo info = parse(req);
         BugViewDao dao = new BugViewDao(connection);
@@ -91,7 +93,7 @@ public final class RouterServlet extends BaseServlet {
                 throw new NoAccessException("User " + user.id + " has no access to project " + projectName, HttpServletResponse.SC_FORBIDDEN);
             }
             String projectBase = ProjectBean.getProjectBase(projectRoot, projectName);
-            CommonInfo common = new CommonInfo(projectId, projectName, webRoot, projectBase, user, availableProjects);
+            ProjectInfo request = new ProjectInfo(webRoot, clientLocale, user, availableProjects, projectId, projectName, projectBase);
             String page = info.page;
             if (info.item != null && info.num != null) {
                 int num = info.num.intValue();
@@ -103,31 +105,31 @@ public final class RouterServlet extends BaseServlet {
                     }
                     int bugId = maybeBugId.intValue();
                     if ("edit.html".equals(page)) {
-                        return new EditBugAction(bugId, common);
+                        return new EditBugAction(bugId, request);
                     } else if ("comment.html".equals(page)) {
-                        return new AddCommentAction(bugId, num, common);
+                        return new AddCommentAction(bugId, num, request);
                     } else if ("assign.html".equals(page)) {
-                        return new AssignAction(bugId, num, common);
+                        return new AssignAction(bugId, num, request);
                     } else if ("move.html".equals(page)) {
-                        return new MoveStateAction(bugId, num, common);
+                        return new MoveStateAction(bugId, num, request);
                     }
                     // todo: удаление комментов
-                    return new ViewBugAction(bugId, common);
+                    return new ViewBugAction(bugId, request);
                 case FILE:
                     return new AttachmentAction(false, num);
                 case CFILE:
                     return new AttachmentAction(true, num);
                 case REPORT:
-                    return new ViewReportAction(common);
+                    return new ViewReportAction(request);
                 }
             } else {
                 if ("newbug.html".equals(page)) {
-                    return new NewBugAction(common);
+                    return new NewBugAction(request);
                 }
             }
-            return new ReportListAction(common);
+            return new ReportListAction(request);
         } else {
-            return new ProjectListAction(webRoot, availableProjects, user);
+            return new ProjectListAction(new LoginInfo(webRoot, clientLocale, user, availableProjects));
         }
     }
 }

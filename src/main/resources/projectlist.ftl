@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="projects" type="java.util.List<btrack.dao.ProjectBean>" -->
+<#-- @ftlvariable name="info" type="btrack.actions.RequestInfo" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -10,7 +10,7 @@
 <#include "header.ftl">
 <div class="container">
     <h1>Проекты</h1>
-    <#list projects as p>
+    <#list info.availableProjects as p>
         <h3 class="mt-4">
             <a href="${p.viewLink}">${p.name}</a>
         </h3>

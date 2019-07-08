@@ -2,7 +2,7 @@ package btrack.dao;
 
 public final class UserBean {
 
-    private final int id;
+    public final int id;
     private final String login;
 
     public UserBean(int id, String login) {
@@ -10,8 +10,8 @@ public final class UserBean {
         this.login = login;
     }
 
-    public int getId() {
-        return id;
+    public String getId() {
+        return String.valueOf(id);
     }
 
     public String getLogin() {

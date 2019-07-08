@@ -10,17 +10,17 @@ import java.util.Map;
 
 public final class ReportListAction extends Action {
 
-    private final CommonInfo common;
+    private final ProjectInfo request;
 
-    public ReportListAction(CommonInfo common) {
-        this.common = common;
+    public ReportListAction(ProjectInfo request) {
+        this.request = request;
     }
 
     @Override
     public void get(Context ctx, HttpServletResponse resp) throws Exception {
-        List<ReportBean> reports = Collections.singletonList(new ReportBean(1, "Все баги", common));
+        List<ReportBean> reports = Collections.singletonList(new ReportBean(1, "Все баги", request));
         Map<String, Object> params = new HashMap<>();
-        common.putAll(params);
+        request.putTo(params);
         params.put("reports", reports);
         TemplateUtil.process("reportlist.ftl", params, resp.getWriter());
     }

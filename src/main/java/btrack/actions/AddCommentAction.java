@@ -10,12 +10,12 @@ public final class AddCommentAction extends Action {
 
     private final int bugId;
     private final int bugNum;
-    private final CommonInfo common;
+    private final ProjectInfo request;
 
-    public AddCommentAction(int bugId, int bugNum, CommonInfo common) {
+    public AddCommentAction(int bugId, int bugNum, ProjectInfo request) {
         this.bugId = bugId;
         this.bugNum = bugNum;
-        this.common = common;
+        this.request = request;
     }
 
     private Integer createComment(BugEditDao dao, Map<String, String> parameters) throws ValidationException, SQLException {
@@ -23,7 +23,7 @@ public final class AddCommentAction extends Action {
         if (untrustedHtml == null)
             throw new ValidationException("Missing 'comment' parameter");
         String safeHtml = UploadUtil.POLICY.sanitize(untrustedHtml);
-        return dao.addBugComment(bugId, common.getUserId(), safeHtml);
+        return dao.addBugComment(bugId, request.getUserId(), safeHtml);
     }
 
     @Override
@@ -35,6 +35,6 @@ public final class AddCommentAction extends Action {
             (commentId, fileName, content) -> dao.addCommentAttachment(commentId.intValue(), fileName, content)
         );
         ctx.connection.commit();
-        return common.getBugUrl(bugNum);
+        return request.getBugUrl(bugNum);
     }
 }

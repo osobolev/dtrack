@@ -1,6 +1,6 @@
 package btrack;
 
-import btrack.actions.Context;
+import btrack.actions.RequestInfo;
 import btrack.dao.BugViewDao;
 import btrack.dao.ProjectBean;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public final class RootServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         UserInfo user = (UserInfo) req.getSession().getAttribute(UserInfo.ATTRIBUTE);
-        String webRoot = Context.getWebRoot(req);
+        String webRoot = RequestInfo.getWebRoot(req);
         if (user == null) {
             resp.sendRedirect(webRoot + "/login.html");
         } else {

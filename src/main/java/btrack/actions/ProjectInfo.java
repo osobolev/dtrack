@@ -6,38 +6,26 @@ import btrack.dao.LinkFactory;
 import btrack.dao.ProjectBean;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-public final class CommonInfo implements LinkFactory {
+public final class ProjectInfo extends LoginInfo implements LinkFactory {
 
     public final int projectId;
     public final String projectName;
-    private final String webRoot;
     private final String projectBase;
-    private final UserInfo user;
-    public final List<ProjectBean> availableProjects;
     // todo: add list of reports for current project
 
-    public CommonInfo(int projectId, String projectName, String webRoot, String projectBase, UserInfo user,
-                      List<ProjectBean> availableProjects) {
+    public ProjectInfo(String webRoot, Locale clientLocale, UserInfo user, List<ProjectBean> availableProjects,
+                       int projectId, String projectName, String projectBase) {
+        super(webRoot, clientLocale, user, availableProjects);
         this.projectId = projectId;
         this.projectName = projectName;
-        this.webRoot = webRoot;
         this.projectBase = projectBase;
-        this.user = user;
-        this.availableProjects = availableProjects;
-    }
-
-    int getUserId() {
-        return user.id;
     }
 
     public String getProjectName() {
         return projectName;
-    }
-
-    public List<ProjectBean> getAvailableProjects() {
-        return availableProjects;
     }
 
     private String getProjectUrl(String page) {
@@ -61,13 +49,9 @@ public final class CommonInfo implements LinkFactory {
         return projectBase + "/" + item.name().toLowerCase() + "/" + num + (page == null ? "" : "/" + page);
     }
 
-    void putAll(Map<String, Object> params) {
-        params.put("info", this);
-        putHeaderData(params, user, webRoot);
-    }
-
-    static void putHeaderData(Map<String, Object> params, UserInfo user, String webRoot) {
-        params.put("displayUser", user.displayName);
-        params.put("webRoot", webRoot);
+    @Override
+    void putTo(Map<String, Object> params) {
+        super.putTo(params);
+        params.put("project", this);
     }
 }

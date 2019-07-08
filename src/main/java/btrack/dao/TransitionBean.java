@@ -10,8 +10,8 @@ public final class TransitionBean {
         this.name = name;
     }
 
-    public int getToId() {
-        return toId;
+    public String getToId() {
+        return String.valueOf(toId);
     }
 
     public String getName() {

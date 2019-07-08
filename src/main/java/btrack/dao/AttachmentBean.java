@@ -2,7 +2,7 @@ package btrack.dao;
 
 public final class AttachmentBean {
 
-    private final int id;
+    public final int id;
     private final String name;
 
     public AttachmentBean(int id, String name) {
@@ -10,8 +10,8 @@ public final class AttachmentBean {
         this.name = name;
     }
 
-    public int getId() {
-        return id;
+    public String getId() {
+        return String.valueOf(id);
     }
 
     public String getName() {

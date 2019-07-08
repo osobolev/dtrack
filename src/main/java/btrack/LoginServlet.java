@@ -13,7 +13,7 @@ public final class LoginServlet extends BaseServlet {
     }
 
     protected Action getAction(Connection connection, HttpServletRequest req, UserInfo user) throws NoAccessException, SQLException, ValidationException {
-        String webRoot = Context.getWebRoot(req);
-        return new LoginAction(webRoot, null);
+        RequestInfo request = new RequestInfo(RequestInfo.getWebRoot(req), RequestInfo.getClientLocale(req));
+        return new LoginAction(null, request);
     }
 }

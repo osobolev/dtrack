@@ -13,19 +13,19 @@ import java.util.Map;
 
 public final class NewBugAction extends Action {
 
-    private final CommonInfo common;
+    private final ProjectInfo request;
 
-    public NewBugAction(CommonInfo common) {
-        this.common = common;
+    public NewBugAction(ProjectInfo request) {
+        this.request = request;
     }
 
     @Override
     public void get(Context ctx, HttpServletResponse resp) throws Exception {
         BugViewDao dao = new BugViewDao(ctx.connection);
-        List<PriorityBean> priorities = dao.listPriorities(common.projectId, null);
+        List<PriorityBean> priorities = dao.listPriorities(request.projectId, null);
         Map<String, Object> params = new HashMap<>();
-        common.putAll(params);
-        params.put("postLink", common.getNewBugUrl());
+        request.putTo(params);
+        params.put("postLink", request.getNewBugUrl());
         params.put("priorities", priorities);
         TemplateUtil.process("newbug.ftl", params, resp.getWriter());
     }
@@ -42,13 +42,13 @@ public final class NewBugAction extends Action {
     }
 
     private BugCoords createBug(BugEditDao dao, Map<String, String> parameters) throws ValidationException, SQLException {
-        BugData data = BugData.create(dao, common, parameters);
-        Integer stateId = dao.getDefaultState(common.projectId);
+        BugData data = BugData.create(dao, request, parameters);
+        Integer stateId = dao.getDefaultState(request.projectId);
         if (stateId == null) {
-            throw new ValidationException("No default state for project " + common.projectName);
+            throw new ValidationException("No default state for project " + request.projectName);
         }
-        int num = dao.getNextBugId(common.projectId);
-        int id = dao.newBug(common.projectId, common.getUserId(), num, data.priorityId, stateId.intValue(), data.title, data.safeHtml);
+        int num = dao.getNextBugId(request.projectId);
+        int id = dao.newBug(request.projectId, request.getUserId(), num, data.priorityId, stateId.intValue(), data.title, data.safeHtml);
         return new BugCoords(num, id);
     }
 
@@ -61,6 +61,6 @@ public final class NewBugAction extends Action {
             (bug, fileName, content) -> dao.addBugAttachment(bug.id, fileName, content)
         );
         ctx.connection.commit();
-        return common.getBugUrl(bugCoords.num);
+        return request.getBugUrl(bugCoords.num);
     }
 }

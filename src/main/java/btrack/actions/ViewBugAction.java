@@ -14,11 +14,11 @@ import java.util.Map;
 public final class ViewBugAction extends Action {
 
     private final int bugId;
-    private final CommonInfo common;
+    private final ProjectInfo request;
 
-    public ViewBugAction(int bugId, CommonInfo common) {
+    public ViewBugAction(int bugId, ProjectInfo request) {
         this.bugId = bugId;
-        this.common = common;
+        this.request = request;
     }
 
     @Override
@@ -28,23 +28,23 @@ public final class ViewBugAction extends Action {
 
     void render(Context ctx, HttpServletResponse resp, String error) throws SQLException, NoAccessException, IOException, TemplateException {
         BugViewDao dao = new BugViewDao(ctx.connection);
-        BugBean bug = dao.loadBug(bugId, common);
+        BugBean bug = dao.loadBug(bugId, request);
         if (bug == null)
             throw new NoAccessException("Bug " + bugId + " not found", HttpServletResponse.SC_NOT_FOUND);
-        List<TransitionBean> transitions = dao.listTransitions(common.projectId, bug.getStateId());
+        List<TransitionBean> transitions = dao.listTransitions(request.projectId, bug.stateId);
         List<AttachmentBean> attachments = dao.listBugAttachments(bugId);
-        List<ChangeBean> changes = dao.loadBugHistory(bugId);
+        List<ChangeBean> changes = dao.loadBugHistory(bugId, request);
         List<UserBean> users = new ArrayList<>();
         Integer toSkip;
-        if (bug.getAssignedUserId() != null && bug.getAssignedUserId().intValue() == common.getUserId()) {
+        if (bug.getAssignedUserId() != null && bug.getAssignedUserId().intValue() == request.getUserId()) {
             toSkip = null;
         } else {
-            toSkip = common.getUserId();
-            users.add(new UserBean(common.getUserId(), "Назначить мне"));
+            toSkip = request.getUserId();
+            users.add(new UserBean(request.getUserId(), "Назначить мне"));
         }
-        dao.listPossibleAssignees(common.projectId, toSkip, users);
+        dao.listPossibleAssignees(request.projectId, toSkip, users);
         Map<String, Object> params = new HashMap<>();
-        common.putAll(params);
+        request.putTo(params);
         params.put("bug", bug);
         params.put("transitions", transitions);
         params.put("attachments", attachments);
