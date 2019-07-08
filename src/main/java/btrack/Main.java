@@ -21,8 +21,7 @@ public final class Main {
         Logger logger = LoggerFactory.getLogger(Main.class);
         try {
             TemplateUtil.init();
-            Server server = new Server(8080);
-            ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+
             HikariConfig config = new HikariConfig();
             config.setMaximumPoolSize(10);
             config.setDriverClassName("org.postgresql.Driver");
@@ -32,6 +31,7 @@ public final class Main {
             config.setAutoCommit(false);
             config.setConnectionTestQuery("select 1");
             HikariPool pool = new HikariPool(config);
+
             ConnectionProducer dataSource = pool::getConnection;
             try (Connection connection = dataSource.getConnection()) {
                 BugEditDao dao = new BugEditDao(connection);
@@ -41,6 +41,9 @@ public final class Main {
             } catch (SQLException ex) {
                 logger.warn(ex.getMessage());
             }
+
+            Server server = new Server(8080);
+            ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
             handler.setResourceBase("src/main/webapp");
             handler.addServlet(new ServletHolder(new RouterServlet(dataSource)), "/p/*");
             handler.addServlet(new ServletHolder(new LoginServlet(dataSource)), "/login.html");

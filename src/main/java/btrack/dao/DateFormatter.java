@@ -6,7 +6,8 @@ import java.time.format.DateTimeFormatter;
 public interface DateFormatter {
 
     static String isoDate(LocalDateTime dt) {
-        return dt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        // todo: strip leading zeroes???
+        return dt.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
     }
 
     String localDate(LocalDateTime dt);

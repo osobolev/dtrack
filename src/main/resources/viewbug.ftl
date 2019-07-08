@@ -104,22 +104,11 @@
 
 <script>
     $(document).ready(function () {
-        $('#summernote').summernote({
-            lang: 'ru-RU',
-            height: '200px'
-        });
+        configSummer($('#summernote', '200px'));
     });
 
     function onFileChange() {
-        var fs = $('#files').get(0).files;
-        var buf = '';
-        for (var i = 0; i < fs.length; i++) {
-            if (buf.length > 0) {
-                buf += ', ';
-            }
-            buf += fs[i].name;
-        }
-        $('#filesLabel').text(buf);
+        filesChosen($('#files'), $('#filesLabel'));
     }
 
     function onAssignedChange() {

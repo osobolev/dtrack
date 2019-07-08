@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Список багов</title>
     <#include "head.ftl">
-    <link rel="stylesheet" type="text/css" href="DataTables-1.10.18/css/jquery.dataTables.min.css"/>
+<#--    <link rel="stylesheet" type="text/css" href="DataTables-1.10.18/css/jquery.dataTables.min.css"/>-->
     <link rel="stylesheet" type="text/css" href="DataTables-1.10.18/css/dataTables.bootstrap4.min.css"/>
     <script type="text/javascript" src="DataTables-1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="DataTables-1.10.18/js/dataTables.bootstrap4.min.js"></script>
@@ -13,7 +13,7 @@
 <body>
 <#include "header.ftl">
 <div class="container">
-    <table id="bugs" class="display" style="width: 100%;">
+    <table id="bugs" class="display compact cell-border" style="width: 100%;">
         <thead>
         <tr>
             <th>Баг</th>
@@ -41,33 +41,14 @@
 
 <script>
     $(document).ready(function () {
-        $('#bugs').DataTable({
-            "language": {
-                "decimal": "",
-                "emptyTable": "Багов не найдено",
-                "info": "Показано _START_ - _END_ из _TOTAL_ багов",
-                "infoEmpty": "Показано 0 - 0 из 0 багов",
-                "infoFiltered": "(из _MAX_ багов)",
-                "infoPostFix": "",
-                "thousands": ",",
-                "lengthMenu": "Показать _MENU_ багов",
-                "loadingRecords": "Загрузка...",
-                "processing": "Обработка...",
-                "search": "Поиск:",
-                "zeroRecords": "Ничего не найдено",
-                "paginate": {
-                    "first": "В начало",
-                    "last": "В конец",
-                    "next": "След",
-                    "previous": "Пред"
-                },
-                "aria": {
-                    "sortAscending": ": activate to sort column ascending",
-                    "sortDescending": ": activate to sort column descending"
-                }
-            },
-            "iDisplayLength": 50
-        });
+        configTable($('#bugs'), 50, 'багов', [
+            { "width": "8pt" },
+            { "width" : "50%" },
+            null,
+            { "width": "50pt" },
+            { "width": "80pt" },
+            { "width": "80pt" },
+        ]);
     });
 </script>
 
