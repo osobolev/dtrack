@@ -68,7 +68,7 @@ public final class RouterServlet extends BaseServlet {
 
     protected Action getAction(Connection connection, HttpServletRequest req, UserInfo user) throws NoAccessException, SQLException, ValidationException {
         if (user == null) {
-            StringBuffer url = req.getRequestURL();
+            StringBuilder url = new StringBuilder(req.getRequestURI());
             String queryString = req.getQueryString();
             if (queryString != null) {
                 url.append('?').append(queryString);

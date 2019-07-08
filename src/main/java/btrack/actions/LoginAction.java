@@ -51,7 +51,7 @@ public final class LoginAction extends Action {
             req.getSession().setAttribute(UserInfo.ATTRIBUTE, new UserInfo(userId.intValue(), login));
             String to;
             if (redirect == null) {
-                to = "/"; // todo: redirect to list of projects (or project, if only one accessible for this user)
+                to = "/";
             } else {
                 to = redirect;
             }

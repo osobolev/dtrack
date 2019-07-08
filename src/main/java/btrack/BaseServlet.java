@@ -32,12 +32,7 @@ abstract class BaseServlet extends HttpServlet {
             UserInfo user = (UserInfo) req.getSession().getAttribute(UserInfo.ATTRIBUTE);
             Action action = getAction(connection, req, user);
             if (action == null) {
-                if (get) {
-                    // todo: show index page with login link
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-                } else {
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-                }
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             } else {
                 Context ctx = new Context(connection);
                 if (get) {

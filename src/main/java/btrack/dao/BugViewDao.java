@@ -80,7 +80,7 @@ public final class BugViewDao extends BaseDao {
 
     public List<ProjectBean> listAvailableProjects(int userId, String projectRoot) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select id, name, description " +
+            "select id, name, description" +
             "  from projects" +
             " where id in (select project_id from user_access where user_id = ?)" +
             " order by name"
