@@ -34,6 +34,10 @@ public final class CommonInfo implements LinkFactory {
         return projectName;
     }
 
+    public List<ProjectBean> getAvailableProjects() {
+        return availableProjects;
+    }
+
     private String getProjectUrl(String page) {
         return projectBase + (page == null ? "" : "/" + page);
     }

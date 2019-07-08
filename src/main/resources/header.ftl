@@ -4,16 +4,15 @@
     <div class="navbar-collapse collapse">
         <ul class="navbar-nav mr-auto">
             <#if info??>
-            <li class="nav-item active">
+            <li class="nav-item">
                 <span class="navbar-text">Проект:</span>
             </li>
             <li class="nav-item active dropdown mr-3">
-                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">${info.projectName}</a>
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">${info.projectName}</a>
                 <div class="dropdown-menu">
-                    <#-- todo: choose between accessible projects: -->
-                    <a class="dropdown-item" href="#">Link 1</a>
-                    <a class="dropdown-item" href="#">Link 2</a>
-                    <a class="dropdown-item" href="#">Link 3</a>
+                    <#list info.availableProjects as p>
+                        <a class="dropdown-item" href="${p.viewLink}">${p.name}</a>
+                    </#list>
                 </div>
             </li>
             <li class="nav-item active mr-4">
@@ -22,6 +21,10 @@
             </li>
             <li class="nav-item active">
                 <button type="button" class="btn btn-primary" onclick="location.href='${info.newBugUrl}';">Новый баг</button>
+            </li>
+            <#else>
+            <li class="nav-item">
+                <span class="navbar-text">Выбор проекта</span>
             </li>
             </#if>
         </ul>
