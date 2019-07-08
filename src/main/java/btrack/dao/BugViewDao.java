@@ -104,7 +104,7 @@ public final class BugViewDao extends BaseDao {
         }
     }
 
-    public BugBean loadBug(String project, int bugId, int bugNum, String projectBase) throws SQLException {
+    public BugBean loadBug(int bugId, int bugNum, LinkFactory linkFactory) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select b.created, b.modified, uc.login, um.login," +
             "       b.state_id, s.name, b.priority_id, p.name, b.assigned_user_id, ua.login," +
@@ -134,10 +134,10 @@ public final class BugViewDao extends BaseDao {
                 String title = rs.getString(11);
                 String html = rs.getString(12);
                 return new BugBean(
-                    project, bugNum, title, html, priorityId, priority,
+                    bugNum, title, html, priorityId, priority,
                     created.toLocalDateTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)), createdBy,
                     modified.toLocalDateTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)), modifiedBy,
-                    stateId, state, assignedUserId, assigned, projectBase
+                    stateId, state, assignedUserId, assigned, linkFactory
                 );
             }
         }

@@ -1,6 +1,5 @@
 package btrack.actions;
 
-import btrack.AccessUtil;
 import btrack.dao.BugEditDao;
 import btrack.dao.BugViewDao;
 import btrack.dao.PriorityBean;
@@ -14,22 +13,19 @@ import java.util.Map;
 
 public final class NewBugAction extends Action {
 
-    private final int projectId;
-    private final String projectName;
-    private final int userId;
+    private final CommonInfo common;
 
-    public NewBugAction(int projectId, String projectName, int userId) {
-        this.projectId = projectId;
-        this.projectName = projectName;
-        this.userId = userId;
+    public NewBugAction(CommonInfo common) {
+        this.common = common;
     }
 
     @Override
-    public void get(Context ctx, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public void get(Context ctx, HttpServletResponse resp) throws Exception {
         BugViewDao dao = new BugViewDao(ctx.connection);
-        List<PriorityBean> priorities = dao.listPriorities(projectId, null);
+        List<PriorityBean> priorities = dao.listPriorities(common.projectId, null);
         Map<String, Object> params = new HashMap<>();
-        params.put("project", projectName);
+        params.put("user", common.user);
+        params.put("project", common.projectName);
         params.put("priorities", priorities);
         TemplateUtil.process("newbug.ftl", params, resp.getWriter());
     }
@@ -46,13 +42,13 @@ public final class NewBugAction extends Action {
     }
 
     private BugCoords createBug(BugEditDao dao, Map<String, String> parameters) throws ValidationException, SQLException {
-        BugData data = BugData.create(dao, projectId, parameters);
-        Integer stateId = dao.getDefaultState(projectId);
+        BugData data = BugData.create(dao, common, parameters);
+        Integer stateId = dao.getDefaultState(common.projectId);
         if (stateId == null) {
-            throw new ValidationException("No default state for project " + projectId);
+            throw new ValidationException("No default state for project " + common.projectName);
         }
-        int num = dao.getNextBugId(projectId);
-        int id = dao.newBug(projectId, userId, num, data.priorityId, stateId.intValue(), data.title, data.safeHtml);
+        int num = dao.getNextBugId(common.projectId);
+        int id = dao.newBug(common.projectId, common.getUserId(), num, data.priorityId, stateId.intValue(), data.title, data.safeHtml);
         return new BugCoords(num, id);
     }
 
@@ -65,6 +61,6 @@ public final class NewBugAction extends Action {
             (bug, fileName, content) -> dao.addBugAttachment(bug.id, fileName, content)
         );
         ctx.connection.commit();
-        return AccessUtil.getBugUrl(req, projectName, bugCoords.num);
+        return common.getBugUrl(bugCoords.num);
     }
 }

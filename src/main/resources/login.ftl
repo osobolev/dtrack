@@ -1,5 +1,6 @@
 <#-- @ftlvariable name="error" type="java.lang.String" -->
 <#-- @ftlvariable name="redirect" type="java.lang.String" -->
+<#-- @ftlvariable name="login" type="java.lang.String" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -9,6 +10,7 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <link href="/style.css" rel="stylesheet">
 </head>
 <body>
 
@@ -24,7 +26,7 @@
                     <input type="hidden" value="${redirect}" name="redirect">
                 </#if>
                 <div class="form-group">
-                    <input class="form-control" placeholder="Логин" name="login">
+                    <input class="form-control" placeholder="Логин" name="login" value="${login}">
                 </div>
                 <div class="form-group">
                     <input type="password" class="form-control" placeholder="Пароль" name="password">

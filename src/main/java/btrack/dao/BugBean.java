@@ -1,11 +1,9 @@
 package btrack.dao;
 
-import btrack.AccessUtil;
 import btrack.ProjectItem;
 
 public final class BugBean {
 
-    private final String project;
     private final int bugNum;
     private final String title;
     private final String html;
@@ -19,10 +17,9 @@ public final class BugBean {
     private final String state;
     private final Integer assignedUserId;
     private final String assignedUser;
-    private final String projectBase;
+    private final LinkFactory linkFactory;
 
-    public BugBean(String project, int bugNum, String title, String html, int priorityId, String priority, String created, String createdBy, String lastUpdated, String lastUpdatedBy, int stateId, String state, Integer assignedUserId, String assignedUser, String projectBase) {
-        this.project = project;
+    public BugBean(int bugNum, String title, String html, int priorityId, String priority, String created, String createdBy, String lastUpdated, String lastUpdatedBy, int stateId, String state, Integer assignedUserId, String assignedUser, LinkFactory linkFactory) {
         this.bugNum = bugNum;
         this.title = title;
         this.html = html;
@@ -36,11 +33,7 @@ public final class BugBean {
         this.state = state;
         this.assignedUserId = assignedUserId;
         this.assignedUser = assignedUser;
-        this.projectBase = projectBase;
-    }
-
-    public String getProject() {
-        return project;
+        this.linkFactory = linkFactory;
     }
 
     public int getBugNum() {
@@ -104,30 +97,30 @@ public final class BugBean {
     }
 
     public String getViewLink() {
-        return AccessUtil.getItemUrl(projectBase, ProjectItem.BUG, bugNum, null);
+        return linkFactory.getItemUrl(ProjectItem.BUG, bugNum, null);
     }
 
     public String getEditLink() {
-        return AccessUtil.getItemUrl(projectBase, ProjectItem.BUG, bugNum, "edit.html");
+        return linkFactory.getItemUrl(ProjectItem.BUG, bugNum, "edit.html");
     }
 
     public String getCommentLink() {
-        return AccessUtil.getItemUrl(projectBase, ProjectItem.BUG, bugNum, "comment.html");
+        return linkFactory.getItemUrl(ProjectItem.BUG, bugNum, "comment.html");
     }
 
     public String getAssignLink() {
-        return AccessUtil.getItemUrl(projectBase, ProjectItem.BUG, bugNum, "assign.html");
+        return linkFactory.getItemUrl(ProjectItem.BUG, bugNum, "assign.html");
     }
 
     public String getMoveLink() {
-        return AccessUtil.getItemUrl(projectBase, ProjectItem.BUG, bugNum, "move.html");
+        return linkFactory.getItemUrl(ProjectItem.BUG, bugNum, "move.html");
     }
 
     public String getAttachmentLink(AttachmentBean attachment) {
-        return AccessUtil.getItemUrl(projectBase, ProjectItem.FILE, attachment.getId(), attachment.getName());
+        return linkFactory.getItemUrl(ProjectItem.FILE, attachment.getId(), attachment.getName());
     }
 
     public String getCommentAttachmentLink(AttachmentBean attachment) {
-        return AccessUtil.getItemUrl(projectBase, ProjectItem.CFILE, attachment.getId(), attachment.getName());
+        return linkFactory.getItemUrl(ProjectItem.CFILE, attachment.getId(), attachment.getName());
     }
 }

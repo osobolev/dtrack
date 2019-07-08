@@ -8,18 +8,14 @@ import javax.servlet.http.HttpServletResponse;
 
 public final class MoveStateAction extends Action {
 
-    private final int projectId;
-    private final String projectName;
     private final int bugId;
     private final int bugNum;
-    private final int userId;
+    private final CommonInfo common;
 
-    public MoveStateAction(int projectId, String projectName, int bugId, int bugNum, int userId) {
-        this.projectId = projectId;
-        this.projectName = projectName;
+    public MoveStateAction(int bugId, int bugNum, CommonInfo common) {
         this.bugId = bugId;
         this.bugNum = bugNum;
-        this.userId = userId;
+        this.common = common;
     }
 
     @Override
@@ -29,17 +25,17 @@ public final class MoveStateAction extends Action {
         int fromId = AccessUtil.parseInt(from);
         int toId = AccessUtil.parseInt(to);
         BugEditDao dao = new BugEditDao(ctx.connection);
-        if (!dao.validateTransition(projectId, fromId, toId)) {
+        if (!dao.validateTransition(common.projectId, fromId, toId)) {
             throw new ValidationException("Cannot move from " + fromId + " to " + toId);
         }
         Integer[] changeBox = new Integer[1];
-        boolean ok = dao.changeBugState(bugId, userId, changeBox, fromId, toId);
+        boolean ok = dao.changeBugState(bugId, common.getUserId(), changeBox, fromId, toId);
         if (ok) {
             ctx.connection.commit();
-            resp.sendRedirect(AccessUtil.getBugUrl(req, projectName, bugNum));
+            resp.sendRedirect(common.getBugUrl(bugNum));
         } else {
             String error = "Другой пользователь уже изменил состояние";
-            new ViewBugAction(projectId, projectName, bugId, bugNum, userId).render(ctx, req, resp, error);
+            new ViewBugAction(bugId, bugNum, common).render(ctx, resp, error);
         }
     }
 }

@@ -1,6 +1,5 @@
 package btrack.actions;
 
-import btrack.AccessUtil;
 import btrack.dao.*;
 import freemarker.template.TemplateException;
 
@@ -15,44 +14,41 @@ import java.util.Map;
 
 public final class ViewBugAction extends Action {
 
-    private final int projectId;
-    private final String projectName;
     private final int bugId;
     private final int bugNum;
-    private final int userId;
+    private final CommonInfo common;
 
-    public ViewBugAction(int projectId, String projectName, int bugId, int bugNum, int userId) {
-        this.projectId = projectId;
-        this.projectName = projectName;
+    public ViewBugAction(int bugId, int bugNum, CommonInfo common) {
         this.bugId = bugId;
         this.bugNum = bugNum;
-        this.userId = userId;
+        this.common = common;
     }
 
     @Override
-    public void get(Context ctx, HttpServletRequest req, HttpServletResponse resp) throws SQLException, ValidationException, IOException, TemplateException, NoAccessException {
-        render(ctx, req, resp, null);
+    public void get(Context ctx, HttpServletResponse resp) throws SQLException, ValidationException, IOException, TemplateException, NoAccessException {
+        render(ctx, resp, null);
     }
 
-    void render(Context ctx, HttpServletRequest req, HttpServletResponse resp, String error) throws SQLException, NoAccessException, IOException, TemplateException {
+    void render(Context ctx, HttpServletResponse resp, String error) throws SQLException, NoAccessException, IOException, TemplateException {
         BugViewDao dao = new BugViewDao(ctx.connection);
-        String projectBase = AccessUtil.getProjectBase(req, projectName);
-        BugBean bug = dao.loadBug(projectName, bugId, bugNum, projectBase);
+        BugBean bug = dao.loadBug(bugId, bugNum, common);
         if (bug == null)
             throw new NoAccessException("Bug " + bugId + " not found", HttpServletResponse.SC_NOT_FOUND);
-        List<TransitionBean> transitions = dao.listTransitions(projectId, bug.getStateId());
+        List<TransitionBean> transitions = dao.listTransitions(common.projectId, bug.getStateId());
         List<AttachmentBean> attachments = dao.listBugAttachments(bugId);
         List<ChangeBean> changes = dao.loadBugHistory(bugId);
         List<UserBean> users = new ArrayList<>();
         Integer toSkip;
-        if (bug.getAssignedUserId() != null && bug.getAssignedUserId().intValue() == userId) {
+        if (bug.getAssignedUserId() != null && bug.getAssignedUserId().intValue() == common.getUserId()) {
             toSkip = null;
         } else {
-            toSkip = userId;
-            users.add(new UserBean(userId, "Назначить мне"));
+            toSkip = common.getUserId();
+            users.add(new UserBean(common.getUserId(), "Назначить мне"));
         }
-        dao.listPossibleAssignees(projectId, toSkip, users);
+        dao.listPossibleAssignees(common.projectId, toSkip, users);
         Map<String, Object> params = new HashMap<>();
+        params.put("user", common.user);
+        params.put("project", common.projectName);
         params.put("bug", bug);
         params.put("transitions", transitions);
         params.put("attachments", attachments);

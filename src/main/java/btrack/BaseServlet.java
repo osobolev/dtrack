@@ -23,14 +23,14 @@ abstract class BaseServlet extends HttpServlet {
         this.dataSource = dataSource;
     }
 
-    protected abstract Action getAction(Connection connection, HttpServletRequest req, Integer maybeUserId) throws Exception;
+    protected abstract Action getAction(Connection connection, HttpServletRequest req, UserInfo user) throws Exception;
 
-    private final void perform(boolean get, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void perform(boolean get, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         try (Connection connection = dataSource.getConnection()) {
-            Integer userId = (Integer) req.getSession().getAttribute("userId");
-            Action action = getAction(connection, req, userId);
+            UserInfo user = (UserInfo) req.getSession().getAttribute(UserInfo.ATTRIBUTE);
+            Action action = getAction(connection, req, user);
             if (action == null) {
                 if (get) {
                     // todo: show index page with login link
@@ -41,7 +41,7 @@ abstract class BaseServlet extends HttpServlet {
             } else {
                 Context ctx = new Context(connection);
                 if (get) {
-                    action.get(ctx, req, resp);
+                    action.get(ctx, resp);
                 } else {
                     action.post(ctx, req, resp);
                 }

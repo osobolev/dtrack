@@ -64,10 +64,10 @@ public final class RouterServlet extends BaseServlet {
         }
     }
 
-    protected Action getAction(Connection connection, HttpServletRequest req, Integer maybeUserId) throws NoAccessException, SQLException, ValidationException {
+    protected Action getAction(Connection connection, HttpServletRequest req, UserInfo user) throws NoAccessException, SQLException, ValidationException {
         PathInfo info = parse(req);
         if (info.projectName != null) {
-            if (maybeUserId == null) {
+            if (user == null) {
                 StringBuffer url = req.getRequestURL();
                 String queryString = req.getQueryString();
                 if (queryString != null) {
@@ -75,7 +75,6 @@ public final class RouterServlet extends BaseServlet {
                 }
                 return new LoginAction(url.toString());
             }
-            int userId = maybeUserId.intValue();
             String projectName = info.projectName;
             BugViewDao dao = new BugViewDao(connection);
             Integer maybeProjectId = dao.getProjectId(projectName);
@@ -83,9 +82,11 @@ public final class RouterServlet extends BaseServlet {
                 throw new NoAccessException("Project not found: " + projectName, HttpServletResponse.SC_NOT_FOUND);
             }
             int projectId = maybeProjectId.intValue();
-            if (!dao.userHasAccess(projectId, userId)) {
-                throw new NoAccessException("User " + userId + " has no access to project " + projectName, HttpServletResponse.SC_FORBIDDEN);
+            if (!dao.userHasAccess(projectId, user.id)) {
+                throw new NoAccessException("User " + user.id + " has no access to project " + projectName, HttpServletResponse.SC_FORBIDDEN);
             }
+            String projectBase = req.getServletPath() + "/" + projectName;
+            CommonInfo common = new CommonInfo(projectId, projectName, projectBase, user);
             String page = info.page;
             if (info.item != null && info.num != null) {
                 int num = info.num.intValue();
@@ -97,15 +98,16 @@ public final class RouterServlet extends BaseServlet {
                     }
                     int bugId = maybeBugId.intValue();
                     if ("edit.html".equals(page)) {
-                        return new EditBugAction(projectId, projectName, bugId, num, userId);
+                        return new EditBugAction(bugId, num, common);
                     } else if ("comment.html".equals(page)) {
-                        return new AddCommentAction(projectName, bugId, num, userId);
+                        return new AddCommentAction(bugId, num, common);
                     } else if ("assign.html".equals(page)) {
-                        return new AssignAction(projectId, projectName, bugId, num, userId);
+                        return new AssignAction(bugId, num, common);
                     } else if ("move.html".equals(page)) {
-                        return new MoveStateAction(projectId, projectName, bugId, num, userId);
+                        return new MoveStateAction(bugId, num, common);
                     }
-                    return new ViewBugAction(projectId, projectName, bugId, num, userId);
+                    // todo: удаление комментов
+                    return new ViewBugAction(bugId, num, common);
                 case FILE:
                     return new AttachmentAction(false, num);
                 case CFILE:
@@ -115,7 +117,7 @@ public final class RouterServlet extends BaseServlet {
                 }
             } else {
                 if ("newbug.html".equals(page)) {
-                    return new NewBugAction(projectId, projectName, userId);
+                    return new NewBugAction(common);
                 }
             }
             return null; // todo: view project reports action

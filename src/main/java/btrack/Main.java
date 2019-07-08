@@ -40,6 +40,7 @@ public final class Main {
         handler.setResourceBase("src/main/webapp");
         handler.addServlet(new ServletHolder(new RouterServlet(dataSource)), "/p/*");
         handler.addServlet(new ServletHolder(new LoginServlet(dataSource)), "/login.html");
+        handler.addServlet(new ServletHolder(new LogoutServlet()), "/logout.html");
         handler.addServlet(DefaultServlet.class, "/");
         server.setHandler(handler);
         server.start();

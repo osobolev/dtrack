@@ -1,5 +1,6 @@
 package btrack.actions;
 
+import btrack.UserInfo;
 import btrack.dao.BugViewDao;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +20,10 @@ public final class LoginAction extends Action {
     }
 
     @Override
-    public void get(Context ctx, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public void get(Context ctx, HttpServletResponse resp) throws Exception {
         Map<String, Object> params = new HashMap<>();
         params.put("redirect", redirectTo);
+        params.put("login", "");
         TemplateUtil.process("login.ftl", params, resp.getWriter());
     }
 
@@ -43,9 +45,10 @@ public final class LoginAction extends Action {
             Map<String, Object> params = new HashMap<>();
             params.put("redirect", redirect);
             params.put("error", "Неправильный логин или пароль");
+            params.put("login", login == null ? "" : login);
             TemplateUtil.process("login.ftl", params, resp.getWriter());
         } else {
-            req.getSession().setAttribute("userId", userId);
+            req.getSession().setAttribute(UserInfo.ATTRIBUTE, new UserInfo(userId.intValue(), login));
             String to;
             if (redirect == null) {
                 to = "/"; // todo: redirect to list of projects (or project, if only one accessible for this user)

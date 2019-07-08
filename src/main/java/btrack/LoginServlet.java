@@ -15,7 +15,7 @@ public final class LoginServlet extends BaseServlet {
         super(dataSource);
     }
 
-    protected Action getAction(Connection connection, HttpServletRequest req, Integer maybeUserId) throws NoAccessException, SQLException, ValidationException {
+    protected Action getAction(Connection connection, HttpServletRequest req, UserInfo user) throws NoAccessException, SQLException, ValidationException {
         return new LoginAction(null);
     }
 }

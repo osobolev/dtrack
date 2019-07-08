@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public abstract class Action {
 
-    public void get(Context ctx, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public void get(Context ctx, HttpServletResponse resp) throws Exception {
         throw new NoAccessException("Not implemented", HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 

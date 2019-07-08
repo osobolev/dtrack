@@ -9,18 +9,14 @@ import javax.servlet.http.HttpServletResponse;
 
 public final class AssignAction extends Action {
 
-    private final int projectId;
-    private final String projectName;
     private final int bugId;
     private final int bugNum;
-    private final int userId;
+    private final CommonInfo common;
 
-    public AssignAction(int projectId, String projectName, int bugId, int bugNum, int userId) {
-        this.projectId = projectId;
-        this.projectName = projectName;
+    public AssignAction(int bugId, int bugNum, CommonInfo common) {
         this.bugId = bugId;
         this.bugNum = bugNum;
-        this.userId = userId;
+        this.common = common;
     }
 
     private static Integer parseUserId(String str) throws ValidationException {
@@ -37,19 +33,19 @@ public final class AssignAction extends Action {
         Integer newUserId = parseUserId(req.getParameter("newUserId"));
         if (newUserId != null) {
             BugViewDao vdao = new BugViewDao(ctx.connection);
-            if (!vdao.userHasAccess(projectId, newUserId.intValue())) {
-                throw new NoAccessException("User " + newUserId + " has no access to project " + projectName, HttpServletResponse.SC_FORBIDDEN);
+            if (!vdao.userHasAccess(common.projectId, newUserId.intValue())) {
+                throw new NoAccessException("User " + newUserId + " has no access to project " + common.projectName, HttpServletResponse.SC_FORBIDDEN);
             }
         }
         Integer[] changeBox = new Integer[1];
         BugEditDao dao = new BugEditDao(ctx.connection);
-        boolean ok = dao.changeAssignedUser(bugId, userId, changeBox, oldUserId, newUserId);
+        boolean ok = dao.changeAssignedUser(bugId, common.getUserId(), changeBox, oldUserId, newUserId);
         if (ok) {
             ctx.connection.commit();
-            resp.sendRedirect(AccessUtil.getBugUrl(req, projectName, bugNum));
+            resp.sendRedirect(common.getBugUrl(bugNum));
         } else {
             String error = "Другой пользователь уже изменил исполнителя";
-            new ViewBugAction(projectId, projectName, bugId, bugNum, userId).render(ctx, req, resp, error);
+            new ViewBugAction(bugId, bugNum, common).render(ctx, resp, error);
         }
     }
 }
