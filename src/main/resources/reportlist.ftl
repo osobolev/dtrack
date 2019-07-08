@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>Список отчетов</title>
     <#include "head.ftl">
-    <link rel="stylesheet" type="text/css" href="DataTables-1.10.18/css/jquery.dataTables.min.css"/>
     <link rel="stylesheet" type="text/css" href="DataTables-1.10.18/css/dataTables.bootstrap4.min.css"/>
     <script type="text/javascript" src="DataTables-1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="DataTables-1.10.18/js/dataTables.bootstrap4.min.js"></script>
@@ -14,7 +13,7 @@
 <#include "header.ftl">
 <div class="container">
     <h2>Отчеты</h2>
-    <table id="reports" class="display compact cell-border" style="width: 100%;">
+    <table id="reports" class="table table-bordered table-hover" style="width: 100%;">
         <thead>
         <tr>
             <th>Отчет</th>
@@ -24,7 +23,7 @@
         <tbody>
         <#list reports as r>
             <tr>
-                <td><a href="${r.viewLink}">#${r.reportNum}</a></td>
+                <td data-order="${r.reportNum}"><a href="${r.viewLink}">#${r.reportNum}</a></td>
                 <td><a href="${r.viewLink}">${r.title}</a></td>
             </tr>
         </#list>
