@@ -1,5 +1,6 @@
 package btrack;
 
+import btrack.actions.Context;
 import btrack.dao.BugViewDao;
 import btrack.dao.ProjectBean;
 import org.slf4j.Logger;
@@ -26,11 +27,12 @@ public final class RootServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         UserInfo user = (UserInfo) req.getSession().getAttribute(UserInfo.ATTRIBUTE);
+        String webRoot = Context.getWebRoot(req);
         if (user == null) {
-            resp.sendRedirect("/login.html");
+            resp.sendRedirect(webRoot + "/login.html");
         } else {
             try (Connection connection = dataSource.getConnection()) {
-                String projectRoot = "/p"; // todo: ???
+                String projectRoot = webRoot + "/p";
                 List<ProjectBean> projects = new BugViewDao(connection).listAvailableProjects(user.id, projectRoot);
                 if (projects.size() == 1) {
                     resp.sendRedirect(projects.get(0).getViewLink());

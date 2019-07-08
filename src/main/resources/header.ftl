@@ -33,7 +33,7 @@
                 <span class="navbar-text">Пользователь: ${displayUser}</span>
             </li>
             <li class="nav-item active">
-                <form method="post" action="/logout.html">
+                <form method="post" action="logout.html">
                     <button type="submit" class="btn btn-secondary">Выход</button>
                 </form>
             </li>

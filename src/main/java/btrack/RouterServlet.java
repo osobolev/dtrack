@@ -47,7 +47,7 @@ public final class RouterServlet extends BaseServlet {
                 if (item.name().equalsIgnoreCase(part1)) {
                     if (parts.length > 2) {
                         String strNum = parts[2];
-                        int num = AccessUtil.parseInt(strNum);
+                        int num = Context.parseInt(strNum);
                         String page;
                         if (parts.length > 3) {
                             page = parts[3];
@@ -67,17 +67,18 @@ public final class RouterServlet extends BaseServlet {
     }
 
     protected Action getAction(Connection connection, HttpServletRequest req, UserInfo user) throws NoAccessException, SQLException, ValidationException {
+        String webRoot = Context.getWebRoot(req);
         if (user == null) {
             StringBuilder url = new StringBuilder(req.getRequestURI());
             String queryString = req.getQueryString();
             if (queryString != null) {
                 url.append('?').append(queryString);
             }
-            return new LoginAction(url.toString());
+            return new LoginAction(webRoot, url.toString());
         }
         PathInfo info = parse(req);
         BugViewDao dao = new BugViewDao(connection);
-        String projectRoot = req.getServletPath();
+        String projectRoot = webRoot + req.getServletPath();
         List<ProjectBean> availableProjects = dao.listAvailableProjects(user.id, projectRoot);
         if (info.projectName != null) {
             String projectName = info.projectName;
@@ -90,7 +91,7 @@ public final class RouterServlet extends BaseServlet {
                 throw new NoAccessException("User " + user.id + " has no access to project " + projectName, HttpServletResponse.SC_FORBIDDEN);
             }
             String projectBase = ProjectBean.getProjectBase(projectRoot, projectName);
-            CommonInfo common = new CommonInfo(projectId, projectName, projectBase, user, availableProjects);
+            CommonInfo common = new CommonInfo(projectId, projectName, webRoot, projectBase, user, availableProjects);
             String page = info.page;
             if (info.item != null && info.num != null) {
                 int num = info.num.intValue();
@@ -126,7 +127,7 @@ public final class RouterServlet extends BaseServlet {
             }
             return new ReportListAction(common);
         } else {
-            return new ProjectListAction(availableProjects, user);
+            return new ProjectListAction(webRoot, availableProjects, user);
         }
     }
 }

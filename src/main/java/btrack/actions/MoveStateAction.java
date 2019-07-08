@@ -1,6 +1,5 @@
 package btrack.actions;
 
-import btrack.AccessUtil;
 import btrack.dao.BugEditDao;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,8 +21,8 @@ public final class MoveStateAction extends Action {
     public void post(Context ctx, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String from = req.getParameter("from");
         String to = req.getParameter("to");
-        int fromId = AccessUtil.parseInt(from);
-        int toId = AccessUtil.parseInt(to);
+        int fromId = Context.parseInt(from);
+        int toId = Context.parseInt(to);
         BugEditDao dao = new BugEditDao(ctx.connection);
         if (!dao.validateTransition(common.projectId, fromId, toId)) {
             throw new ValidationException("Cannot move from " + fromId + " to " + toId);

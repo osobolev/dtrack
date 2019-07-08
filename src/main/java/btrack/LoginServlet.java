@@ -1,9 +1,6 @@
 package btrack;
 
-import btrack.actions.Action;
-import btrack.actions.LoginAction;
-import btrack.actions.NoAccessException;
-import btrack.actions.ValidationException;
+import btrack.actions.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Connection;
@@ -16,6 +13,7 @@ public final class LoginServlet extends BaseServlet {
     }
 
     protected Action getAction(Connection connection, HttpServletRequest req, UserInfo user) throws NoAccessException, SQLException, ValidationException {
-        return new LoginAction(null);
+        String webRoot = Context.getWebRoot(req);
+        return new LoginAction(webRoot, null);
     }
 }

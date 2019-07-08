@@ -9,14 +9,10 @@
 <head>
     <meta charset="UTF-8">
     <title>#${bug.bugNum} (${bug.title})</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-    <link href="/style.css" rel="stylesheet">
-    <link href="/summernote-bs4.css" rel="stylesheet">
-    <script src="/summernote-bs4.js"></script>
-    <script src="/lang/summernote-ru-RU.js"></script>
+    <#include "head.ftl">
+    <link href="summernote-bs4.css" rel="stylesheet">
+    <script src="summernote-bs4.js"></script>
+    <script src="lang/summernote-ru-RU.js"></script>
 </head>
 <body>
 <#include "header.ftl">

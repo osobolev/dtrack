@@ -25,6 +25,7 @@ public final class NewBugAction extends Action {
         List<PriorityBean> priorities = dao.listPriorities(common.projectId, null);
         Map<String, Object> params = new HashMap<>();
         common.putAll(params);
+        params.put("postLink", common.getNewBugUrl());
         params.put("priorities", priorities);
         TemplateUtil.process("newbug.ftl", params, resp.getWriter());
     }

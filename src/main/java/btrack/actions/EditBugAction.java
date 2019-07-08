@@ -1,6 +1,5 @@
 package btrack.actions;
 
-import btrack.AccessUtil;
 import btrack.dao.*;
 import freemarker.template.TemplateException;
 
@@ -55,7 +54,7 @@ public final class EditBugAction extends Action {
                 if (key.startsWith(FILE_KEY_START)) {
                     String value = entry.getValue();
                     if (!Boolean.parseBoolean(value)) {
-                        int attachmentId = AccessUtil.parseInt(key.substring(FILE_KEY_START.length()));
+                        int attachmentId = Context.parseInt(key.substring(FILE_KEY_START.length()));
                         int changeId = dao.getChangeId(bugId, common.getUserId(), changeBox);
                         dao.removeBugAttachment(changeId, attachmentId);
                     }

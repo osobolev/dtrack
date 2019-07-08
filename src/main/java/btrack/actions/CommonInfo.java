@@ -12,15 +12,17 @@ public final class CommonInfo implements LinkFactory {
 
     public final int projectId;
     public final String projectName;
+    private final String webRoot;
     private final String projectBase;
     private final UserInfo user;
     public final List<ProjectBean> availableProjects;
     // todo: add list of reports for current project
 
-    public CommonInfo(int projectId, String projectName, String projectBase, UserInfo user,
+    public CommonInfo(int projectId, String projectName, String webRoot, String projectBase, UserInfo user,
                       List<ProjectBean> availableProjects) {
         this.projectId = projectId;
         this.projectName = projectName;
+        this.webRoot = webRoot;
         this.projectBase = projectBase;
         this.user = user;
         this.availableProjects = availableProjects;
@@ -61,10 +63,11 @@ public final class CommonInfo implements LinkFactory {
 
     void putAll(Map<String, Object> params) {
         params.put("info", this);
-        putUser(params, user);
+        putHeaderData(params, user, webRoot);
     }
 
-    static void putUser(Map<String, Object> params, UserInfo user) {
+    static void putHeaderData(Map<String, Object> params, UserInfo user, String webRoot) {
         params.put("displayUser", user.displayName);
+        params.put("webRoot", webRoot);
     }
 }

@@ -1,6 +1,5 @@
 package btrack.actions;
 
-import btrack.AccessUtil;
 import btrack.dao.BugEditDao;
 import btrack.dao.BugViewDao;
 
@@ -23,7 +22,7 @@ public final class AssignAction extends Action {
         if (str == null || str.trim().isEmpty()) {
             return null;
         } else {
-            return AccessUtil.parseInt(str);
+            return Context.parseInt(str);
         }
     }
 

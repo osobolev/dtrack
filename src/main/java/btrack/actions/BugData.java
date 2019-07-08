@@ -1,6 +1,5 @@
 package btrack.actions;
 
-import btrack.AccessUtil;
 import btrack.dao.BugEditDao;
 
 import java.sql.SQLException;
@@ -29,7 +28,7 @@ final class BugData {
         if (priority == null)
             throw new ValidationException("Missing 'priority' parameter");
         String safeHtml = UploadUtil.POLICY.sanitize(untrustedHtml);
-        int priorityId = AccessUtil.parseInt(priority);
+        int priorityId = Context.parseInt(priority);
         if (!dao.validatePriority(common.projectId, priorityId)) {
             throw new ValidationException("Wrong priority " + priorityId + " for project " + common.projectName);
         }
