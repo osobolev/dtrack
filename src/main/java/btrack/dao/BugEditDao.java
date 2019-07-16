@@ -1,13 +1,10 @@
 package btrack.dao;
 
-import org.h2.util.ScriptReader;
-
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -363,21 +360,6 @@ public final class BugEditDao extends BaseDao {
             stmt.setInt(1, changeId);
             stmt.setInt(2, attachmentId);
             executeUpdate(stmt);
-        }
-    }
-
-    public void runScript(Path script) throws SQLException, IOException {
-        if (testing)
-            return;
-        try (ScriptReader reader = new ScriptReader(Files.newBufferedReader(script, StandardCharsets.UTF_8))) {
-            try (Statement stmt = connection.createStatement()) {
-                while (true) {
-                    String sql = reader.readStatement();
-                    if (sql == null)
-                        break;
-                    stmt.execute(sql);
-                }
-            }
         }
     }
 }

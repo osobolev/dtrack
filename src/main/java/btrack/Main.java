@@ -1,7 +1,6 @@
 package btrack;
 
 import btrack.actions.TemplateUtil;
-import btrack.dao.BugEditDao;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.pool.HikariPool;
 import org.eclipse.jetty.server.Server;
@@ -11,40 +10,43 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.util.Properties;
 
 public final class Main {
 
     public static void main(String[] args) {
+        // todo: logger impl!!! for production!!!
         Logger logger = LoggerFactory.getLogger(Main.class);
         try {
-            TemplateUtil.init();
+            Properties props = new Properties();
+            Path path = Paths.get("btrack.properties");
+            try (BufferedReader reader = Files.newBufferedReader(path)) {
+                props.load(reader);
+            }
+
+            TemplateUtil.init(props.getProperty("templates.root"));
 
             HikariConfig config = new HikariConfig();
             config.setMaximumPoolSize(10);
             config.setDriverClassName("org.postgresql.Driver");
-            config.setJdbcUrl("jdbc:postgresql://localhost:5431/");
-            config.setUsername("btrack");
-            config.setPassword("btrack");
+            config.setJdbcUrl(props.getProperty("jdbc.url"));
+            config.setUsername(props.getProperty("jdbc.user"));
+            config.setPassword(props.getProperty("jdbc.password"));
             config.setAutoCommit(false);
             config.setConnectionTestQuery("select 1");
             HikariPool pool = new HikariPool(config);
 
             ConnectionProducer dataSource = pool::getConnection;
-            try (Connection connection = dataSource.getConnection()) {
-                BugEditDao dao = new BugEditDao(connection);
-                dao.runScript(Paths.get("sql/tables.sql"));
-                dao.runScript(Paths.get("sql/data.sql"));
-                connection.commit();
-            } catch (SQLException ex) {
-                logger.warn(ex.getMessage());
-            }
 
-            Server server = new Server(8080);
+            int port = Integer.parseInt(props.getProperty("http.port", "8080"));
+            Server server = new Server(port);
             ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-            handler.setResourceBase("src/main/webapp");
+            String root = props.getProperty("http.root", "src/main/webapp");
+            handler.setResourceBase(root);
             handler.addServlet(new ServletHolder(new RouterServlet(dataSource)), "/p/*");
             handler.addServlet(new ServletHolder(new LoginServlet(dataSource)), "/login.html");
             handler.addServlet(new ServletHolder(new LogoutServlet()), "/logout.html");

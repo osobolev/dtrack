@@ -6,6 +6,7 @@ group 'btrack'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
+compileJava.options.encoding = 'UTF-8'
 
 repositories {
     mavenCentral()
@@ -17,7 +18,27 @@ dependencies {
     compile 'org.freemarker:freemarker:2.3.28'
     compile 'commons-fileupload:commons-fileupload:1.4'
     compile 'com.zaxxer:HikariCP:3.3.1'
-    compile 'com.h2database:h2:1.4.199'
     runtime 'org.postgresql:postgresql:42.2.5'
     runtime 'org.slf4j:slf4j-simple:1.7.26'
 }
+
+jar.manifest.attributes(
+    'Class-Path': configurations.runtime.collect { it.name }.sort().join(' '),
+    'Main-Class': 'btrack.Main'
+)
+
+def dest = "$rootDir/distr"
+
+task webFiles(type: Copy) {
+    from 'src/main/webapp'
+    into "$dest/root"
+}
+
+task copyServerJars(type: Copy) {
+    from project.configurations.runtime
+    from jar
+    from 'config'
+    into "$dest"
+}
+
+task distr(dependsOn: [webFiles, copyServerJars])
