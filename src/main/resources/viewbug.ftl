@@ -17,48 +17,60 @@
 <body>
 <#include "header.ftl">
 <div class="container">
-    <div class="card">
+    <div class="card" style="margin-bottom: 5px;">
         <div class="card-header">
-            <h3>#${bug.bugNum}: ${bug.title}</h3>
+            <h3 style="border-bottom: 1px solid gray; padding-bottom: 5px;">#${bug.bugNum}: ${bug.title}</h3>
             <#if error??>
                 <h4 class="text-danger">${error}</h4>
             </#if>
-            <#-- todo: better layout for header -->
             <div style="float: right;">
                 <small>Создан ${bug.created} пользователем ${bug.createdBy}</small>
                 <br>
                 <small>Изменен ${bug.lastUpdated} пользователем ${bug.lastUpdatedBy}</small>
             </div>
-            Приоритет: ${bug.priority}
-            <a href="${bug.editLink}">Редактировать</a>
-            Статус: ${bug.state}
-            <form method="post" action="${bug.assignLink}" id="assignForm">
-                <#if bug.assignedUserId??>
-                    <input type="hidden" value="${bug.assignedUserId}" name="oldUserId">
-                </#if>
-                <label for="newUserId">Исполнитель:</label>
-                <select name="newUserId" id="newUserId" onchange="onAssignedChange()">
-                    <option value=""<#if bug.isNotAssigned()> selected</#if>>не выбран</option>
-                    <#list users as u>
-                        <option value="${u.id}"<#if bug.isAssigned(u)> selected</#if>>${u.login}</option>
-                    </#list>
-                </select>
-            </form>
+            <table>
+                <tr>
+                    <td width="33%">Приоритет: <strong>${bug.priority}</strong></td>
+                    <td width="33%">Статус: <strong>${bug.state}</strong></td>
+                    <td width="33%">
+                        <form method="post" action="${bug.assignLink}" id="assignForm">
+                            <#if bug.assignedUserId??>
+                                <input type="hidden" value="${bug.assignedUserId}" name="oldUserId">
+                            </#if>
+                        Исполнитель:
+                        <select name="newUserId" id="newUserId" onchange="onAssignedChange()">
+                            <option value=""<#if bug.isNotAssigned()> selected</#if>>не выбран</option>
+                            <#list users as u>
+                                <option value="${u.id}"<#if bug.isAssigned(u)> selected</#if>>${u.login}</option>
+                            </#list>
+                        </select>
+                        </form>
+                    </td>
+                </tr>
+            </table>
             <form id="moveBug" method="post" action="${bug.moveLink}">
                 <input type="hidden" name="from" value="${bug.stateId}">
                 <#list transitions as t>
                     <button type="submit" name="to" value="${t.toId}" class="btn btn-primary">${t.name}</button>
                 </#list>
+                <a class="btn btn-secondary" href="${bug.editLink}">Редактировать</a>
             </form>
         </div>
         <div class="card-body">
             ${bug.html?no_esc}
         </div>
+        <#if attachments?has_content>
+        <div class="card-footer">
+            <ul style="margin-bottom: 0;">
+                <#list attachments as a>
+                    <li>
+                        <a href="${bug.getAttachmentLink(a)}" target="_blank">${a.name}</a> (${a.size})
+                    </li>
+                </#list>
+            </ul>
+        </div>
+        </#if>
     </div>
-    <#-- todo: attachments layout -->
-    <#list attachments as a>
-        <a href="${bug.getAttachmentLink(a)}" target="_blank">${a.name}</a>
-    </#list>
 
     <#if changes?has_content>
     <ul class="nav nav-tabs" role="tablist">
@@ -69,7 +81,7 @@
         </#list>
     </ul>
 
-    <div class="tab-content mt-2">
+    <div class="tab-content border" style="padding-top: 5px; padding-bottom: 5px; margin-bottom: 5px;">
         <#list changes as change>
         <div id="${change.id}" class="tab-pane<#if change?is_first> show active</#if>" role="tabpanel">
             <#list change.changes as c>
@@ -95,7 +107,7 @@
                         <#if cc.commentAttachments?has_content>
                             Прикрепленные файлы:
                             <#list cc.commentAttachments as ca>
-                                <a href="${bug.getCommentAttachmentLink(ca)}" target="_blank">${ca.name}</a><#if ca_has_next>, </#if>
+                                <a href="${bug.getCommentAttachmentLink(ca)}" target="_blank">${ca.name}</a> (${ca.size})<#if ca_has_next>, </#if>
                             </#list>
                         </#if>
                     </#if>
@@ -109,7 +121,7 @@
                         <#elseif cd.fileChange??>
                             ${cd.fileChange}
                             <#list cd.changedFiles as cf>
-                                <a href="${bug.getAttachmentLink(cf)}" target="_blank">${cf.name}</a><#if cf_has_next>, </#if>
+                                <a href="${bug.getAttachmentLink(cf)}" target="_blank">${cf.name}</a> (${cf.size})<#if cf_has_next>, </#if>
                             </#list>
                         </#if>
                     </li>
@@ -163,6 +175,7 @@
 
     $('#collapseComment').on('shown.bs.collapse', function () {
         this.scrollIntoView();
+        $('#summernote').summernote('focus');
     });
 </script>
 

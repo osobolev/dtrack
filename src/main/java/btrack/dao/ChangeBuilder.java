@@ -114,7 +114,7 @@ final class ChangeBuilder {
         }
         Map<Integer, List<AttachmentBean>> commentFiles = new HashMap<>();
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select cc.change_id, ca.id, ca.file_name" +
+            "select cc.change_id, ca.id, ca.file_name, length(ca.file_content)" +
             "  from comment_attachments ca join changes_comments cc on ca.change_id = cc.change_id" +
             " where cc.delete_ts is null" +
             "   and cc.change_id in (select id from changes where bug_id = ?)" +
@@ -126,7 +126,8 @@ final class ChangeBuilder {
                     int id = rs.getInt(1);
                     int fileId = rs.getInt(2);
                     String fileName = rs.getString(3);
-                    commentFiles.computeIfAbsent(id, k -> new ArrayList<>()).add(new AttachmentBean(fileId, fileName));
+                    long size = rs.getLong(4);
+                    commentFiles.computeIfAbsent(id, k -> new ArrayList<>()).add(new AttachmentBean(fileId, fileName, size));
                 }
             }
         }
@@ -152,8 +153,8 @@ final class ChangeBuilder {
         }
         try (PreparedStatement stmt = connection.prepareStatement(
             "select cf.change_id, " +
-            "       a1.id, a1.file_name file1, " +
-            "       a2.id, a2.file_name file2" +
+            "       a1.id, a1.file_name file1, length(a1.file_content)," +
+            "       a2.id, a2.file_name file2, length(a2.file_content)" +
             "  from changes_files cf" +
             "       left join bug_attachments a1 on a1.id = cf.old_attachment_id" +
             "       left join bug_attachments a2 on a2.id = cf.new_attachment_id" +
@@ -168,14 +169,16 @@ final class ChangeBuilder {
                     int id = rs.getInt(1);
                     Integer deletedFileId = BaseDao.getInt(rs, 2);
                     String deletedFileName = rs.getString(3);
-                    Integer addedFileId = BaseDao.getInt(rs, 4);
-                    String addedFileName = rs.getString(5);
+                    long deletedSize = rs.getLong(4);
+                    Integer addedFileId = BaseDao.getInt(rs, 5);
+                    String addedFileName = rs.getString(6);
+                    long addedSize = rs.getLong(7);
                     if (deletedFileId != null && deletedFileName != null) {
-                        AttachmentBean a = new AttachmentBean(deletedFileId.intValue(), deletedFileName);
+                        AttachmentBean a = new AttachmentBean(deletedFileId.intValue(), deletedFileName, deletedSize);
                         deleted.computeIfAbsent(id, k -> new ArrayList<>()).add(a);
                     }
                     if (addedFileId != null && addedFileName != null) {
-                        AttachmentBean a = new AttachmentBean(addedFileId.intValue(), addedFileName);
+                        AttachmentBean a = new AttachmentBean(addedFileId.intValue(), addedFileName, addedSize);
                         added.computeIfAbsent(id, k -> new ArrayList<>()).add(a);
                     }
                 }

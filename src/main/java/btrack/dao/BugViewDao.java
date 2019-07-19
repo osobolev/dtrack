@@ -184,7 +184,7 @@ public final class BugViewDao extends BaseDao {
 
     public List<AttachmentBean> listBugAttachments(int bugId) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select id, file_name" +
+            "select id, file_name, length(file_content)" +
             "  from bug_attachments" +
             " where bug_id = ?" +
             "   and not is_deleted" +
@@ -196,7 +196,8 @@ public final class BugViewDao extends BaseDao {
                 while (rs.next()) {
                     int id = rs.getInt(1);
                     String fileName = rs.getString(2);
-                    result.add(new AttachmentBean(id, fileName));
+                    long size = rs.getLong(3);
+                    result.add(new AttachmentBean(id, fileName, size));
                 }
                 return result;
             }
