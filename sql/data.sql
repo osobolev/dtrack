@@ -48,17 +48,17 @@ insert into transitions
   (1, 3, 2, 'Тестировать');
 
 insert into priorities
-  (id, project_id, order_num, name)
+  (id, project_id, order_num, name, color)
   values
-  (1, 1, 1, 'Высокий');
+  (1, 1, 1, 'Высокий', '#fed');
 insert into priorities
-  (id, project_id, order_num, name, is_default)
+  (id, project_id, order_num, name, color, is_default)
   values
-  (2, 1, 2, 'Средний', true);
+  (2, 1, 2, 'Средний', '#ffb', true);
 insert into priorities
-  (id, project_id, order_num, name)
+  (id, project_id, order_num, name, color)
   values
-  (3, 1, 3, 'Низкий');
+  (3, 1, 3, 'Низкий', '#fbfbfb');
 
 insert into reports
   (id, project_id, visible_id, name)

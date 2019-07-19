@@ -1,5 +1,6 @@
 <#-- @ftlvariable name="report" type="btrack.dao.ReportBean" -->
 <#-- @ftlvariable name="bugs" type="java.util.List<btrack.dao.BugBean>" -->
+<#-- @ftlvariable name="priorities" type="java.util.List<btrack.dao.PriorityBean>" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -10,15 +11,11 @@
     <script type="text/javascript" src="DataTables-1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="DataTables-1.10.18/js/dataTables.bootstrap4.min.js"></script>
     <style>
-        .bugPriority1 {
-            background-color: #fed;
+        <#list priorities as p>
+        .table-hover tbody tr.bugPriority${p.id} {
+            background-color: ${p.color};
         }
-        .bugPriority2 {
-            background-color: #ffb;
-        }
-        .bugPriority3 {
-            background-color: #fbfbfb;
-        }
+        </#list>
     </style>
 </head>
 <body>

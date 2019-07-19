@@ -2,6 +2,7 @@ package btrack.actions;
 
 import btrack.dao.BugBean;
 import btrack.dao.BugViewDao;
+import btrack.dao.PriorityBean;
 import btrack.dao.ReportBean;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,10 +24,12 @@ public final class ViewReportAction extends Action {
     public void get(Context ctx, HttpServletResponse resp) throws Exception {
         BugViewDao dao = new BugViewDao(ctx.connection);
         List<BugBean> bugs = dao.listAllBugs(request.projectId, request);
+        List<PriorityBean> priorities = dao.listPriorities(request.projectId, null);
         Map<String, Object> params = new HashMap<>();
         request.putTo(params);
         params.put("report", report);
         params.put("bugs", bugs);
+        params.put("priorities", priorities);
         TemplateUtil.process("buglist.ftl", params, resp.getWriter());
     }
 }

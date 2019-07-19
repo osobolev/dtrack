@@ -39,6 +39,7 @@ CREATE TABLE priorities (
   project_id INT NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
   order_num INT NOT NULL,
   name TEXT NOT NULL,
+  color TEXT NOT NULL,
   is_default BOOLEAN NOT NULL DEFAULT FALSE,
     UNIQUE (project_id, order_num)
 );

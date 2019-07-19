@@ -41,3 +41,7 @@ html {
 ul.change-other {
     margin-bottom: 0.5rem;
 }
+
+.table-hover tbody tr:hover {
+    filter: brightness(85%);
+}

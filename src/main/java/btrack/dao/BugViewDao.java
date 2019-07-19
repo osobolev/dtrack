@@ -99,7 +99,7 @@ public final class BugViewDao extends BaseDao {
 
     public List<PriorityBean> listPriorities(int projectId, Integer defaultId) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select id, name, is_default" +
+            "select id, name, color, is_default" +
             "  from priorities" +
             " where project_id = ?" +
             " order by order_num"
@@ -110,13 +110,14 @@ public final class BugViewDao extends BaseDao {
                 while (rs.next()) {
                     int id = rs.getInt(1);
                     String name = rs.getString(2);
+                    String color = rs.getString(3);
                     boolean isDefault;
                     if (defaultId != null) {
                         isDefault = defaultId.intValue() == id;
                     } else {
-                        isDefault = rs.getBoolean(3);
+                        isDefault = rs.getBoolean(4);
                     }
-                    priorities.add(new PriorityBean(id, name, isDefault));
+                    priorities.add(new PriorityBean(id, name, color, isDefault));
                 }
                 return priorities;
             }
