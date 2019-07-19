@@ -12,7 +12,7 @@
 </head>
 <body>
 <#include "header.ftl">
-<div class="container">
+<div class="container" style="padding-bottom: 5px;">
     <h3>Новый баг</h3>
     <form method="post" action="${postLink}" enctype="multipart/form-data">
         <div class="form-row">

@@ -16,7 +16,7 @@
 </head>
 <body>
 <#include "header.ftl">
-<div class="container">
+<div class="container" style="padding-bottom: 5px;">
     <div class="card" style="margin-bottom: 5px;">
         <div class="card-header">
             <h3 style="border-bottom: 1px solid gray; padding-bottom: 5px;">#${bug.bugNum}: ${bug.title}</h3>
@@ -28,32 +28,29 @@
                 <br>
                 <small>Изменен ${bug.lastUpdated} пользователем ${bug.lastUpdatedBy}</small>
             </div>
-            <table>
-                <tr>
-                    <td width="33%">Приоритет: <strong>${bug.priority}</strong></td>
-                    <td width="33%">Статус: <strong>${bug.state}</strong></td>
-                    <td width="33%">
-                        <form method="post" action="${bug.assignLink}" id="assignForm">
-                            <#if bug.assignedUserId??>
-                                <input type="hidden" value="${bug.assignedUserId}" name="oldUserId">
-                            </#if>
-                        Исполнитель:
-                        <select name="newUserId" id="newUserId" onchange="onAssignedChange()">
-                            <option value=""<#if bug.isNotAssigned()> selected</#if>>не выбран</option>
-                            <#list users as u>
-                                <option value="${u.id}"<#if bug.isAssigned(u)> selected</#if>>${u.login}</option>
-                            </#list>
-                        </select>
-                        </form>
-                    </td>
-                </tr>
-            </table>
-            <form id="moveBug" method="post" action="${bug.moveLink}">
+            <div>
+                <span class="align-middle">Приоритет: <strong>${bug.priority}</strong></span>
+                <span class="align-middle" style="margin-left: 20px;">Статус: <strong>${bug.state}</strong></span>
+                <form method="post" action="${bug.assignLink}" id="assignForm" style="display: inline;">
+                    <#if bug.assignedUserId??>
+                        <input type="hidden" value="${bug.assignedUserId}" name="oldUserId">
+                    </#if>
+                    <span class="align-middle" style="margin-left: 20px;">Исполнитель:
+                    <select name="newUserId" id="newUserId" onchange="onAssignedChange()">
+                        <option value=""<#if bug.isNotAssigned()> selected</#if>>не выбран</option>
+                        <#list users as u>
+                            <option value="${u.id}"<#if bug.isAssigned(u)> selected</#if>>${u.login}</option>
+                        </#list>
+                    </select>
+                    </span>
+                </form>
+                <a class="btn btn-secondary" style="margin-left: 20px;" href="${bug.editLink}">Редактировать</a>
+            </div>
+            <form id="moveBug" method="post" action="${bug.moveLink}" style="margin-top: 5px;">
                 <input type="hidden" name="from" value="${bug.stateId}">
                 <#list transitions as t>
                     <button type="submit" name="to" value="${t.toId}" class="btn btn-primary">${t.name}</button>
                 </#list>
-                <a class="btn btn-secondary" href="${bug.editLink}">Редактировать</a>
             </form>
         </div>
         <div class="card-body">

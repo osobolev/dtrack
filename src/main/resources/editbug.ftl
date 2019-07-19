@@ -13,7 +13,7 @@
 </head>
 <body>
 <#include "header.ftl">
-<div class="container">
+<div class="container" style="padding-bottom: 5px;">
     <h3>Баг #${bug.bugNum}</h3>
     <form method="post" action="${bug.editLink}" enctype="multipart/form-data">
         <div class="form-row">
