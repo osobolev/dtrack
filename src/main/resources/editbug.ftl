@@ -29,8 +29,6 @@
                     </#list>
                 </select>
             </div>
-            <#-- todo: display state -->
-            <#-- todo: display assigned user -->
         </div>
         <div class="form-group">
             <label for="summernote">Полное описание:</label>
@@ -41,7 +39,7 @@
                 <#list attachments as a>
                     <li>
                         <input type="hidden" name="file_${a.id}" value="true">
-                        <span class="bugFile"><a href="${bug.getAttachmentLink(a)}">${a.name}</a></span><button type="button" onclick="removeAttachment(event)">Удалить</button>
+                        <span class="bugFile"><a href="${bug.getAttachmentLink(a)}">${a.name}</a></span> (${a.size}) <a href="javascript:void(0)" class="small att-butt" onclick="removeAttachment(event)">Удалить</a>
                     </li>
                 </#list>
             </ul>
@@ -70,7 +68,7 @@
     function removeAttachment(event) {
         var li = $(event.target).parent();
         var field = li.find('input[type=hidden]');
-        var butt = li.find('button');
+        var butt = li.find('.att-butt');
         var fname = li.find('span[class=bugFile]');
         if (field.val() === 'true') {
             fname.css('text-decoration', 'line-through');
@@ -81,7 +79,6 @@
             field.val('true');
             butt.text('Удалить');
         }
-        console.log(field.val());
     }
 </script>
 
