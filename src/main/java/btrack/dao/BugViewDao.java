@@ -203,8 +203,8 @@ public final class BugViewDao extends BaseDao {
         }
     }
 
-    public List<ChangeBean> loadBugHistory(int bugId, LinkFactory linkFactory) throws SQLException {
-        return new ChangeBuilder(connection).loadBugHistory(bugId, linkFactory);
+    public List<ChangeBean> loadBugHistory(int bugNum, int bugId, LinkFactory linkFactory) throws SQLException {
+        return new ChangeBuilder(connection).loadBugHistory(bugNum, bugId, linkFactory);
     }
 
     public void listPossibleAssignees(int projectId, Integer toSkip, List<UserBean> result) throws SQLException {

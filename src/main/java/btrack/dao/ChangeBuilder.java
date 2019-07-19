@@ -1,9 +1,6 @@
 package btrack.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -26,10 +23,14 @@ final class ChangeBuilder {
 
         final String comment;
         final List<AttachmentBean> attachments;
+        final LocalDateTime deleted;
+        final String deleteUser;
 
-        CommentChange(String comment, List<AttachmentBean> attachments) {
+        CommentChange(String comment, List<AttachmentBean> attachments, LocalDateTime deleted, String deleteUser) {
             this.comment = comment;
             this.attachments = attachments;
+            this.deleted = deleted;
+            this.deleteUser = deleteUser;
         }
     }
 
@@ -55,7 +56,7 @@ final class ChangeBuilder {
         changes.computeIfAbsent(id, k -> new ArrayList<>()).add(change);
     }
 
-    List<ChangeBean> loadBugHistory(int bugId, LinkFactory linkFactory) throws SQLException {
+    List<ChangeBean> loadBugHistory(int bugNum, int bugId, LinkFactory linkFactory) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select cf.change_id," +
             "       au1.login, au2.login," +
@@ -115,7 +116,7 @@ final class ChangeBuilder {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select cc.change_id, ca.id, ca.file_name" +
             "  from comment_attachments ca join changes_comments cc on ca.change_id = cc.change_id" +
-            " where not cc.is_deleted" +
+            " where not cc.delete_ts is null" +
             "   and cc.change_id in (select id from changes where bug_id = ?)" +
             " order by file_name"
         )) {
@@ -130,17 +131,22 @@ final class ChangeBuilder {
             }
         }
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select cc.change_id, case when cc.is_deleted then null else cc.comment_text end" +
-            "  from changes_comments cc" +
+            "select cc.change_id, cc.delete_ts, du.login, " +
+            "       case when cc.delete_ts is null then cc.comment_text else null end" +
+            "  from changes_comments cc " +
+            "       left join users du on cc.delete_user_id = du.id" +
             " where cc.change_id in (select id from changes where bug_id = ?)"
         )) {
             stmt.setInt(1, bugId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     int id = rs.getInt(1);
-                    String comment = rs.getString(2);
+                    Timestamp deletedTS = rs.getTimestamp(2);
+                    LocalDateTime deleted = deletedTS == null ? null : deletedTS.toLocalDateTime();
+                    String deleteUser = rs.getString(3);
+                    String comment = rs.getString(4);
                     List<AttachmentBean> attachments = commentFiles.getOrDefault(id, Collections.emptyList());
-                    addChange(id, new CommentChange(comment, attachments));
+                    addChange(id, new CommentChange(comment, attachments, deleted, deleteUser));
                 }
             }
         }
@@ -204,25 +210,25 @@ final class ChangeBuilder {
                         continue;
                     String user = rs.getString(2);
                     LocalDateTime ts = rs.getTimestamp(3).toLocalDateTime();
+                    List<CommentDetailBean> comments = new ArrayList<>();
                     List<ChangeDetailBean> details = new ArrayList<>();
                     for (Change c : change) {
+                        if (c instanceof CommentChange) {
+                            CommentChange cc = (CommentChange) c;
+                            comments.add(new CommentDetailBean(
+                                bugNum, id, cc.comment, cc.attachments, cc.deleted, cc.deleteUser, linkFactory
+                            ));
+                            continue;
+                        }
                         ChangeDetailBean detail;
                         if (c instanceof FieldChange) {
                             FieldChange fc = (FieldChange) c;
                             detail = new ChangeDetailBean(
-                                null, Collections.emptyList(),
                                 fc.change, null, Collections.emptyList()
-                            );
-                        } else if (c instanceof CommentChange) {
-                            CommentChange cc = (CommentChange) c;
-                            detail = new ChangeDetailBean(
-                                cc.comment, cc.attachments,
-                                null, null, Collections.emptyList()
                             );
                         } else if (c instanceof FileChange) {
                             FileChange fc = (FileChange) c;
                             detail = new ChangeDetailBean(
-                                null, Collections.emptyList(),
                                 null, fc.filesAdded ? "Добавлены файлы" : "Удалены файлы", fc.files
                             );
                         } else {
@@ -230,9 +236,9 @@ final class ChangeBuilder {
                         }
                         details.add(detail);
                     }
-                    if (details.isEmpty())
+                    if (comments.isEmpty() && details.isEmpty())
                         continue;
-                    result.add(new ChangeBean(id, user, ts, details, linkFactory));
+                    result.add(new ChangeBean(id, user, ts, comments, details, linkFactory));
                 }
             }
         }

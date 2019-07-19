@@ -106,7 +106,8 @@ CREATE TABLE changes_files (
 CREATE TABLE changes_comments (
   change_id INT NOT NULL REFERENCES changes (id) ON DELETE CASCADE,
   comment_text TEXT,
-  is_deleted BOOLEAN NOT NULL DEFAULT FALSE
+  delete_ts TIMESTAMP,
+  delete_user_id INT REFERENCES users (id)
 );
 
 CREATE TABLE comment_attachments (

@@ -33,7 +33,7 @@ public final class ViewBugAction extends Action {
             throw new NoAccessException("Bug " + bugId + " not found", HttpServletResponse.SC_NOT_FOUND);
         List<TransitionBean> transitions = dao.listTransitions(request.projectId, bug.stateId);
         List<AttachmentBean> attachments = dao.listBugAttachments(bugId);
-        List<ChangeBean> changes = dao.loadBugHistory(bugId, request);
+        List<ChangeBean> changes = dao.loadBugHistory(bug.bugNum, bugId, request);
         List<UserBean> users = new ArrayList<>();
         Integer toSkip;
         if (bug.getAssignedUserId() != null && bug.getAssignedUserId().intValue() == request.getUserId()) {

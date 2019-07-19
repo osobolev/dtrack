@@ -110,12 +110,13 @@ public final class RouterServlet extends BaseServlet {
                         return new EditBugAction(bugId, request);
                     } else if ("comment.html".equals(page)) {
                         return new AddCommentAction(bugId, num, request);
+                    } else if ("deleteComment.html".equals(page)) {
+                        return new DeleteCommentAction(num, request);
                     } else if ("assign.html".equals(page)) {
                         return new AssignAction(bugId, num, request);
                     } else if ("move.html".equals(page)) {
                         return new MoveStateAction(bugId, num, request);
                     }
-                    // todo: удаление комментов
                     return new ViewBugAction(bugId, request);
                 case FILE:
                     return new AttachmentAction(false, num);

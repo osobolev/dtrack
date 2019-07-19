@@ -47,7 +47,7 @@
             <form id="moveBug" method="post" action="${bug.moveLink}">
                 <input type="hidden" name="from" value="${bug.stateId}">
                 <#list transitions as t>
-                    <button type="submit" name="to" value="${t.toId}">${t.name}</button>
+                    <button type="submit" name="to" value="${t.toId}" class="btn btn-primary">${t.name}</button>
                 </#list>
             </form>
         </div>
@@ -60,32 +60,51 @@
         <a href="${bug.getAttachmentLink(a)}" target="_blank">${a.name}</a>
     </#list>
     <#if changes?has_content>
-    <ul>
+    <div>
         <#list changes as c>
-            <li>
-                Изменено пользователем ${c.user} ${c.ts}
-                <ul>
-                    <#list c.details as cd>
-                        <li>
-                            <#if cd.commentHtml??>
-                                ${cd.commentHtml?no_esc}
-                                <#list cd.commentAttachments as ca>
-                                    <a href="${bug.getCommentAttachmentLink(ca)}" target="_blank">${ca.name}</a>
-                                </#list>
-                            <#elseif cd.fieldChange??>
-                                ${cd.fieldChange}
-                            <#elseif cd.fileChange??>
-                                ${cd.fileChange}
-                                <#list cd.changedFiles as cf>
-                                    <a href="${bug.getAttachmentLink(cf)}" target="_blank">${cf.name}</a>
-                                </#list>
-                            </#if>
-                        </li>
-                    </#list>
-                </ul>
-            </li>
+            <div>
+            <h6 class="change-heading">
+                <#if c.comments?has_content>
+                    Комментарий пользователя ${c.user} ${c.ts}
+                <#else>
+                    Изменено пользователем ${c.user} ${c.ts}
+                </#if>
+            </h6>
+            <#list c.comments as cc>
+            <div class="change-comment">
+                <#if cc.deleted??>
+                    <em>Комментарий удален пользователем ${cc.deleteUser} ${cc.deleted}</em>
+                <#else>
+                    <form action="${cc.deleteLink}" method="post" id="deleteComment">
+                        <input type="hidden" name="commentId" value="${cc.id}">
+                        <button type="button" class="delete-comment-button" onclick="confirmDeleteComment()">Удалить</button>
+                    </form>
+                    ${cc.commentHtml?no_esc}
+                    <div>
+                        <#list cc.commentAttachments as ca>
+                            <a href="${bug.getCommentAttachmentLink(ca)}" target="_blank">${ca.name}</a><#if ca_has_next>, </#if>
+                        </#list>
+                    </div>
+                </#if>
+            </div>
+            </#list>
+            <ul class="change-other">
+                <#list c.details as cd>
+                    <li>
+                        <#if cd.fieldChange??>
+                            ${cd.fieldChange}
+                        <#elseif cd.fileChange??>
+                            ${cd.fileChange}
+                            <#list cd.changedFiles as cf>
+                                <a href="${bug.getAttachmentLink(cf)}" target="_blank">${cf.name}</a><#if cf_has_next>, </#if>
+                            </#list>
+                        </#if>
+                    </li>
+                </#list>
+            </ul>
+            </div>
         </#list>
-    </ul>
+    </div>
     </#if>
     <h5>Добавить комментарий:</h5>
     <form method="post" action="${bug.commentLink}" enctype="multipart/form-data">
@@ -113,6 +132,12 @@
 
     function onAssignedChange() {
         $('#assignForm').submit();
+    }
+
+    function confirmDeleteComment() {
+        if (!confirm('Действительно удалить комментарий?'))
+            return;
+        $('#deleteComment').submit();
     }
 </script>
 

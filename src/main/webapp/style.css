@@ -1,3 +1,43 @@
 html {
     font-size: 10pt;
 }
+
+.table td {
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.change-heading {
+    border-bottom: 1px solid gray;
+    padding-top: 0;
+    margin-left: 5px;
+    margin-right: 10px;
+    font-size: smaller;
+    font-weight: normal;
+    color: gray;
+}
+
+.change-comment {
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+.delete-comment-button {
+    float: right;
+    font-size: 6pt;
+    padding: 0 0.1rem;
+    background: none;
+    border: 1px solid gray;
+}
+
+.delete-comment-button:hover {
+    background: lightgray;
+}
+
+.change-other li {
+    font-size: small;
+}
+
+ul.change-other {
+    margin-bottom: 0.5rem;
+}

@@ -331,6 +331,16 @@ public final class BugEditDao extends BaseDao {
         }
     }
 
+    public void deleteComment(int changeId, int userId) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "update changes_comments set delete_ts = current_timestamp, delete_user_id = ? where change_id = ?"
+        )) {
+            stmt.setInt(1, userId);
+            stmt.setInt(2, changeId);
+            executeUpdate(stmt);
+        }
+    }
+
     public void removeBugAttachment(int changeId, int attachmentId) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "insert into changes_files" +

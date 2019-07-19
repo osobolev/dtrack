@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public final class BugBean {
 
-    private final int bugNum;
+    public final int bugNum;
     private final String title;
     private final String html;
     public final int priorityId;
@@ -48,6 +48,10 @@ public final class BugBean {
 
     public String getHtml() {
         return html;
+    }
+
+    public String getPriorityId() {
+        return String.valueOf(priorityId);
     }
 
     public String getPriority() {
