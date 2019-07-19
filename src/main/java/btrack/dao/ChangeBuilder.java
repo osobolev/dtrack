@@ -116,7 +116,7 @@ final class ChangeBuilder {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select cc.change_id, ca.id, ca.file_name" +
             "  from comment_attachments ca join changes_comments cc on ca.change_id = cc.change_id" +
-            " where not cc.delete_ts is null" +
+            " where cc.delete_ts is null" +
             "   and cc.change_id in (select id from changes where bug_id = ?)" +
             " order by file_name"
         )) {

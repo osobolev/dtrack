@@ -92,11 +92,12 @@
                             </button>
                         </form>
                         ${cc.commentHtml?no_esc}
-                        <div>
+                        <#if cc.commentAttachments?has_content>
+                            Прикрепленные файлы:
                             <#list cc.commentAttachments as ca>
                                 <a href="${bug.getCommentAttachmentLink(ca)}" target="_blank">${ca.name}</a><#if ca_has_next>, </#if>
                             </#list>
-                        </div>
+                        </#if>
                     </#if>
                 </div>
                 </#list>
