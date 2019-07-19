@@ -11,8 +11,8 @@
 </head>
 <body>
 <#include "header.ftl">
-<div class="container">
-    <h2>Список отчетов</h2>
+<div class="container pb-2 mt-2">
+    <h3>Список отчетов</h3>
     <table id="reports" class="table table-bordered table-hover" style="width: 100%;">
         <thead>
         <tr>

@@ -16,8 +16,8 @@
 </head>
 <body>
 <#include "header.ftl">
-<div class="container" style="padding-bottom: 5px;">
-    <div class="card" style="margin-bottom: 5px;">
+<div class="container pb-2">
+    <div class="card mb-2">
         <div class="card-header">
             <h3 style="border-bottom: 1px solid gray; padding-bottom: 5px;">#${bug.bugNum}: ${bug.title}</h3>
             <#if error??>

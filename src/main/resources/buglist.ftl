@@ -20,8 +20,8 @@
 </head>
 <body>
 <#include "header.ftl">
-<div class="container">
-    <h2>Отчет #${report.reportNum}: ${report.title}</h2>
+<div class="container pb-2 mt-2">
+    <h3>Отчет #${report.reportNum}: ${report.title}</h3>
     <table id="bugs" class="table table-bordered table-hover" style="width: 100%;">
         <thead>
         <tr>

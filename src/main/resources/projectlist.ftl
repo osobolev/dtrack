@@ -8,12 +8,12 @@
 </head>
 <body>
 <#include "header.ftl">
-<div class="container">
-    <h1>Проекты</h1>
+<div class="container pb-2 mt-2">
+    <h3>Проекты</h3>
     <#list login.availableProjects as p>
-        <h3 class="mt-4">
+        <h5 class="mt-4">
             <a href="${p.viewLink}">${p.name}</a>
-        </h3>
+        </h5>
         <#if p.description??>
             <small>${p.description}</small>
         </#if>

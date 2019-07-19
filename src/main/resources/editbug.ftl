@@ -13,7 +13,7 @@
 </head>
 <body>
 <#include "header.ftl">
-<div class="container" style="padding-bottom: 5px;">
+<div class="container pb-2 mt-2">
     <h3>Баг #${bug.bugNum}</h3>
     <form method="post" action="${bug.editLink}" enctype="multipart/form-data">
         <div class="form-row">
@@ -51,7 +51,7 @@
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Сохранить</button>
-        <button type="button" class="btn" onclick="location.href='${bug.viewLink}'">Отмена</button>
+        <button type="button" class="btn btn-secondary" onclick="location.href='${bug.viewLink}'">Отмена</button>
     </form>
 </div>
 
