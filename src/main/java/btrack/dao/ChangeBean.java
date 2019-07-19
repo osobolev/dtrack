@@ -40,4 +40,8 @@ public final class ChangeBean {
     public List<ChangeDetailBean> getDetails() {
         return details;
     }
+
+    public boolean hasComments() {
+        return comments.stream().anyMatch(c -> c.deleted == null);
+    }
 }

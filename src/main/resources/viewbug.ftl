@@ -1,7 +1,7 @@
 <#-- @ftlvariable name="bug" type="btrack.dao.BugBean" -->
 <#-- @ftlvariable name="transitions" type="java.util.List<btrack.dao.TransitionBean>" -->
 <#-- @ftlvariable name="attachments" type="java.util.List<btrack.dao.AttachmentBean>" -->
-<#-- @ftlvariable name="changes" type="java.util.List<btrack.dao.ChangeBean>" -->
+<#-- @ftlvariable name="changes" type="java.util.List<btrack.dao.ChangeListBean>" -->
 <#-- @ftlvariable name="users" type="java.util.List<btrack.dao.UserBean>" -->
 <#-- @ftlvariable name="error" type="java.lang.String" -->
 <!DOCTYPE html>
@@ -34,7 +34,7 @@
             Статус: ${bug.state}
             <form method="post" action="${bug.assignLink}" id="assignForm">
                 <#if bug.assignedUserId??>
-                <input type="hidden" value="${bug.assignedUserId}" name="oldUserId">
+                    <input type="hidden" value="${bug.assignedUserId}" name="oldUserId">
                 </#if>
                 <label for="newUserId">Исполнитель:</label>
                 <select name="newUserId" id="newUserId" onchange="onAssignedChange()">
@@ -59,37 +59,49 @@
     <#list attachments as a>
         <a href="${bug.getAttachmentLink(a)}" target="_blank">${a.name}</a>
     </#list>
+
     <#if changes?has_content>
-    <div>
-        <#list changes as c>
+    <ul class="nav nav-tabs" role="tablist">
+        <#list changes as change>
+        <li class="nav-item">
+            <a class="nav-link<#if change?is_first> active</#if>" data-toggle="tab" href="#${change.id}" role="tab">${change.text}</a>
+        </li>
+        </#list>
+    </ul>
+
+    <div class="tab-content mt-2">
+        <#list changes as change>
+        <div id="${change.id}" class="tab-pane<#if change?is_first> show active</#if>" role="tabpanel">
+            <#list change.changes as c>
             <div>
-            <h6 class="change-heading">
-                <#if c.comments?has_content>
-                    Комментарий пользователя ${c.user} ${c.ts}
-                <#else>
-                    Изменено пользователем ${c.user} ${c.ts}
-                </#if>
-            </h6>
-            <#list c.comments as cc>
-            <div class="change-comment">
-                <#if cc.deleted??>
-                    <em>Комментарий удален пользователем ${cc.deleteUser} ${cc.deleted}</em>
-                <#else>
-                    <form action="${cc.deleteLink}" method="post" id="deleteComment">
-                        <input type="hidden" name="commentId" value="${cc.id}">
-                        <button type="button" class="delete-comment-button" onclick="confirmDeleteComment()">Удалить</button>
-                    </form>
-                    ${cc.commentHtml?no_esc}
-                    <div>
-                        <#list cc.commentAttachments as ca>
-                            <a href="${bug.getCommentAttachmentLink(ca)}" target="_blank">${ca.name}</a><#if ca_has_next>, </#if>
-                        </#list>
-                    </div>
-                </#if>
-            </div>
-            </#list>
-            <ul class="change-other">
-                <#list c.details as cd>
+                <h6 class="change-heading">
+                    <#if c.comments?has_content>
+                        Комментарий пользователя ${c.user} ${c.ts}
+                    <#else>
+                        Изменено пользователем ${c.user} ${c.ts}
+                    </#if>
+                </h6>
+                <#list c.comments as cc>
+                <div class="change-comment">
+                    <#if cc.deleted??>
+                        <em>Комментарий удален пользователем ${cc.deleteUser} ${cc.deleted}</em>
+                    <#else>
+                        <form action="${cc.deleteLink}" method="post">
+                            <input type="hidden" name="commentId" value="${cc.id}">
+                            <button type="button" class="delete-comment-button" onclick="confirmDeleteComment(event)">Удалить
+                            </button>
+                        </form>
+                        ${cc.commentHtml?no_esc}
+                        <div>
+                            <#list cc.commentAttachments as ca>
+                                <a href="${bug.getCommentAttachmentLink(ca)}" target="_blank">${ca.name}</a><#if ca_has_next>, </#if>
+                            </#list>
+                        </div>
+                    </#if>
+                </div>
+                </#list>
+                <ul class="change-other">
+                    <#list c.details as cd>
                     <li>
                         <#if cd.fieldChange??>
                             ${cd.fieldChange}
@@ -100,30 +112,37 @@
                             </#list>
                         </#if>
                     </li>
-                </#list>
-            </ul>
+                    </#list>
+                </ul>
             </div>
+            </#list>
+        </div>
         </#list>
     </div>
     </#if>
-    <h5>Добавить комментарий:</h5>
-    <form method="post" action="${bug.commentLink}" enctype="multipart/form-data">
-        <div class="form-group">
-            <textarea id="summernote" name="comment"></textarea>
-        </div>
-        <div class="form-group">
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" id="files" name="files" onchange="onFileChange()" multiple>
-                <label class="custom-file-label" for="files" id="filesLabel">Прикрепить файлы</label>
+
+    <a class="btn btn-secondary" data-toggle="collapse" href="#collapseComment" role="button">
+        Новый комментарий
+    </a>
+    <div class="collapse mt-2" id="collapseComment">
+        <form method="post" action="${bug.commentLink}" enctype="multipart/form-data">
+            <div class="form-group">
+                <textarea id="summernote" name="comment"></textarea>
             </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Добавить комментарий</button>
-    </form>
+            <div class="form-group">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="files" name="files" onchange="onFileChange()" multiple>
+                    <label class="custom-file-label" for="files" id="filesLabel">Прикрепить файлы</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Добавить комментарий</button>
+        </form>
+    </div>
 </div>
 
 <script>
     $(document).ready(function () {
-        configSummer($('#summernote'), '200px');
+        configSummer($('#summernote'), '180px');
     });
 
     function onFileChange() {
@@ -134,11 +153,16 @@
         $('#assignForm').submit();
     }
 
-    function confirmDeleteComment() {
+    function confirmDeleteComment(e) {
         if (!confirm('Действительно удалить комментарий?'))
             return;
-        $('#deleteComment').submit();
+        var form = $(e.target).parent();
+        form.submit();
     }
+
+    $('#collapseComment').on('shown.bs.collapse', function () {
+        this.scrollIntoView();
+    });
 </script>
 
 </body>

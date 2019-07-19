@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class ViewBugAction extends Action {
 
@@ -33,7 +34,11 @@ public final class ViewBugAction extends Action {
             throw new NoAccessException("Bug " + bugId + " not found", HttpServletResponse.SC_NOT_FOUND);
         List<TransitionBean> transitions = dao.listTransitions(request.projectId, bug.stateId);
         List<AttachmentBean> attachments = dao.listBugAttachments(bugId);
-        List<ChangeBean> changes = dao.loadBugHistory(bug.bugNum, bugId, request);
+        List<ChangeBean> allChanges = dao.loadBugHistory(bug.bugNum, bugId, request);
+        List<ChangeListBean> changes = new ArrayList<>();
+        List<ChangeBean> comments = allChanges.stream().filter(ChangeBean::hasComments).collect(Collectors.toList());
+        changes.add(new ChangeListBean("comments", "Комментарии", comments));
+        changes.add(new ChangeListBean("changes", "Все изменения", allChanges));
         List<UserBean> users = new ArrayList<>();
         Integer toSkip;
         if (bug.getAssignedUserId() != null && bug.getAssignedUserId().intValue() == request.getUserId()) {

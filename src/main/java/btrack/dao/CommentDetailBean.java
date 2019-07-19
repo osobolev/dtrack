@@ -11,7 +11,7 @@ public final class CommentDetailBean {
     private final int id;
     private final String commentHtml;
     private final List<AttachmentBean> commentAttachments;
-    private final LocalDateTime deleted;
+    final LocalDateTime deleted;
     private final String deleteUser;
     private final LinkFactory linkFactory;
 

@@ -9,6 +9,17 @@
     <link rel="stylesheet" type="text/css" href="DataTables-1.10.18/css/dataTables.bootstrap4.min.css"/>
     <script type="text/javascript" src="DataTables-1.10.18/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="DataTables-1.10.18/js/dataTables.bootstrap4.min.js"></script>
+    <style>
+        .bugPriority1 {
+            background-color: #fed;
+        }
+        .bugPriority2 {
+            background-color: #ffb;
+        }
+        .bugPriority3 {
+            background-color: #fbfbfb;
+        }
+    </style>
 </head>
 <body>
 <#include "header.ftl">
@@ -27,7 +38,7 @@
         </thead>
         <tbody>
         <#list bugs as b>
-            <tr>
+            <tr class="bugPriority${b.priorityId}">
                 <td data-order="${b.bugNum}"><a href="${b.viewLink}">#${b.bugNum}</a></td>
                 <td><a href="${b.viewLink}">${b.title}</a></td>
                 <td>${b.assignedUser!}</td>
