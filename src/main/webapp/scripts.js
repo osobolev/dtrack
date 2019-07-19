@@ -28,10 +28,7 @@ function configTable(elem, pageSize, what, columns) {
         "iDisplayLength": pageSize,
         "order": [],
         "autoWidth": false,
-        "columns": columns,
-        "createdRow": function (row, data, index) {
-            // todo: color with severity
-        }
+        "columns": columns
     });
 }
 
