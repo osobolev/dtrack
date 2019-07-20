@@ -298,7 +298,10 @@ public final class BugEditDao extends BaseDao {
                                   String fromStateCode, String toStateCode) throws SQLException {
         return updateBugFields(
             bugId, userId, changeBox,
-            Collections.singletonList(new FieldUpdate<>("state_code", toStateCode, true, fromStateCode, ResultSet::getString, PreparedStatement::setString))
+            Arrays.asList(
+                new FieldUpdate<>("state_code", toStateCode, true, fromStateCode, ResultSet::getString, PreparedStatement::setString),
+                new FieldUpdate<>("assigned_user_id", null, BaseDao::getInt, BaseDao::setInt)
+            )
         );
     }
 
