@@ -7,5 +7,6 @@ def add(name, path) {
 }
 
 add('common', 'subprojects/common')
+add('dao_test', 'subprojects/dao_test')
 add('web', 'subprojects/web')
 add('admin', 'subprojects/admin')

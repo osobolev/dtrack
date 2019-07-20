@@ -1,5 +1,8 @@
 package btrack;
 
+import btrack.web.Logger;
+import btrack.web.Main;
+
 public final class TestMain {
 
     public static void main(String[] args) {

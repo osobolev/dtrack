@@ -1,8 +1,8 @@
-<#-- @ftlvariable name="bug" type="btrack.data.BugBean" -->
-<#-- @ftlvariable name="transitions" type="java.util.List<btrack.data.TransitionBean>" -->
-<#-- @ftlvariable name="attachments" type="java.util.List<btrack.data.AttachmentBean>" -->
-<#-- @ftlvariable name="changes" type="java.util.List<btrack.data.ChangeListBean>" -->
-<#-- @ftlvariable name="users" type="java.util.List<btrack.data.UserBean>" -->
+<#-- @ftlvariable name="bug" type="btrack.web.data.BugBean" -->
+<#-- @ftlvariable name="transitions" type="java.util.List<btrack.web.data.TransitionBean>" -->
+<#-- @ftlvariable name="attachments" type="java.util.List<btrack.web.data.AttachmentBean>" -->
+<#-- @ftlvariable name="changes" type="java.util.List<btrack.web.data.ChangeListBean>" -->
+<#-- @ftlvariable name="users" type="java.util.List<btrack.web.data.UserBean>" -->
 <#-- @ftlvariable name="error" type="java.lang.String" -->
 <!DOCTYPE html>
 <html lang="ru">
