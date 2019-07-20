@@ -43,7 +43,7 @@ public final class Exporter {
         }
         Project project = new Project(projectStates, projectPriorities, projectTransitions, projectReports);
         String json = gson.toJson(project);
-        pw.write(json);
+        pw.println(json);
         pw.flush();
     }
 }

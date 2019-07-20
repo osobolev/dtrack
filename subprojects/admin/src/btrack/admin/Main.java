@@ -7,6 +7,7 @@ import btrack.common.AppConfig;
 import btrack.common.ConnectionProducer;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -501,9 +502,12 @@ public final class Main {
             pw.println(ue.getMessage());
         } catch (Exception ex) {
             ex.printStackTrace(pw);
+        } finally {
+            pw.flush();
         }
     }
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void main(String[] args) {
         ConnectionProducer dataSource = () -> {
             AppConfig appConfig = AppConfig.load();
@@ -511,15 +515,29 @@ public final class Main {
         };
 
         Console console = System.console();
-        Main main = new Main(
-            console.reader(), console.writer(),
-            () -> {
-                char[] chars = console.readPassword();
-                if (chars == null)
-                    return null;
-                return new String(chars);
-            }
-        );
+        Main main;
+        if (console == null) {
+            InputStreamReader in = new InputStreamReader(System.in, StandardCharsets.UTF_8);
+            PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
+            main = new Main(
+                in, pw,
+                () -> {
+                    pw.print("Password: ");
+                    pw.flush();
+                    return new Scanner(in).nextLine();
+                }
+            );
+        } else {
+            main = new Main(
+                console.reader(), console.writer(),
+                () -> {
+                    char[] chars = console.readPassword("Password: ");
+                    if (chars == null)
+                        return null;
+                    return new String(chars);
+                }
+            );
+        }
         main.admin(dataSource, args);
     }
 }
