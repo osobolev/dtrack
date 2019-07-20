@@ -1,47 +1,37 @@
-plugins {
-    id 'war'
+subprojects {
+    group 'btrack'
+    version '1.0-SNAPSHOT'
+
+    apply plugin: 'java'
+    
+    sourceCompatibility = 1.8
+    compileJava.options.encoding = 'UTF-8'
+    compileTestJava.options.encoding = 'UTF-8'
+
+    sourceSets.main.java.srcDirs = ['src']
+    sourceSets.main.resources.srcDirs = ['resources']
+    sourceSets.test.java.srcDirs = ['test']
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+/*
+    def dest = "$rootDir/distr"
+
+    task webFiles(type: Copy) {
+        from 'src/main/webapp'
+        into "$dest/root"
+    }
+
+    task copyServerJars(type: Copy) {
+        from project.configurations.runtime
+        from jar
+        from 'config'
+        into "$dest"
+    }
+
+    task distr(dependsOn: [webFiles, copyServerJars])
+*/
 }
-
-group 'btrack'
-version '1.0-SNAPSHOT'
-
-sourceCompatibility = 1.8
-compileJava.options.encoding = 'UTF-8'
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
-dependencies {
-    compile 'org.eclipse.jetty:jetty-servlet:9.4.19.v20190610'
-    compile 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20190610.1'
-    compile 'org.freemarker:freemarker:2.3.28'
-    compile 'commons-fileupload:commons-fileupload:1.4'
-    compile 'com.zaxxer:HikariCP:3.3.1'
-    compile 'org.json:json:20180813'
-    compile 'com.github.osobolev.app-delivery:apploader-common:3.0'
-    runtime 'org.postgresql:postgresql:42.2.5'
-    runtime 'org.slf4j:slf4j-nop:1.7.26'
-}
-
-jar.manifest.attributes(
-    'Class-Path': configurations.runtime.collect { it.name }.sort().join(' '),
-    'Main-Class': 'btrack.Main'
-)
-
-def dest = "$rootDir/distr"
-
-task webFiles(type: Copy) {
-    from 'src/main/webapp'
-    into "$dest/root"
-}
-
-task copyServerJars(type: Copy) {
-    from project.configurations.runtime
-    from jar
-    from 'config'
-    into "$dest"
-}
-
-task distr(dependsOn: [webFiles, copyServerJars])

@@ -1,2 +1,11 @@
 rootProject.name = 'btrack'
 
+def add(name, path) {
+    def dir = file(path)
+    include name
+    project(":${name}").projectDir = dir
+}
+
+add('common', 'subprojects/common')
+add('web', 'subprojects/web')
+add('admin', 'subprojects/admin')
