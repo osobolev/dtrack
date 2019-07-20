@@ -148,12 +148,7 @@ public final class BugViewDao extends BaseDao {
         void addWhere(PreparedStatement stmt) throws SQLException;
     }
 
-    public List<BugBean> listBugs(LinkFactory linkFactory, boolean needsFullText, String where, String orderBy, Conditioner conditioner) throws SQLException {
-        if (testing) {
-            where = "true";
-            orderBy = "order by 1";
-            conditioner = stmt -> {};
-        }
+    private List<BugBean> doListBugs(LinkFactory linkFactory, boolean needsFullText, String where, String orderBy, Conditioner conditioner) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select b.visible_id, b.created, b.modified, uc.login, um.login," +
             "       b.state_code, s.name, b.priority_code, p.name, b.assigned_user_id, ua.login," +
@@ -196,21 +191,21 @@ public final class BugViewDao extends BaseDao {
         }
     }
 
+    public List<BugBean> listBugs(LinkFactory linkFactory, String where, String orderBy, Conditioner conditioner) throws SQLException {
+        if (testing) {
+            where = "true";
+            orderBy = "order by 1";
+            conditioner = stmt -> {};
+        }
+        return doListBugs(linkFactory, false, where, orderBy, conditioner);
+    }
+
     public BugBean loadBug(int bugId, LinkFactory linkFactory) throws SQLException {
-        List<BugBean> bugs = listBugs(linkFactory, true, "b.id = ?", "", stmt -> stmt.setInt(1, bugId));
+        List<BugBean> bugs = doListBugs(linkFactory, true, "b.id = ?", "", stmt -> stmt.setInt(1, bugId));
         if (bugs.size() != 1)
             return null;
         return bugs.get(0);
     }
-
-//    public List<BugBean> listBugs(int projectId, String reportSql, LinkFactory linkFactory) throws SQLException {
-//        return listBugs(
-//            linkFactory, false,
-//            "b.project_id = ? and b.id in (" + reportSql + ")",
-//            "order by b.id",
-//            stmt -> stmt.setInt(1, projectId)
-//        );
-//    }
 
     public List<AttachmentBean> listBugAttachments(int bugId) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(

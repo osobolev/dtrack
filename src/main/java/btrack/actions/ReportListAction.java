@@ -27,6 +27,7 @@ public final class ReportListAction extends Action {
         request.putTo(params);
         params.put("stats", stats);
         params.put("reports", reports);
+        params.put("skipReports", true);
         TemplateUtil.process("reportlist.ftl", params, resp.getWriter());
     }
 }

@@ -1,5 +1,6 @@
 <#-- @ftlvariable name="stats" type="java.util.List<btrack.data.StatsBean>" -->
 <#-- @ftlvariable name="reports" type="java.util.List<btrack.data.ReportBean>" -->
+<#-- @ftlvariable name="project" type="btrack.actions.ProjectInfo" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -29,7 +30,12 @@
         <tbody>
         <#list reports as r>
             <tr>
-                <td data-order="${r.reportNum}"><a href="${r.viewLink}">#${r.reportNum}</a></td>
+                <td data-order="${r.reportNum}">
+                    <span class="align-middle">
+                    <img src="<#if project.isFavourite(r)>star.png<#else>no_star.png</#if>" alt="star" style="vertical-align: text-top; margin-right: 3px; cursor: pointer;" onclick="favourite(event, '${r.viewLink}')">
+                    <a href="${r.viewLink}">#${r.reportNum}</a>
+                    </span>
+                </td>
                 <td><a href="${r.viewLink}">${r.title}</a></td>
             </tr>
         </#list>
@@ -44,6 +50,19 @@
             null
         ]);
     });
+
+    function favourite(event, reportLink) {
+        var src = $(event.target).attr('src');
+        var page;
+        if (src === 'star.png') {
+            $(event.target).attr('src', 'no_star.png');
+            page = 'unlike.html';
+        } else {
+            $(event.target).attr('src', 'star.png');
+            page = 'like.html';
+        }
+        $.post(reportLink + '/' + page);
+    }
 </script>
 
 </body>

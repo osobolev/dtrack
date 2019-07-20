@@ -1,20 +1,20 @@
 package btrack.actions;
 
-import btrack.data.ProjectItem;
 import btrack.UserInfo;
 import btrack.data.LinkFactory;
 import btrack.data.ProjectBean;
+import btrack.data.ProjectItem;
+import btrack.data.ReportBean;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public final class ProjectInfo extends LoginInfo implements LinkFactory {
 
     public final int projectId;
     public final String projectName;
     private final String projectBase;
-    // todo: add list of reports for current project
+    private final List<ReportBean> favourites = new ArrayList<>();
+    private final Set<Integer> favouriteIds = new HashSet<>();
 
     public ProjectInfo(String webRoot, Locale clientLocale, UserInfo user, List<ProjectBean> availableProjects,
                        int projectId, String projectName, String projectBase) {
@@ -24,8 +24,23 @@ public final class ProjectInfo extends LoginInfo implements LinkFactory {
         this.projectBase = projectBase;
     }
 
+    public void addFavourites(List<ReportBean> reports) {
+        favourites.addAll(reports);
+        for (ReportBean report : reports) {
+            favouriteIds.add(report.id);
+        }
+    }
+
     public String getProjectName() {
         return projectName;
+    }
+
+    public List<ReportBean> getFavourites() {
+        return favourites;
+    }
+
+    public boolean isFavourite(ReportBean report) {
+        return favouriteIds.contains(report.id);
     }
 
     private String getProjectUrl(String page) {

@@ -112,6 +112,6 @@ public final class DaoTest {
     }
 
     public static void main(String[] args) throws Throwable {
-        testDaos(Arrays.asList(BugViewDao.class, BugEditDao.class));
+        testDaos(Arrays.asList(BugViewDao.class, BugEditDao.class, ReportDao.class));
     }
 }

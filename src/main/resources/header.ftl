@@ -1,3 +1,4 @@
+<#-- @ftlvariable name="skipReports" type="boolean" -->
 <#-- @ftlvariable name="login" type="btrack.actions.LoginInfo" -->
 <#-- @ftlvariable name="project" type="btrack.actions.ProjectInfo" -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -15,9 +16,16 @@
                     </#list>
                 </div>
             </li>
-            <li class="nav-item active mr-4">
-                <a class="nav-link" href="${project.reportRootUrl}"><u>Просмотр багов</u></a>
-                <#-- todo: show dropdown with available reports for quick navigation??? -->
+            <li class="nav-item active dropdown mr-3">
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Просмотр багов</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="${project.reportRootUrl}">Все отчеты</a>
+                    <#if !skipReports??>
+                    <#list project.favourites as fav>
+                        <a class="dropdown-item" href="${fav.viewLink}">${fav.title}</a>
+                    </#list>
+                    </#if>
+                </div>
             </li>
             <li class="nav-item active">
                 <button type="button" class="btn btn-primary" onclick="location.href='${project.newBugUrl}';">Новый баг</button>

@@ -2,10 +2,10 @@ package btrack;
 
 import btrack.actions.*;
 import btrack.dao.BugViewDao;
+import btrack.dao.ReportDao;
 import btrack.data.ProjectBean;
 import btrack.data.ProjectItem;
 import btrack.data.ReportBean;
-import btrack.dao.ReportDao;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -99,7 +99,11 @@ final class RouterServlet extends BaseServlet {
                 throw new NoAccessException("User " + user.id + " has no access to project " + projectName, HttpServletResponse.SC_FORBIDDEN);
             }
             String projectBase = ProjectBean.getProjectBase(projectRoot, projectName);
-            ProjectInfo request = new ProjectInfo(webRoot, clientLocale, user, availableProjects, projectId, projectName, projectBase);
+            ProjectInfo request = new ProjectInfo(
+                webRoot, clientLocale, user, availableProjects, projectId, projectName, projectBase
+            );
+            List<ReportBean> favourites = new ReportDao(connection).listFavouriteReports(projectId, user.id, request);
+            request.addFavourites(favourites);
             String page = info.page;
             if (info.item != null && info.num != null) {
                 int num = info.num.intValue();
@@ -128,11 +132,17 @@ final class RouterServlet extends BaseServlet {
                     return new AttachmentAction(true, num);
                 case REPORT:
                     ReportDao rdao = new ReportDao(connection);
-                    ReportBean report = rdao.loadReport(projectId, num, request);
-                    if (report == null) {
+                    Integer maybeReportId = rdao.getReportId(projectId, num);
+                    if (maybeReportId == null) {
                         throw new NoAccessException("Report not found: " + projectName + "/" + num, HttpServletResponse.SC_NOT_FOUND);
                     }
-                    return new ViewReportAction(report, request);
+                    int reportId = maybeReportId.intValue();
+                    if ("like.html".equals(page)) {
+                        return new ReportLikeAction(reportId, true, request);
+                    } else if ("unlike.html".equals(page)) {
+                        return new ReportLikeAction(reportId, false, request);
+                    }
+                    return new ViewReportAction(reportId, request);
                 }
             } else {
                 if ("newbug.html".equals(page)) {

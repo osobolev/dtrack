@@ -32,7 +32,21 @@ public final class BugEditDao extends BaseDao {
         }
     }
 
-    public String getDefaultState(int projectId) throws SQLException {
+    public String getDefaultState(int projectId, int userId) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "select default_state_code" +
+            "  from user_states" +
+            " where project_id = ?" +
+            "   and user_id = ?"
+        )) {
+            stmt.setInt(1, projectId);
+            stmt.setInt(2, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next() && !testing) {
+                    return rs.getString(1);
+                }
+            }
+        }
         try (PreparedStatement stmt = connection.prepareStatement(
             "select code" +
             "  from project_states" +
@@ -41,12 +55,12 @@ public final class BugEditDao extends BaseDao {
         )) {
             stmt.setInt(1, projectId);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (!rs.next()) {
-                    return null;
+                if (rs.next() && !testing) {
+                    return rs.getString(1);
                 }
-                return rs.getString(1);
             }
         }
+        return null;
     }
 
     public int getNextBugId(int projectId) throws SQLException {
@@ -237,7 +251,7 @@ public final class BugEditDao extends BaseDao {
             }
         }
         List<FieldUpdate<?>> updated = fields.stream().filter(FieldUpdate::isUpdated).collect(Collectors.toList());
-        if (!updated.isEmpty()) {
+        if (!updated.isEmpty() || testing) {
             int id = getChangeId(bugId, userId, changeBox);
             String insertFields = updated.stream().map(uf -> uf.oldField + ", " + uf.newField).collect(Collectors.joining(", "));
             String insertValues = updated.stream().map(uf -> "?, ?").collect(Collectors.joining(", "));

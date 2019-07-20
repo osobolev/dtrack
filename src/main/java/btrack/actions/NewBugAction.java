@@ -43,7 +43,7 @@ public final class NewBugAction extends Action {
 
     private BugCoords createBug(BugEditDao dao, Map<String, String> parameters) throws ValidationException, SQLException {
         BugData data = BugData.create(dao, request, parameters);
-        String stateCode = dao.getDefaultState(request.projectId);
+        String stateCode = dao.getDefaultState(request.projectId, request.getUserId());
         if (stateCode == null) {
             throw new ValidationException("No default state for project " + request.projectName);
         }

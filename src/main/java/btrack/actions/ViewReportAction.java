@@ -1,5 +1,6 @@
 package btrack.actions;
 
+import btrack.dao.ReportDao;
 import btrack.data.BugBean;
 import btrack.dao.BugViewDao;
 import btrack.data.PriorityBean;
@@ -19,11 +20,11 @@ public final class ViewReportAction extends Action {
 
     private static final String USER_FIELD = "user";
 
-    private final ReportBean report;
+    private final int reportId;
     private final ProjectInfo request;
 
-    public ViewReportAction(ReportBean report, ProjectInfo request) {
-        this.report = report;
+    public ViewReportAction(int reportId, ProjectInfo request) {
+        this.reportId = reportId;
         this.request = request;
     }
 
@@ -88,7 +89,7 @@ public final class ViewReportAction extends Action {
     private List<BugBean> performQuery(BugViewDao dao, boolean simple, String where, String orderBy) throws SQLException {
         ParsedWhere parsedWhere = parseWhere(where, simple);
         return dao.listBugs(
-            request, false,
+            request,
             "b.project_id = ? and (" + parsedWhere.where + ")",
             "order by " + (orderBy == null ? "visible_id" : orderBy),
             stmt -> {
@@ -125,7 +126,7 @@ public final class ViewReportAction extends Action {
                     }
                     return;
                 } else {
-                    throw new ValidationException("Wrong query in report " + report.id);
+                    throw new ValidationException("Wrong query in report " + reportId);
                 }
             }
         } else if (value instanceof JSONArray) {
@@ -135,13 +136,16 @@ public final class ViewReportAction extends Action {
             }
             return;
         } else {
-            throw new ValidationException("Wrong query in report " + report.id);
+            throw new ValidationException("Wrong query in report " + reportId);
         }
         groups.add(bugs);
     }
 
     @Override
     public void get(Context ctx, HttpServletResponse resp) throws Exception {
+        ReportBean report = new ReportDao(ctx.connection).loadReport(reportId, request);
+        if (report == null)
+            throw new NoAccessException("Report " + reportId + " not found", HttpServletResponse.SC_NOT_FOUND);
         BugViewDao dao = new BugViewDao(ctx.connection);
         List<List<BugBean>> groups = new ArrayList<>();
         if (report.simpleQuery != null) {

@@ -18,6 +18,10 @@ public final class ReportBean {
         this.linkFactory = linkFactory;
     }
 
+    public String getId() {
+        return String.valueOf(id);
+    }
+
     public String getReportNum() {
         return String.valueOf(reportNum);
     }

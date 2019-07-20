@@ -13,7 +13,7 @@ import java.sql.Connection;
 
 abstract class BaseServlet extends HttpServlet {
 
-    private final Logger logger;
+    protected final Logger logger;
     private final ConnectionProducer dataSource;
 
     protected BaseServlet(Logger logger, ConnectionProducer dataSource) {
