@@ -1,4 +1,4 @@
-package btrack.dao;
+package btrack.data;
 
 import java.util.List;
 

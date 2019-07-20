@@ -1,6 +1,6 @@
-<#-- @ftlvariable name="report" type="btrack.dao.ReportBean" -->
-<#-- @ftlvariable name="bugGroups" type="java.util.List<java.util.List<btrack.dao.BugBean>>" -->
-<#-- @ftlvariable name="priorities" type="java.util.List<btrack.dao.PriorityBean>" -->
+<#-- @ftlvariable name="report" type="btrack.data.ReportBean" -->
+<#-- @ftlvariable name="bugGroups" type="java.util.List<java.util.List<btrack.data.BugBean>>" -->
+<#-- @ftlvariable name="priorities" type="java.util.List<btrack.data.PriorityBean>" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>

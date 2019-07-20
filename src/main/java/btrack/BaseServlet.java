@@ -4,8 +4,6 @@ import btrack.actions.Action;
 import btrack.actions.Context;
 import btrack.actions.NoAccessException;
 import btrack.actions.ValidationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,11 +13,11 @@ import java.sql.Connection;
 
 abstract class BaseServlet extends HttpServlet {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
+    private final Logger logger;
     private final ConnectionProducer dataSource;
 
-    protected BaseServlet(ConnectionProducer dataSource) {
+    protected BaseServlet(Logger logger, ConnectionProducer dataSource) {
+        this.logger = logger;
         this.dataSource = dataSource;
     }
 
@@ -42,13 +40,13 @@ abstract class BaseServlet extends HttpServlet {
                 }
             }
         } catch (NoAccessException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex);
             resp.sendError(ex.code);
         } catch (ValidationException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
         } catch (Exception ex) {
-            logger.error("Error", ex);
+            logger.error(ex);
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

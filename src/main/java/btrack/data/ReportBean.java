@@ -1,6 +1,4 @@
-package btrack.dao;
-
-import btrack.ProjectItem;
+package btrack.data;
 
 public final class ReportBean {
 

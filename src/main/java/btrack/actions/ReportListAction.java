@@ -1,9 +1,9 @@
 package btrack.actions;
 
 import btrack.dao.BugViewDao;
-import btrack.dao.ReportBean;
+import btrack.data.ReportBean;
 import btrack.dao.ReportDao;
-import btrack.dao.StatsBean;
+import btrack.data.StatsBean;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;

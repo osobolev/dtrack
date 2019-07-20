@@ -1,5 +1,5 @@
-<#-- @ftlvariable name="stats" type="java.util.List<btrack.dao.StatsBean>" -->
-<#-- @ftlvariable name="reports" type="java.util.List<btrack.dao.ReportBean>" -->
+<#-- @ftlvariable name="stats" type="java.util.List<btrack.data.StatsBean>" -->
+<#-- @ftlvariable name="reports" type="java.util.List<btrack.data.ReportBean>" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>

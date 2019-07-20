@@ -1,6 +1,6 @@
 package btrack.actions;
 
-import btrack.dao.DateFormatter;
+import btrack.data.DateFormatter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;

@@ -7,8 +7,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.nio.file.Files;
@@ -18,9 +16,7 @@ import java.util.Properties;
 
 public final class Main {
 
-    public static void main(String[] args) {
-        // todo: logger impl!!! for production!!!
-        Logger logger = LoggerFactory.getLogger(Main.class);
+    public static void runServer(Logger logger, boolean debug) {
         try {
             Properties props = new Properties();
             Path path = Paths.get("btrack.properties");
@@ -47,16 +43,22 @@ public final class Main {
             ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
             String root = props.getProperty("http.root", "src/main/webapp");
             handler.setResourceBase(root);
-            handler.addServlet(new ServletHolder(new RouterServlet(dataSource)), "/p/*");
-            handler.addServlet(new ServletHolder(new LoginServlet(dataSource)), "/login.html");
+            handler.addServlet(new ServletHolder(new RouterServlet(logger, dataSource, debug)), "/p/*");
+            handler.addServlet(new ServletHolder(new LoginServlet(logger, dataSource, debug)), "/login.html");
             handler.addServlet(new ServletHolder(new LogoutServlet()), "/logout.html");
-            handler.addServlet(new ServletHolder(new RootServlet(dataSource)), "");
+            handler.addServlet(new ServletHolder(new RootServlet(logger, dataSource)), "");
             handler.addServlet(DefaultServlet.class, "/");
             server.setHandler(handler);
             server.start();
+            logger.info("Server started on port " + port + ", web root " + root);
         } catch (Throwable ex) {
-            logger.error("Fatal error", ex);
+            logger.error(ex);
             System.exit(1);
         }
+    }
+
+    public static void main(String[] args) {
+        Logger logger = new FileLogger("btrack.log");
+        runServer(logger, false);
     }
 }

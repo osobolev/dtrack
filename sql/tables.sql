@@ -6,7 +6,7 @@ CREATE TABLE users (
 
 CREATE TABLE projects (
   id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
+  name TEXT NOT NULL UNIQUE,
   description TEXT,
   last_visible_bug_id INT NOT NULL DEFAULT 0
 );
@@ -64,6 +64,20 @@ CREATE TABLE reports (
   simple_query TEXT,
   json_query TEXT,
     UNIQUE (project_id, visible_id)
+);
+
+CREATE TABLE user_states (
+  project_id INT NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
+  user_id INT NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  default_state_code TEXT NOT NULL,
+    PRIMARY KEY (project_id, user_id),
+    FOREIGN KEY (project_id, default_state_code) REFERENCES project_states (project_id, code) ON DELETE CASCADE
+);
+
+CREATE TABLE user_reports (
+  user_id INT NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  report_id INT NOT NULL REFERENCES reports (id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, report_id)
 );
 
 CREATE TABLE bugs (

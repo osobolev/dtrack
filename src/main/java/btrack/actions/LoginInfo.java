@@ -1,7 +1,7 @@
 package btrack.actions;
 
 import btrack.UserInfo;
-import btrack.dao.ProjectBean;
+import btrack.data.ProjectBean;
 
 import java.util.List;
 import java.util.Locale;

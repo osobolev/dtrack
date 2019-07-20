@@ -1,9 +1,9 @@
 package btrack.actions;
 
-import btrack.dao.BugBean;
+import btrack.data.BugBean;
 import btrack.dao.BugViewDao;
-import btrack.dao.PriorityBean;
-import btrack.dao.ReportBean;
+import btrack.data.PriorityBean;
+import btrack.data.ReportBean;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;

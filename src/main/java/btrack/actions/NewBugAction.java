@@ -2,7 +2,7 @@ package btrack.actions;
 
 import btrack.dao.BugEditDao;
 import btrack.dao.BugViewDao;
-import btrack.dao.PriorityBean;
+import btrack.data.PriorityBean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

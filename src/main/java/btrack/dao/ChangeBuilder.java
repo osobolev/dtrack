@@ -1,5 +1,7 @@
 package btrack.dao;
 
+import btrack.data.*;
+
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;

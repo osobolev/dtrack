@@ -1,6 +1,9 @@
 package btrack.actions;
 
 import btrack.dao.*;
+import btrack.data.AttachmentBean;
+import btrack.data.BugBean;
+import btrack.data.PriorityBean;
 import freemarker.template.TemplateException;
 
 import javax.servlet.http.HttpServletRequest;

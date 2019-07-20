@@ -1,5 +1,7 @@
 package btrack.dao;
 
+import btrack.data.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,18 +15,34 @@ public final class BugViewDao extends BaseDao {
         super(connection);
     }
 
-    // todo: use passHash!!!
-    public Integer checkLogin(String login, byte[] passHash) throws SQLException {
-        try (PreparedStatement stmt = connection.prepareStatement(
-            "select id" +
-            "  from users" +
-            " where login = ?"
-        )) {
-            stmt.setString(1, login);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (!rs.next())
-                    return null;
-                return rs.getInt(1);
+    public Integer checkLogin(boolean debug, String login, byte[] passHash) throws SQLException {
+        if (debug) {
+            try (PreparedStatement stmt = connection.prepareStatement(
+                "select id" +
+                "  from users" +
+                " where login = ?"
+            )) {
+                stmt.setString(1, login);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (!rs.next())
+                        return null;
+                    return rs.getInt(1);
+                }
+            }
+        } else {
+            try (PreparedStatement stmt = connection.prepareStatement(
+                "select id" +
+                "  from users" +
+                " where login = ?" +
+                "   and pass_hash = ?"
+            )) {
+                stmt.setString(1, login);
+                stmt.setBytes(2, passHash);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (!rs.next())
+                        return null;
+                    return rs.getInt(1);
+                }
             }
         }
     }

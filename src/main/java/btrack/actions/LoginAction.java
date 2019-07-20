@@ -15,17 +15,19 @@ import java.util.Map;
 
 public final class LoginAction extends Action {
 
+    private final boolean debug;
     private final String redirectTo;
     private final RequestInfo request;
 
-    public LoginAction(String redirectTo, RequestInfo request) {
+    public LoginAction(boolean debug, String redirectTo, RequestInfo request) {
+        this.debug = debug;
         this.redirectTo = redirectTo;
         this.request = request;
     }
 
-    private void render(HttpServletResponse resp, String login, String error) throws IOException, TemplateException {
+    private void render(HttpServletResponse resp, String login, String redirect, String error) throws IOException, TemplateException {
         Map<String, Object> params = new HashMap<>();
-        params.put("redirect", redirectTo);
+        params.put("redirect", redirect);
         params.put("error", error);
         params.put("login", login == null ? "" : login);
         request.putTo(params);
@@ -34,10 +36,10 @@ public final class LoginAction extends Action {
 
     @Override
     public void get(Context ctx, HttpServletResponse resp) throws Exception {
-        render(resp, null, null);
+        render(resp, null, redirectTo, null);
     }
 
-    static byte[] hash(String login, String password) throws NoSuchAlgorithmException {
+    private static byte[] hash(String login, String password) throws NoSuchAlgorithmException {
         MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
         sha256.update((login + password).getBytes(StandardCharsets.UTF_8));
         return sha256.digest();
@@ -49,10 +51,10 @@ public final class LoginAction extends Action {
         String password = req.getParameter("password");
         byte[] passHash = hash(login, password);
         BugViewDao dao = new BugViewDao(ctx.connection);
-        Integer userId = dao.checkLogin(login, passHash);
+        Integer userId = dao.checkLogin(debug, login, passHash);
         String redirect = req.getParameter("redirect");
         if (userId == null) {
-            render(resp, login, "Неправильный логин или пароль");
+            render(resp, login, redirect, "Неправильный логин или пароль");
         } else {
             req.getSession().setAttribute(UserInfo.ATTRIBUTE, new UserInfo(userId.intValue(), login));
             String to;

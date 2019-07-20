@@ -1,5 +1,8 @@
 package btrack.dao;
 
+import btrack.data.LinkFactory;
+import btrack.data.ReportBean;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

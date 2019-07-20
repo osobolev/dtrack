@@ -2,8 +2,9 @@ package btrack;
 
 import btrack.actions.*;
 import btrack.dao.BugViewDao;
-import btrack.dao.ProjectBean;
-import btrack.dao.ReportBean;
+import btrack.data.ProjectBean;
+import btrack.data.ProjectItem;
+import btrack.data.ReportBean;
 import btrack.dao.ReportDao;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,10 +14,13 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
 
-public final class RouterServlet extends BaseServlet {
+final class RouterServlet extends BaseServlet {
 
-    public RouterServlet(ConnectionProducer dataSource) {
-        super(dataSource);
+    private final boolean debug;
+
+    RouterServlet(Logger logger, ConnectionProducer dataSource, boolean debug) {
+        super(logger, dataSource);
+        this.debug = debug;
     }
 
     private static final class PathInfo {
@@ -78,7 +82,7 @@ public final class RouterServlet extends BaseServlet {
             if (queryString != null) {
                 url.append('?').append(queryString);
             }
-            return new LoginAction(url.toString(), new RequestInfo(webRoot, clientLocale));
+            return new LoginAction(debug, url.toString(), new RequestInfo(webRoot, clientLocale));
         }
         PathInfo info = parse(req);
         BugViewDao dao = new BugViewDao(connection);

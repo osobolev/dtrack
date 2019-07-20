@@ -1,9 +1,9 @@
 package btrack.actions;
 
-import btrack.ProjectItem;
+import btrack.data.ProjectItem;
 import btrack.UserInfo;
-import btrack.dao.LinkFactory;
-import btrack.dao.ProjectBean;
+import btrack.data.LinkFactory;
+import btrack.data.ProjectBean;
 
 import java.util.List;
 import java.util.Locale;

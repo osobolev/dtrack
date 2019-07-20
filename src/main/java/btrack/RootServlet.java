@@ -2,9 +2,7 @@ package btrack;
 
 import btrack.actions.RequestInfo;
 import btrack.dao.BugViewDao;
-import btrack.dao.ProjectBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import btrack.data.ProjectBean;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,13 +12,13 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
 
-public final class RootServlet extends HttpServlet {
+final class RootServlet extends HttpServlet {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
+    private final Logger logger;
     private final ConnectionProducer dataSource;
 
-    public RootServlet(ConnectionProducer dataSource) {
+    RootServlet(Logger logger, ConnectionProducer dataSource) {
+        this.logger = logger;
         this.dataSource = dataSource;
     }
 
@@ -40,7 +38,7 @@ public final class RootServlet extends HttpServlet {
                     resp.sendRedirect(projectRoot);
                 }
             } catch (Exception ex) {
-                logger.error("Error", ex);
+                logger.error(ex);
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         }

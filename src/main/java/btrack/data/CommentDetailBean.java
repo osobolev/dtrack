@@ -1,6 +1,4 @@
-package btrack.dao;
-
-import btrack.ProjectItem;
+package btrack.data;
 
 import java.time.LocalDateTime;
 import java.util.List;

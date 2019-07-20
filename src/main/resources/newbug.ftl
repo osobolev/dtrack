@@ -1,5 +1,5 @@
 <#-- @ftlvariable name="postLink" type="java.lang.String" -->
-<#-- @ftlvariable name="priorities" type="java.util.List<btrack.dao.PriorityBean>" -->
+<#-- @ftlvariable name="priorities" type="java.util.List<btrack.data.PriorityBean>" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
