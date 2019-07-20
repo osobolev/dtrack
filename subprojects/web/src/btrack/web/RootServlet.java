@@ -1,5 +1,6 @@
 package btrack.web;
 
+import btrack.common.ConnectionProducer;
 import btrack.web.actions.RequestInfo;
 import btrack.web.dao.BugViewDao;
 import btrack.web.data.ProjectBean;

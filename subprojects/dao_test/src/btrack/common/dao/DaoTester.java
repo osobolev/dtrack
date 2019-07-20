@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-// todo: move to special artifact for test dependencies???
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public final class DaoTester {
 
     private static Object generateTestObject(Class<?> cls) {

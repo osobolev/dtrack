@@ -1,12 +1,12 @@
 package btrack.admin;
 
-import btrack.admin.dao.ProjectDao;
-import btrack.admin.dao.UserDao;
-import btrack.admin.json.Updater;
+import btrack.admin.dao.*;
+import btrack.admin.json.Exporter;
+import btrack.admin.json.Importer;
 import btrack.common.AppConfig;
+import btrack.common.ConnectionProducer;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,8 +14,20 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public final class Main {
+
+    private final Reader in;
+    private final PrintWriter pw;
+    private final Supplier<String> getPassword;
+
+    public Main(Reader in, PrintWriter pw, Supplier<String> getPassword) {
+        this.in = in;
+        this.pw = pw;
+        this.getPassword = getPassword;
+    }
 
     private static Map<String, List<String>> parseOptions(List<String> args, String... allowed) {
         Map<String, List<String>> map = new HashMap<>();
@@ -65,17 +77,17 @@ public final class Main {
         }
     }
 
-    private static String readPassword(Map<String, List<String>> options) throws UsageException {
+    private String readPassword(Map<String, List<String>> options) throws UsageException {
         String password = getSingle(options, "-W");
         if (password != null)
             return password;
-        char[] passChars = System.console().readPassword("Password: ");
-        if (passChars == null)
+        String inputPassword = getPassword.get();
+        if (inputPassword == null || inputPassword.isEmpty())
             return help("No password entered");
-        return new String(passChars);
+        return inputPassword;
     }
 
-    private static Action userAdd(String login, Map<String, List<String>> options) throws UsageException {
+    private Action userAdd(String login, Map<String, List<String>> options) throws UsageException {
         String password = readPassword(options);
         byte[] passHash = AppConfig.hash(login, password);
         List<String> projects = options.get("-p");
@@ -134,7 +146,7 @@ public final class Main {
         };
     }
 
-    private static Action userPassword(String login, Map<String, List<String>> options) throws UsageException {
+    private Action userPassword(String login, Map<String, List<String>> options) throws UsageException {
         String password = readPassword(options);
         byte[] passHash = AppConfig.hash(login, password);
         return connection -> {
@@ -161,7 +173,32 @@ public final class Main {
         };
     }
 
-    private static Action user(String command, List<String> args) throws UsageException {
+    private Action userList() throws UsageException {
+        return connection -> {
+            UserDao dao = new UserDao(connection);
+            List<String> users = dao.listUsers();
+            for (String user : users) {
+                pw.println(user);
+            }
+        };
+    }
+
+    private Action userShow(String login) throws UsageException {
+        return connection -> {
+            UserDao dao = new UserDao(connection);
+            int userId = resolveUser(connection, login);
+            List<ProjectDTO> projects = dao.listUserAccess(userId);
+            Map<Integer, String> projectStates = dao.loadUserStates(userId);
+            pw.println("User: " + login);
+            pw.println("Has access to projects:");
+            for (ProjectDTO project : projects) {
+                String state = projectStates.get(project.id);
+                pw.println("    " + project.name + (state == null ? "" : ": initial state '" + state + "'"));
+            }
+        };
+    }
+
+    private Action user(String command, List<String> args) throws UsageException {
         switch (command) {
         case "add": {
             if (args.isEmpty())
@@ -212,26 +249,38 @@ public final class Main {
             String login = args.remove(0);
             String project = args.remove(0);
             String state = args.remove(0);
+            parseOptions(args);
             return userState(login, project, state);
         }
+        case "list": {
+            parseOptions(args);
+            return userList();
         }
-        return usage("user add|remove|access|password login [options]");
+        case "show": {
+            if (args.isEmpty())
+                return usage("user show login");
+            String login = args.remove(0);
+            parseOptions(args);
+            return userShow(login);
+        }
+        }
+        return usage("user add|remove|access|password|state|list|show [login] [options]");
     }
 
-    private static void runJSON(Connection connection, int projectId, String json, Map<Integer, String> userStates) throws IOException, SQLException, UsageException {
+    private void runJSON(Connection connection, int projectId, String json, Map<Integer, String> userStates) throws IOException, SQLException, UsageException {
         if ("-".equals(json)) {
-            Updater.updateProject(connection, projectId, System.in, userStates);
+            Importer.importProject(connection, projectId, in, userStates);
         } else {
             Path path = Paths.get(json);
             if (!Files.exists(path))
                 throw new UsageException("File " + json + " not found");
-            try (InputStream is = Files.newInputStream(path)) {
-                Updater.updateProject(connection, projectId, is, userStates);
+            try (BufferedReader rdr = Files.newBufferedReader(path)) {
+                Importer.importProject(connection, projectId, rdr, userStates);
             }
         }
     }
 
-    private static Action projectAdd(String name, Map<String, List<String>> options) throws UsageException {
+    private Action projectAdd(String name, Map<String, List<String>> options) throws UsageException {
         String description = getSingle(options, "-d");
         String clone = getSingle(options, "-clone");
         String json = getSingle(options, "-json");
@@ -263,7 +312,7 @@ public final class Main {
         };
     }
 
-    private static Action projectUpdate(String name, Map<String, List<String>> options) throws UsageException {
+    private Action projectUpdate(String name, Map<String, List<String>> options) throws UsageException {
         String description = getSingle(options, "-d");
         String json = getSingle(options, "-json");
         if (description == null && json == null)
@@ -282,7 +331,75 @@ public final class Main {
         };
     }
 
-    private static Action project(String command, List<String> args) throws UsageException {
+    private Action projectList() throws UsageException {
+        return connection -> {
+            ProjectDao dao = new ProjectDao(connection);
+            List<String> users = dao.listProjects();
+            for (String user : users) {
+                pw.println(user);
+            }
+        };
+    }
+
+    private Action projectShow(String name) throws UsageException {
+        return connection -> {
+            ProjectDao dao = new ProjectDao(connection);
+            int projectId = resolveProject(connection, name);
+            List<UserDTO> users = dao.listProjectAccess(projectId);
+            pw.println("Project: " + name);
+            String description = dao.getProjectDescription(projectId);
+            if (description != null) {
+                pw.println("Description: " + description);
+            }
+            Map<Integer, String> userStates = dao.loadUserStates(projectId);
+            pw.println("Users with access:");
+            for (UserDTO user : users) {
+                String state = userStates.get(user.id);
+                pw.println("    " + user.login + (state == null ? "" : ": initial state '" + state + "'"));
+            }
+            pw.println("States:");
+            List<StateDTO> states = dao.listStates(projectId);
+            Map<String, List<TransitionDTO>> transitions = dao.listTransitions(projectId);
+            for (StateDTO state : states) {
+                List<TransitionDTO> to = transitions.get(state.code);
+                String toStr;
+                if (to != null) {
+                    toStr = " -> " + to.stream().map(t -> t.to).collect(Collectors.joining(", "));
+                } else {
+                    toStr = "";
+                }
+                pw.println("  " + (state.isDefault ? "X" : " ") + " " + state.code + toStr);
+            }
+            pw.println("Priorities:");
+            List<PriorityDTO> priorities = dao.listPriorities(projectId);
+            for (PriorityDTO priority : priorities) {
+                pw.println("  " + (priority.isDefault ? "X" : " ") + " " + priority.code);
+            }
+            pw.println("Reports:");
+            List<ReportDTO> reports = dao.listReports(projectId, false);
+            for (ReportDTO report : reports) {
+                pw.println("    #" + report.num + ": " + report.name);
+            }
+        };
+    }
+
+    private Action projectExport(String name, Map<String, List<String>> options) throws UsageException {
+        String json = getSingle(options, "-json");
+        return connection -> {
+            int projectId = resolveProject(connection, name);
+            if (json == null || "-".equals(json)) {
+                Exporter.exportProject(connection, projectId, pw);
+            } else {
+                Path file = Paths.get(json);
+                Files.createDirectories(file.getParent());
+                try (PrintWriter pw = new PrintWriter(Files.newBufferedWriter(file))) {
+                    Exporter.exportProject(connection, projectId, pw);
+                }
+            }
+        };
+    }
+
+    private Action project(String command, List<String> args) throws UsageException {
         switch (command) {
         case "add": {
             if (args.isEmpty())
@@ -305,19 +422,37 @@ public final class Main {
             Map<String, List<String>> options = parseOptions(args, "-d", "-json");
             return projectUpdate(project, options);
         }
+        case "list": {
+            parseOptions(args);
+            return projectList();
         }
-        return usage("project add|remove|update name [options]");
+        case "show": {
+            if (args.isEmpty())
+                return usage("project show name");
+            String project = args.remove(0);
+            parseOptions(args);
+            return projectShow(project);
+        }
+        case "export": {
+            if (args.isEmpty())
+                return usage("project export name [-json file]");
+            String project = args.remove(0);
+            Map<String, List<String>> options = parseOptions(args, "-json");
+            return projectExport(project, options);
+        }
+        }
+        return usage("project add|remove|update|list|show [name] [options]");
     }
 
-    private static <T> T usage(String help) throws UsageException{
+    private static <T> T usage(String help) throws UsageException {
         throw new UsageException("Usage: " + help);
     }
 
-    private static <T> T help(String help) throws UsageException{
+    private static <T> T help(String help) throws UsageException {
         throw new UsageException(help);
     }
 
-    private static Action admin(List<String> args) throws UsageException {
+    private Action admin(List<String> args) throws UsageException {
         if (!args.isEmpty()) {
             String group = args.remove(0);
             switch (group) {
@@ -344,13 +479,11 @@ public final class Main {
         return usage("user|project ...");
     }
 
-    @SuppressWarnings({"UseOfSystemOutOrSystemErr", "CallToPrintStackTrace"})
-    public static void main(String[] args) {
+    public void admin(ConnectionProducer dataSource, String... args) {
         try {
             List<String> argList = new ArrayList<>(Arrays.asList(args));
             Action action = admin(argList);
-            AppConfig appConfig = AppConfig.load();
-            try (Connection connection = DriverManager.getConnection(appConfig.jdbcUrl, appConfig.jdbcUser, appConfig.jdbcPassword)) {
+            try (Connection connection = dataSource.getConnection()) {
                 connection.setAutoCommit(false);
                 try {
                     action.perform(connection);
@@ -365,9 +498,28 @@ public final class Main {
                 connection.commit();
             }
         } catch (UsageException ue) {
-            System.out.println(ue.getMessage());
+            pw.println(ue.getMessage());
         } catch (Exception ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(pw);
         }
+    }
+
+    public static void main(String[] args) {
+        ConnectionProducer dataSource = () -> {
+            AppConfig appConfig = AppConfig.load();
+            return DriverManager.getConnection(appConfig.jdbcUrl, appConfig.jdbcUser, appConfig.jdbcPassword);
+        };
+
+        Console console = System.console();
+        Main main = new Main(
+            console.reader(), console.writer(),
+            () -> {
+                char[] chars = console.readPassword();
+                if (chars == null)
+                    return null;
+                return new String(chars);
+            }
+        );
+        main.admin(dataSource, args);
     }
 }

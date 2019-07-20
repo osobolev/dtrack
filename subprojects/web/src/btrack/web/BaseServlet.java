@@ -1,5 +1,6 @@
 package btrack.web;
 
+import btrack.common.ConnectionProducer;
 import btrack.web.actions.Action;
 import btrack.web.actions.Context;
 import btrack.web.actions.NoAccessException;

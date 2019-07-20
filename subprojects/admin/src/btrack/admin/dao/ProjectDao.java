@@ -6,10 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public final class ProjectDao extends BaseDao {
 
@@ -26,6 +23,50 @@ public final class ProjectDao extends BaseDao {
                 if (!rs.next())
                     return null;
                 return rs.getInt(1);
+            }
+        }
+    }
+
+    public String getProjectDescription(int projectId) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "select description from projects where id = ?"
+        )) {
+            stmt.setInt(1, projectId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next())
+                    return null;
+                return rs.getString(1);
+            }
+        }
+    }
+
+    public List<String> listProjects() throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "select name from projects order by 1"
+        )) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<String> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(rs.getString(1));
+                }
+                return list;
+            }
+        }
+    }
+
+    public List<UserDTO> listProjectAccess(int projectId) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "select id, login from users where id in (select user_id from user_access where project_id = ?) order by 1"
+        )) {
+            stmt.setInt(1, projectId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<UserDTO> list = new ArrayList<>();
+                while (rs.next()) {
+                    int id = rs.getInt(1);
+                    String login = rs.getString(2);
+                    list.add(new UserDTO(id, login));
+                }
+                return list;
             }
         }
     }
@@ -270,6 +311,98 @@ public final class ProjectDao extends BaseDao {
                     map.put(userId, stateCode);
                 }
                 return map;
+            }
+        }
+    }
+
+    public List<StateDTO> listStates(int projectId) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "select s.code, s.name, ps.is_default, ps.order_num" +
+            "  from project_states ps, states s" +
+            " where ps.code = s.code" +
+            "   and ps.project_id = ?" +
+            " order by order_num"
+        )) {
+            stmt.setInt(1, projectId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<StateDTO> list = new ArrayList<>();
+                while (rs.next()) {
+                    String code = rs.getString(1);
+                    String name = rs.getString(2);
+                    boolean isDefault = rs.getBoolean(3);
+                    list.add(new StateDTO(code, name, isDefault));
+                }
+                return list;
+            }
+        }
+    }
+
+    public List<PriorityDTO> listPriorities(int projectId) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "select p.code, p.name, p.color, pp.is_default, pp.order_num" +
+            "  from project_priorities pp, priorities p" +
+            " where pp.code = p.code" +
+            "   and pp.project_id = ?" +
+            " order by order_num"
+        )) {
+            stmt.setInt(1, projectId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<PriorityDTO> list = new ArrayList<>();
+                while (rs.next()) {
+                    String code = rs.getString(1);
+                    String name = rs.getString(2);
+                    String color = rs.getString(3);
+                    boolean isDefault = rs.getBoolean(4);
+                    list.add(new PriorityDTO(code, name, color, isDefault));
+                }
+                return list;
+            }
+        }
+    }
+
+    public Map<String, List<TransitionDTO>> listTransitions(int projectId) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "select code_from, code_to, name from transitions where project_id = ? order by code_from, code_to"
+        )) {
+            stmt.setInt(1, projectId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                Map<String, List<TransitionDTO>> result = new TreeMap<>();
+                while (rs.next()) {
+                    String from = rs.getString(1);
+                    String to = rs.getString(2);
+                    String name = rs.getString(3);
+                    result.computeIfAbsent(from, k -> new ArrayList<>()).add(new TransitionDTO(to, name));
+                }
+                return result;
+            }
+        }
+    }
+
+    public List<ReportDTO> listReports(int projectId, boolean needQueries) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "select visible_id, name" + (needQueries ? ", simple_query, json_query" : "") +
+            "  from reports" +
+            " where project_id = ?" +
+            " order by visible_id"
+        )) {
+            stmt.setInt(1, projectId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<ReportDTO> list = new ArrayList<>();
+                while (rs.next()) {
+                    int num = rs.getInt(1);
+                    String name = rs.getString(2);
+                    String simple;
+                    String json;
+                    if (needQueries) {
+                        simple = rs.getString(3);
+                        json = rs.getString(4);
+                    } else {
+                        simple = null;
+                        json = null;
+                    }
+                    list.add(new ReportDTO(num, name, simple, json));
+                }
+                return list;
             }
         }
     }

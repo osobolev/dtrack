@@ -6,21 +6,19 @@ import btrack.admin.dao.UserDao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public final class Updater {
+public final class Importer {
 
-    public static void updateProject(Connection connection, int projectId, InputStream jsonFile,
+    public static void importProject(Connection connection, int projectId, Reader rdr,
                                      Map<Integer, String> userStates) throws SQLException, UsageException {
         Gson gson = new GsonBuilder().create();
-        Project project = gson.fromJson(new InputStreamReader(jsonFile, StandardCharsets.UTF_8), Project.class);
+        Project project = gson.fromJson(rdr, Project.class);
         ProjectDao dao = new ProjectDao(connection);
         Set<String> existingStates = dao.loadStates();
         Set<String> existingPriorities = dao.loadPriorities();
