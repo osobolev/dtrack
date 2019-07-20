@@ -1,12 +1,14 @@
 rootProject.name = 'btrack'
 
-def add(name, path) {
+def add(name) {
+    def path = "subprojects/$name"
     def dir = file(path)
     include name
     project(":${name}").projectDir = dir
 }
 
-add('common', 'subprojects/common')
-add('dao_test', 'subprojects/dao_test')
-add('web', 'subprojects/web')
-add('admin', 'subprojects/admin')
+add('common')
+add('dao_test')
+add('web')
+add('admin')
+add('deploy')

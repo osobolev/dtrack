@@ -41,7 +41,7 @@ public final class Main {
             handler.addServlet(DefaultServlet.class, "/");
             server.setHandler(handler);
             server.start();
-            logger.info("Server started on port " + port + ", web root " + root);
+            logger.info("Server started on port " + port + ", web root '" + root + "'");
         } catch (Throwable ex) {
             logger.error(ex);
             System.exit(1);

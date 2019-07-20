@@ -1,0 +1,21 @@
+configurations { distr }
+
+dependencies {
+    distr project(':web')
+    distr project(':admin')
+}
+
+def dest = "$rootDir/distr"
+
+task webFiles(type: Copy) {
+    from '../web/web'
+    into "$dest/root"
+}
+
+task copyJars(type: Copy) {
+    from project.configurations.distr
+    from 'config'
+    into "$dest"
+}
+
+task distr(dependsOn: [webFiles, copyJars])
