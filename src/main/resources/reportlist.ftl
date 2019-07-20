@@ -1,3 +1,4 @@
+<#-- @ftlvariable name="stats" type="java.util.List<btrack.dao.StatsBean>" -->
 <#-- @ftlvariable name="reports" type="java.util.List<btrack.dao.ReportBean>" -->
 <!DOCTYPE html>
 <html lang="ru">
@@ -13,6 +14,11 @@
 <#include "header.ftl">
 <div class="container pb-2 mt-2">
     <h3>Список отчетов</h3>
+    <div class="pb-3">
+        <#list stats as s>
+            <span class="badge badge-info">${s.state}: ${s.count}</span>
+        </#list>
+    </div>
     <table id="reports" class="table table-bordered table-hover" style="width: 100%;">
         <thead>
         <tr>

@@ -1,7 +1,9 @@
 package btrack.actions;
 
+import btrack.dao.BugViewDao;
 import btrack.dao.ReportBean;
 import btrack.dao.ReportDao;
+import btrack.dao.StatsBean;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -18,10 +20,12 @@ public final class ReportListAction extends Action {
 
     @Override
     public void get(Context ctx, HttpServletResponse resp) throws Exception {
+        List<StatsBean> stats = new BugViewDao(ctx.connection).getProjectStats(request.projectId);
         ReportDao dao = new ReportDao(ctx.connection);
         List<ReportBean> reports = dao.listReports(request.projectId, request);
         Map<String, Object> params = new HashMap<>();
         request.putTo(params);
+        params.put("stats", stats);
         params.put("reports", reports);
         TemplateUtil.process("reportlist.ftl", params, resp.getWriter());
     }

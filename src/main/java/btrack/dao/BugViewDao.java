@@ -289,4 +289,27 @@ public final class BugViewDao extends BaseDao {
             }
         }
     }
+
+    public List<StatsBean> getProjectStats(int projectId) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "select s.name, ps.order_num, count(b.id)" +
+            "  from bugs b" +
+            "       join project_states ps on ps.project_id = b.project_id and ps.code = b.state_code" +
+            "       join states s on s.code = b.state_code" +
+            " where b.project_id = ?" +
+            " group by s.name, ps.order_num" +
+            " order by order_num"
+        )) {
+            stmt.setInt(1, projectId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<StatsBean> result = new ArrayList<>();
+                while (rs.next()) {
+                    String state = rs.getString(1);
+                    int count = rs.getInt(3);
+                    result.add(new StatsBean(state, count));
+                }
+                return result;
+            }
+        }
+    }
 }
