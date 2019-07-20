@@ -125,16 +125,21 @@ public final class BugViewDao extends BaseDao {
         }
     }
 
-    private interface Conditioner {
+    public interface Conditioner {
 
         void addWhere(PreparedStatement stmt) throws SQLException;
     }
 
-    private List<BugBean> listBugs(LinkFactory linkFactory, String where, String orderBy, Conditioner conditioner) throws SQLException {
+    public List<BugBean> listBugs(LinkFactory linkFactory, boolean needsFullText, String where, String orderBy, Conditioner conditioner) throws SQLException {
+        if (testing) {
+            where = "true";
+            orderBy = "order by 1";
+            conditioner = stmt -> {};
+        }
         try (PreparedStatement stmt = connection.prepareStatement(
             "select b.visible_id, b.created, b.modified, uc.login, um.login," +
             "       b.state_code, s.name, b.priority_code, p.name, b.assigned_user_id, ua.login," +
-            "       b.short_text, b.full_text" +
+            "       b.short_text" + (needsFullText ? ", b.full_text" : "") +
             "  from bugs b" +
             "       join users uc on b.create_user_id = uc.id" +
             "       join users um on b.modify_user_id = um.id" +
@@ -160,7 +165,7 @@ public final class BugViewDao extends BaseDao {
                     Integer assignedUserId = getInt(rs, 10);
                     String assigned = rs.getString(11);
                     String title = rs.getString(12);
-                    String html = rs.getString(13);
+                    String html = needsFullText ? rs.getString(13) : null;
                     bugs.add(new BugBean(
                         bugNum, title, html, priorityCode, priority,
                         created.toLocalDateTime(), createdBy,
@@ -174,15 +179,20 @@ public final class BugViewDao extends BaseDao {
     }
 
     public BugBean loadBug(int bugId, LinkFactory linkFactory) throws SQLException {
-        List<BugBean> bugs = listBugs(linkFactory, "b.id = ?", "", stmt -> stmt.setInt(1, bugId));
+        List<BugBean> bugs = listBugs(linkFactory, true, "b.id = ?", "", stmt -> stmt.setInt(1, bugId));
         if (bugs.size() != 1)
             return null;
         return bugs.get(0);
     }
 
-    public List<BugBean> listAllBugs(int projectId, LinkFactory linkFactory) throws SQLException {
-        return listBugs(linkFactory, "b.project_id = ?", "order by b.id", stmt -> stmt.setInt(1, projectId));
-    }
+//    public List<BugBean> listBugs(int projectId, String reportSql, LinkFactory linkFactory) throws SQLException {
+//        return listBugs(
+//            linkFactory, false,
+//            "b.project_id = ? and b.id in (" + reportSql + ")",
+//            "order by b.id",
+//            stmt -> stmt.setInt(1, projectId)
+//        );
+//    }
 
     public List<AttachmentBean> listBugAttachments(int bugId) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(

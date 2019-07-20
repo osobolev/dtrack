@@ -18,6 +18,7 @@ dependencies {
     compile 'org.freemarker:freemarker:2.3.28'
     compile 'commons-fileupload:commons-fileupload:1.4'
     compile 'com.zaxxer:HikariCP:3.3.1'
+    compile 'org.json:json:20180813'
     runtime 'org.postgresql:postgresql:42.2.5'
     runtime 'org.slf4j:slf4j-simple:1.7.26'
 }

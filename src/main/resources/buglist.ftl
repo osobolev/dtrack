@@ -1,5 +1,5 @@
 <#-- @ftlvariable name="report" type="btrack.dao.ReportBean" -->
-<#-- @ftlvariable name="bugs" type="java.util.List<btrack.dao.BugBean>" -->
+<#-- @ftlvariable name="bugGroups" type="java.util.List<java.util.List<btrack.dao.BugBean>>" -->
 <#-- @ftlvariable name="priorities" type="java.util.List<btrack.dao.PriorityBean>" -->
 <!DOCTYPE html>
 <html lang="ru">
@@ -22,7 +22,8 @@
 <#include "header.ftl">
 <div class="container pb-2 mt-2">
     <h3>Отчет #${report.reportNum}: ${report.title}</h3>
-    <table id="bugs" class="table table-bordered table-hover" style="width: 100%;">
+    <#list bugGroups as bugs>
+    <table id="bugs${bugs?counter}" class="table table-bordered table-hover" style="width: 100%;">
         <thead>
         <tr>
             <th>Баг</th>
@@ -46,11 +47,13 @@
         </#list>
         </tbody>
     </table>
+    </#list>
 </div>
 
 <script>
     $(document).ready(function () {
-        configTable($('#bugs'), 50, 'багов', [
+        <#list bugGroups as bugs>
+        configTable($('#bugs${bugs?counter}'), 50, 'багов', [
             { "width": "8pt" },
             { "width" : "45%" },
             null,
@@ -58,6 +61,7 @@
             { "width": "80pt" },
             { "width": "80pt" },
         ]);
+        </#list>
     });
 </script>
 

@@ -4,15 +4,19 @@ import btrack.ProjectItem;
 
 public final class ReportBean {
 
-    private final int id;
+    public final int id;
     private final int reportNum;
     private final String title;
+    public final String simpleQuery;
+    public final String jsonQuery;
     private final LinkFactory linkFactory;
 
-    public ReportBean(int id, int reportNum, String title, LinkFactory linkFactory) {
+    public ReportBean(int id, int reportNum, String title, String simpleQuery, String jsonQuery, LinkFactory linkFactory) {
         this.id = id;
         this.reportNum = reportNum;
         this.title = title;
+        this.simpleQuery = simpleQuery;
+        this.jsonQuery = jsonQuery;
         this.linkFactory = linkFactory;
     }
 

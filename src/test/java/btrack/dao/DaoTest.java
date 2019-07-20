@@ -52,6 +52,8 @@ public final class DaoTest {
             Object array = Array.newInstance(componentType, 1);
             Array.set(array, 0, generateTestObject(componentType));
             return array;
+//        } else if (Void.TYPE.isAssignableFrom(cls)) {
+//            return null;
         } else {
             throw new IllegalArgumentException("Cannot create parameter of type " + cls);
         }

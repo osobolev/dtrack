@@ -1,6 +1,9 @@
 package btrack.dao;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +17,8 @@ public final class ReportDao extends BaseDao {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select id, visible_id, name" +
             "  from reports" +
-            " where project_id = ?"
+            " where project_id = ?" +
+            " order by visible_id"
         )) {
             stmt.setInt(1, projectId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -23,7 +27,7 @@ public final class ReportDao extends BaseDao {
                     int id = rs.getInt(1);
                     int num = rs.getInt(2);
                     String name = rs.getString(3);
-                    result.add(new ReportBean(id, num, name, linkFactory));
+                    result.add(new ReportBean(id, num, name, null, null, linkFactory));
                 }
                 return result;
             }
@@ -32,7 +36,7 @@ public final class ReportDao extends BaseDao {
 
     public ReportBean loadReport(int projectId, int num, LinkFactory linkFactory) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select id, name" +
+            "select id, name, simple_query, json_query" +
             "  from reports" +
             " where project_id = ?" +
             "   and visible_id = ?"
@@ -44,21 +48,9 @@ public final class ReportDao extends BaseDao {
                     return null;
                 int id = rs.getInt(1);
                 String name = rs.getString(2);
-                return new ReportBean(id, num, name, linkFactory);
-            }
-        }
-    }
-
-    public void report(int projectId, String sql) throws SQLException {
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            ResultSetMetaData rsmd = stmt.getMetaData();
-            if (rsmd.getColumnCount() == 1 && "bug_id".equalsIgnoreCase(rsmd.getColumnName(1))) {
-                // todo: add standard columns: num, title, created, modified, assigned, state, priority (pseudo-column - display as color)
-            }
-            // todo: 2nd special case: group + bug_id - same shit but with grouping
-            // todo: always limit to project
-            try (ResultSet rs = stmt.executeQuery()) {
-                rs.getMetaData();
+                String simpleQuery = rs.getString(3);
+                String jsonQuery = rs.getString(4);
+                return new ReportBean(id, num, name, simpleQuery, jsonQuery, linkFactory);
             }
         }
     }
