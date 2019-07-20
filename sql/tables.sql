@@ -8,7 +8,7 @@ CREATE TABLE projects (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT,
-  last_visible_id INT NOT NULL DEFAULT 0
+  last_visible_bug_id INT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE user_access (
@@ -18,30 +18,42 @@ CREATE TABLE user_access (
 );
 
 CREATE TABLE states (
-  id SERIAL PRIMARY KEY,
-  project_id INT NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
-  order_num INT NOT NULL,
+  code TEXT NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL
+);
+
+CREATE TABLE priorities (
+  code TEXT NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
+  color TEXT NOT NULL
+);
+
+CREATE TABLE project_states (
+  project_id INT NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
+  code TEXT NOT NULL REFERENCES states (code),
+  order_num INT NOT NULL,
   is_default BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (project_id, code),
+    UNIQUE (project_id, order_num)
+);
+
+CREATE TABLE project_priorities (
+  project_id INT NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
+  code TEXT NOT NULL REFERENCES priorities (code),
+  order_num INT NOT NULL,
+  is_default BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (project_id, code),
     UNIQUE (project_id, order_num)
 );
 
 CREATE TABLE transitions (
   project_id INT NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
-  from_id INT NOT NULL REFERENCES states (id) ON DELETE CASCADE,
-  to_id INT NOT NULL REFERENCES states (id) ON DELETE CASCADE,
+  code_from TEXT NOT NULL,
+  code_to TEXT NOT NULL,
   name TEXT NOT NULL,
-    UNIQUE (project_id, from_id, to_id)
-);
-
-CREATE TABLE priorities (
-  id SERIAL PRIMARY KEY,
-  project_id INT NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
-  order_num INT NOT NULL,
-  name TEXT NOT NULL,
-  color TEXT NOT NULL,
-  is_default BOOLEAN NOT NULL DEFAULT FALSE,
-    UNIQUE (project_id, order_num)
+    UNIQUE (project_id, code_from, code_to),
+    FOREIGN KEY (project_id, code_from) REFERENCES project_states (project_id, code) ON DELETE CASCADE,
+    FOREIGN KEY (project_id, code_to) REFERENCES project_states (project_id, code) ON DELETE CASCADE
 );
 
 CREATE TABLE reports (
@@ -62,10 +74,10 @@ CREATE TABLE bugs (
   create_user_id INT NOT NULL REFERENCES users (id),
   modify_user_id INT NOT NULL REFERENCES users (id),
   assigned_user_id INT REFERENCES users (id),
-  state_id INT NOT NULL REFERENCES states (id),
-  priority_id INT NOT NULL REFERENCES priorities (id),
-  short_text TEXT,
-  full_text TEXT,
+  state_code TEXT NOT NULL REFERENCES states (code),
+  priority_code TEXT NOT NULL REFERENCES priorities (code),
+  short_text TEXT NOT NULL,
+  full_text TEXT NOT NULL,
     UNIQUE (project_id, visible_id)
 );
 
@@ -85,13 +97,13 @@ CREATE TABLE changes (
 );
 
 CREATE TABLE changes_fields (
-  change_id INT NOT NULL REFERENCES changes (id) ON DELETE CASCADE,
+  change_id INT NOT NULL PRIMARY KEY REFERENCES changes (id) ON DELETE CASCADE,
   old_assigned_user_id INT REFERENCES users (id),
   new_assigned_user_id INT REFERENCES users (id),
-  old_state_id INT REFERENCES states (id),
-  new_state_id INT REFERENCES states (id),
-  old_priority_id INT REFERENCES priorities (id),
-  new_priority_id INT REFERENCES priorities (id),
+  old_state_code TEXT REFERENCES states (code),
+  new_state_code TEXT REFERENCES states (code),
+  old_priority_code TEXT REFERENCES priorities (code),
+  new_priority_code TEXT REFERENCES priorities (code),
   old_short_text TEXT,
   new_short_text TEXT,
   old_full_text TEXT,
@@ -99,14 +111,14 @@ CREATE TABLE changes_fields (
 );
 
 CREATE TABLE changes_files (
-  change_id INT NOT NULL REFERENCES changes (id) ON DELETE CASCADE,
+  change_id INT NOT NULL PRIMARY KEY REFERENCES changes (id) ON DELETE CASCADE,
   old_attachment_id INT REFERENCES bug_attachments (id),
   new_attachment_id INT REFERENCES bug_attachments (id)
 );
 
 CREATE TABLE changes_comments (
-  change_id INT NOT NULL REFERENCES changes (id) ON DELETE CASCADE,
-  comment_text TEXT,
+  change_id INT NOT NULL PRIMARY KEY REFERENCES changes (id) ON DELETE CASCADE,
+  comment_text TEXT NOT NULL,
   delete_ts TIMESTAMP,
   delete_user_id INT REFERENCES users (id)
 );

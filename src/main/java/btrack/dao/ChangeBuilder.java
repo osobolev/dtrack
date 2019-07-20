@@ -67,10 +67,10 @@ final class ChangeBuilder {
             "  from changes_fields cf " +
             "       left join users au1 on cf.old_assigned_user_id = au1.id" +
             "       left join users au2 on cf.new_assigned_user_id = au2.id" +
-            "       left join states s1 on cf.old_state_id = s1.id" +
-            "       left join states s2 on cf.new_state_id = s2.id" +
-            "       left join priorities p1 on cf.old_priority_id = p1.id" +
-            "       left join priorities p2 on cf.new_priority_id = p2.id" +
+            "       left join states s1 on cf.old_state_code = s1.code" +
+            "       left join states s2 on cf.new_state_code = s2.code" +
+            "       left join priorities p1 on cf.old_priority_code = p1.code" +
+            "       left join priorities p2 on cf.new_priority_code = p2.code" +
             " where cf.change_id in (select id from changes where bug_id = ?)"
         )) {
             stmt.setInt(1, bugId);

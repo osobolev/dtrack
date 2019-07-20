@@ -32,7 +32,7 @@ public final class ViewBugAction extends Action {
         BugBean bug = dao.loadBug(bugId, request);
         if (bug == null)
             throw new NoAccessException("Bug " + bugId + " not found", HttpServletResponse.SC_NOT_FOUND);
-        List<TransitionBean> transitions = dao.listTransitions(request.projectId, bug.stateId);
+        List<TransitionBean> transitions = dao.listTransitions(request.projectId, bug.stateCode);
         List<AttachmentBean> attachments = dao.listBugAttachments(bugId);
         List<ChangeBean> allChanges = dao.loadBugHistory(bug.bugNum, bugId, request);
         List<ChangeListBean> changes = new ArrayList<>();

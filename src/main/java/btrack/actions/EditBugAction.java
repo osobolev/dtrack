@@ -30,7 +30,7 @@ public final class EditBugAction extends Action {
         if (bug == null)
             throw new NoAccessException("Bug " + bugId + " not found", HttpServletResponse.SC_NOT_FOUND);
         List<AttachmentBean> attachments = dao.listBugAttachments(bugId);
-        List<PriorityBean> priorities = dao.listPriorities(request.projectId, bug.priorityId);
+        List<PriorityBean> priorities = dao.listPriorities(request.projectId, bug.priorityCode);
         Map<String, Object> params = new HashMap<>();
         request.putTo(params);
         params.put("bug", bug);
@@ -60,7 +60,7 @@ public final class EditBugAction extends Action {
                     }
                 }
             }
-            dao.changeBug(bugId, request.getUserId(), changeBox, data.priorityId, data.title, data.safeHtml);
+            dao.changeBug(bugId, request.getUserId(), changeBox, data.priorityCode, data.title, data.safeHtml);
             return null;
         });
         util.post(req, (result, fileName, content) -> {

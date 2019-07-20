@@ -47,9 +47,9 @@
                 <a class="btn btn-secondary" style="margin-left: 20px;" href="${bug.editLink}">Редактировать</a>
             </div>
             <form id="moveBug" method="post" action="${bug.moveLink}" style="margin-top: 5px;">
-                <input type="hidden" name="from" value="${bug.stateId}">
+                <input type="hidden" name="from" value="${bug.stateCode}">
                 <#list transitions as t>
-                    <button type="submit" name="to" value="${t.toId}" class="btn btn-primary">${t.name}</button>
+                    <button type="submit" name="to" value="${t.toCode}" class="btn btn-primary">${t.name}</button>
                 </#list>
             </form>
         </div>

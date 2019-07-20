@@ -9,29 +9,29 @@ public final class BugBean {
     public final int bugNum;
     private final String title;
     private final String html;
-    public final int priorityId;
+    public final String priorityCode;
     private final String priority;
     private final LocalDateTime created;
     private final String createdBy;
     private final LocalDateTime lastUpdated;
     private final String lastUpdatedBy;
-    public final int stateId;
+    public final String stateCode;
     private final String state;
     private final Integer assignedUserId;
     private final String assignedUser;
     private final LinkFactory linkFactory;
 
-    public BugBean(int bugNum, String title, String html, int priorityId, String priority, LocalDateTime created, String createdBy, LocalDateTime lastUpdated, String lastUpdatedBy, int stateId, String state, Integer assignedUserId, String assignedUser, LinkFactory linkFactory) {
+    public BugBean(int bugNum, String title, String html, String priorityCode, String priority, LocalDateTime created, String createdBy, LocalDateTime lastUpdated, String lastUpdatedBy, String stateCode, String state, Integer assignedUserId, String assignedUser, LinkFactory linkFactory) {
         this.bugNum = bugNum;
         this.title = title;
         this.html = html;
-        this.priorityId = priorityId;
+        this.priorityCode = priorityCode;
         this.priority = priority;
         this.created = created;
         this.createdBy = createdBy;
         this.lastUpdated = lastUpdated;
         this.lastUpdatedBy = lastUpdatedBy;
-        this.stateId = stateId;
+        this.stateCode = stateCode;
         this.state = state;
         this.assignedUserId = assignedUserId;
         this.assignedUser = assignedUser;
@@ -50,8 +50,8 @@ public final class BugBean {
         return html;
     }
 
-    public String getPriorityId() {
-        return String.valueOf(priorityId);
+    public String getPriorityCode() {
+        return priorityCode;
     }
 
     public String getPriority() {
@@ -82,8 +82,8 @@ public final class BugBean {
         return lastUpdatedBy;
     }
 
-    public String getStateId() {
-        return String.valueOf(stateId);
+    public String getStateCode() {
+        return stateCode;
     }
 
     public String getState() {

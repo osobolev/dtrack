@@ -9,12 +9,12 @@ final class BugData {
 
     final String title;
     final String safeHtml;
-    final int priorityId;
+    final String priorityCode;
 
-    private BugData(String title, String safeHtml, int priorityId) {
+    private BugData(String title, String safeHtml, String priorityCode) {
         this.title = title;
         this.safeHtml = safeHtml;
-        this.priorityId = priorityId;
+        this.priorityCode = priorityCode;
     }
 
     static BugData create(BugEditDao dao, ProjectInfo request, Map<String, String> parameters) throws ValidationException, SQLException {
@@ -28,10 +28,9 @@ final class BugData {
         if (priority == null)
             throw new ValidationException("Missing 'priority' parameter");
         String safeHtml = UploadUtil.POLICY.sanitize(untrustedHtml);
-        int priorityId = Context.parseInt(priority);
-        if (!dao.validatePriority(request.projectId, priorityId)) {
-            throw new ValidationException("Wrong priority " + priorityId + " for project " + request.projectName);
+        if (!dao.validatePriority(request.projectId, priority)) {
+            throw new ValidationException("Wrong priority " + priority + " for project " + request.projectName);
         }
-        return new BugData(title, safeHtml, priorityId);
+        return new BugData(title, safeHtml, priority);
     }
 }

@@ -17,25 +17,25 @@ public final class BugEditDao extends BaseDao {
         super(connection);
     }
 
-    public boolean validatePriority(int projectId, int priorityId) throws SQLException {
+    public boolean validatePriority(int projectId, String priorityCode) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select id" +
-            "  from priorities" +
+            "select code" +
+            "  from project_priorities" +
             " where project_id = ?" +
-            "   and id = ?"
+            "   and code = ?"
         )) {
             stmt.setInt(1, projectId);
-            stmt.setInt(2, priorityId);
+            stmt.setString(2, priorityCode);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
         }
     }
 
-    public Integer getDefaultState(int projectId) throws SQLException {
+    public String getDefaultState(int projectId) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select id" +
-            "  from states" +
+            "select code" +
+            "  from project_states" +
             " where project_id = ?" +
             "   and is_default"
         )) {
@@ -44,7 +44,7 @@ public final class BugEditDao extends BaseDao {
                 if (!rs.next()) {
                     return null;
                 }
-                return rs.getInt(1);
+                return rs.getString(1);
             }
         }
     }
@@ -52,9 +52,9 @@ public final class BugEditDao extends BaseDao {
     public int getNextBugId(int projectId) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "update projects" +
-            "   set last_visible_id = last_visible_id + 1" +
+            "   set last_visible_bug_id = last_visible_bug_id + 1" +
             " where id = ?" +
-            " returning last_visible_id"
+            " returning last_visible_bug_id"
         )) {
             stmt.setInt(1, projectId);
             stmt.execute();
@@ -65,10 +65,10 @@ public final class BugEditDao extends BaseDao {
         }
     }
 
-    public int newBug(int projectId, int userId, int num, int priorityId, int stateId, String shortText, String fullText) throws SQLException {
+    public int newBug(int projectId, int userId, int num, String priorityCode, String stateCode, String shortText, String fullText) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "insert into bugs" +
-            " (project_id, visible_id, create_user_id, modify_user_id, state_id, priority_id, short_text, full_text)" +
+            " (project_id, visible_id, create_user_id, modify_user_id, state_code, priority_code, short_text, full_text)" +
             " values" +
             " (?, ?, ?, ?, ?, ?, ?, ?)",
             new String[] {"id"}
@@ -77,8 +77,8 @@ public final class BugEditDao extends BaseDao {
             stmt.setInt(2, num);
             stmt.setInt(3, userId);
             stmt.setInt(4, userId);
-            stmt.setInt(5, stateId);
-            stmt.setInt(6, priorityId);
+            stmt.setString(5, stateCode);
+            stmt.setString(6, priorityCode);
             stmt.setString(7, shortText);
             stmt.setString(8, fullText);
             executeUpdate(stmt);
@@ -256,11 +256,11 @@ public final class BugEditDao extends BaseDao {
     }
 
     public boolean changeBug(int bugId, int userId, Integer[] changeBox,
-                             int newPriorityId, String shortText, String fullText) throws SQLException {
+                             String newPriorityCode, String shortText, String fullText) throws SQLException {
         return updateBugFields(
             bugId, userId, changeBox,
             Arrays.asList(
-                new FieldUpdate<>("priority_id", newPriorityId, BaseDao::getInt, BaseDao::setInt),
+                new FieldUpdate<>("priority_code", newPriorityCode, ResultSet::getString, PreparedStatement::setString),
                 new FieldUpdate<>("short_text", shortText, ResultSet::getString, PreparedStatement::setString),
                 new FieldUpdate<>("full_text", fullText, ResultSet::getString, PreparedStatement::setString)
             )
@@ -277,17 +277,17 @@ public final class BugEditDao extends BaseDao {
         );
     }
 
-    public boolean validateTransition(int projectId, int fromId, int toId) throws SQLException {
+    public boolean validateTransition(int projectId, String fromCode, String toCode) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select project_id" +
             "  from transitions" +
             " where project_id = ?" +
-            "   and from_id = ?" +
-            "   and to_id = ?"
+            "   and code_from = ?" +
+            "   and code_to = ?"
         )) {
             stmt.setInt(1, projectId);
-            stmt.setInt(2, fromId);
-            stmt.setInt(3, toId);
+            stmt.setString(2, fromCode);
+            stmt.setString(3, toCode);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
@@ -295,10 +295,10 @@ public final class BugEditDao extends BaseDao {
     }
 
     public boolean changeBugState(int bugId, int userId, Integer[] changeBox,
-                                  int fromStateId, int toStateId) throws SQLException {
+                                  String fromStateCode, String toStateCode) throws SQLException {
         return updateBugFields(
             bugId, userId, changeBox,
-            Collections.singletonList(new FieldUpdate<>("state_id", toStateId, true, fromStateId, BaseDao::getInt, BaseDao::setInt))
+            Collections.singletonList(new FieldUpdate<>("state_code", toStateCode, true, fromStateCode, ResultSet::getString, PreparedStatement::setString))
         );
     }
 

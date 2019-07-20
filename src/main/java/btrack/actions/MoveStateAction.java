@@ -21,14 +21,12 @@ public final class MoveStateAction extends Action {
     public void post(Context ctx, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String from = req.getParameter("from");
         String to = req.getParameter("to");
-        int fromId = Context.parseInt(from);
-        int toId = Context.parseInt(to);
         BugEditDao dao = new BugEditDao(ctx.connection);
-        if (!dao.validateTransition(request.projectId, fromId, toId)) {
-            throw new ValidationException("Cannot move from " + fromId + " to " + toId);
+        if (!dao.validateTransition(request.projectId, from, to)) {
+            throw new ValidationException("Cannot move from " + from + " to " + to);
         }
         Integer[] changeBox = new Integer[1];
-        boolean ok = dao.changeBugState(bugId, request.getUserId(), changeBox, fromId, toId);
+        boolean ok = dao.changeBugState(bugId, request.getUserId(), changeBox, from, to);
         if (ok) {
             ctx.connection.commit();
             resp.sendRedirect(request.getBugUrl(bugNum));

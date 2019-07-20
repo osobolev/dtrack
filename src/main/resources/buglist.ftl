@@ -35,7 +35,7 @@
         </thead>
         <tbody>
         <#list bugs as b>
-            <tr class="bugPriority${b.priorityId}">
+            <tr class="bugPriority${b.priorityCode}">
                 <td data-order="${b.bugNum}"><a href="${b.viewLink}">#${b.bugNum}</a></td>
                 <td><a href="${b.viewLink}">${b.title}</a></td>
                 <td>${b.assignedUser!}</td>

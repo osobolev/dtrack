@@ -97,27 +97,28 @@ public final class BugViewDao extends BaseDao {
         }
     }
 
-    public List<PriorityBean> listPriorities(int projectId, Integer defaultId) throws SQLException {
+    public List<PriorityBean> listPriorities(int projectId, String defaultCode) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select id, name, color, is_default" +
-            "  from priorities" +
-            " where project_id = ?" +
+            "select p.code, p.name, p.color, pp.is_default, pp.order_num" +
+            "  from project_priorities pp, priorities p" +
+            " where pp.project_id = ?" +
+            "   and pp.code = p.code" +
             " order by order_num"
         )) {
             stmt.setInt(1, projectId);
             try (ResultSet rs = stmt.executeQuery()) {
                 List<PriorityBean> priorities = new ArrayList<>();
                 while (rs.next()) {
-                    int id = rs.getInt(1);
+                    String code = rs.getString(1);
                     String name = rs.getString(2);
                     String color = rs.getString(3);
                     boolean isDefault;
-                    if (defaultId != null) {
-                        isDefault = defaultId.intValue() == id;
+                    if (defaultCode != null) {
+                        isDefault = defaultCode.equalsIgnoreCase(code);
                     } else {
                         isDefault = rs.getBoolean(4);
                     }
-                    priorities.add(new PriorityBean(id, name, color, isDefault));
+                    priorities.add(new PriorityBean(code, name, color, isDefault));
                 }
                 return priorities;
             }
@@ -132,14 +133,14 @@ public final class BugViewDao extends BaseDao {
     private List<BugBean> listBugs(LinkFactory linkFactory, String where, String orderBy, Conditioner conditioner) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select b.visible_id, b.created, b.modified, uc.login, um.login," +
-            "       b.state_id, s.name, b.priority_id, p.name, b.assigned_user_id, ua.login," +
+            "       b.state_code, s.name, b.priority_code, p.name, b.assigned_user_id, ua.login," +
             "       b.short_text, b.full_text" +
             "  from bugs b" +
             "       join users uc on b.create_user_id = uc.id" +
             "       join users um on b.modify_user_id = um.id" +
             "       left join users ua on b.assigned_user_id = ua.id" +
-            "       join states s on b.state_id = s.id" +
-            "       join priorities p on b.priority_id = p.id" +
+            "       join states s on b.state_code = s.code" +
+            "       join priorities p on b.priority_code = p.code" +
             " where " + where +
             " " + orderBy
         )) {
@@ -152,19 +153,19 @@ public final class BugViewDao extends BaseDao {
                     Timestamp modified = rs.getTimestamp(3);
                     String createdBy = rs.getString(4);
                     String modifiedBy = rs.getString(5);
-                    int stateId = rs.getInt(6);
+                    String stateCode = rs.getString(6);
                     String state = rs.getString(7);
-                    int priorityId = rs.getInt(8);
+                    String priorityCode = rs.getString(8);
                     String priority = rs.getString(9);
                     Integer assignedUserId = getInt(rs, 10);
                     String assigned = rs.getString(11);
                     String title = rs.getString(12);
                     String html = rs.getString(13);
                     bugs.add(new BugBean(
-                        bugNum, title, html, priorityId, priority,
+                        bugNum, title, html, priorityCode, priority,
                         created.toLocalDateTime(), createdBy,
                         modified.toLocalDateTime(), modifiedBy,
-                        stateId, state, assignedUserId, assigned, linkFactory
+                        stateCode, state, assignedUserId, assigned, linkFactory
                     ));
                 }
                 return bugs;
@@ -255,23 +256,24 @@ public final class BugViewDao extends BaseDao {
         }
     }
 
-    public List<TransitionBean> listTransitions(int projectId, int fromId) throws SQLException {
+    public List<TransitionBean> listTransitions(int projectId, String fromCode) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
-            "select t.to_id, t.name, s.order_num" +
+            "select t.code_to, t.name, ps.order_num" +
             "  from transitions t" +
-            "       join states s on s.id = t.to_id" +
+            "       join project_states ps on ps.project_id = t.project_id and ps.code = t.code_to" +
+            "       join states s on s.code = t.code_to" +
             " where t.project_id = ?" +
-            "   and t.from_id = ?" +
+            "   and t.code_from = ?" +
             " order by order_num"
         )) {
             stmt.setInt(1, projectId);
-            stmt.setInt(2, fromId);
+            stmt.setString(2, fromCode);
             try (ResultSet rs = stmt.executeQuery()) {
                 List<TransitionBean> result = new ArrayList<>();
                 while (rs.next()) {
-                    int toId = rs.getInt(1);
+                    String toCode = rs.getString(1);
                     String name = rs.getString(2);
-                    result.add(new TransitionBean(toId, name));
+                    result.add(new TransitionBean(toCode, name));
                 }
                 return result;
             }

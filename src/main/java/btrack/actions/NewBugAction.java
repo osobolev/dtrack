@@ -43,12 +43,12 @@ public final class NewBugAction extends Action {
 
     private BugCoords createBug(BugEditDao dao, Map<String, String> parameters) throws ValidationException, SQLException {
         BugData data = BugData.create(dao, request, parameters);
-        Integer stateId = dao.getDefaultState(request.projectId);
-        if (stateId == null) {
+        String stateCode = dao.getDefaultState(request.projectId);
+        if (stateCode == null) {
             throw new ValidationException("No default state for project " + request.projectName);
         }
         int num = dao.getNextBugId(request.projectId);
-        int id = dao.newBug(request.projectId, request.getUserId(), num, data.priorityId, stateId.intValue(), data.title, data.safeHtml);
+        int id = dao.newBug(request.projectId, request.getUserId(), num, data.priorityCode, stateCode, data.title, data.safeHtml);
         return new BugCoords(num, id);
     }
 

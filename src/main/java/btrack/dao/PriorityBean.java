@@ -2,20 +2,20 @@ package btrack.dao;
 
 public final class PriorityBean {
 
-    private final int id;
+    private final String code;
     private final String name;
     private final String color;
     private final boolean isDefault;
 
-    public PriorityBean(int id, String name, String color, boolean isDefault) {
-        this.id = id;
+    public PriorityBean(String code, String name, String color, boolean isDefault) {
+        this.code = code;
         this.name = name;
         this.color = color;
         this.isDefault = isDefault;
     }
 
     public String getId() {
-        return String.valueOf(id);
+        return code;
     }
 
     public String getName() {

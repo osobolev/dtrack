@@ -2,16 +2,16 @@ package btrack.dao;
 
 public final class TransitionBean {
 
-    private final int toId;
+    private final String toCode;
     private final String name;
 
-    public TransitionBean(int toId, String name) {
-        this.toId = toId;
+    public TransitionBean(String toCode, String name) {
+        this.toCode = toCode;
         this.name = name;
     }
 
-    public String getToId() {
-        return String.valueOf(toId);
+    public String getToCode() {
+        return String.valueOf(toCode);
     }
 
     public String getName() {
