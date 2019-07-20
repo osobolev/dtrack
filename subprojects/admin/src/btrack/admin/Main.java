@@ -2,8 +2,14 @@ package btrack.admin;
 
 import btrack.admin.dao.ProjectDao;
 import btrack.admin.dao.UserDao;
+import btrack.admin.json.Updater;
 import btrack.common.AppConfig;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -212,6 +218,19 @@ public final class Main {
         return usage("user add|remove|access|password login [options]");
     }
 
+    private static void runJSON(Connection connection, int projectId, String json, Map<Integer, String> userStates) throws IOException, SQLException, UsageException {
+        if ("-".equals(json)) {
+            Updater.updateProject(connection, projectId, System.in, userStates);
+        } else {
+            Path path = Paths.get(json);
+            if (!Files.exists(path))
+                throw new UsageException("File " + json + " not found");
+            try (InputStream is = Files.newInputStream(path)) {
+                Updater.updateProject(connection, projectId, is, userStates);
+            }
+        }
+    }
+
     private static Action projectAdd(String name, Map<String, List<String>> options) throws UsageException {
         String description = getSingle(options, "-d");
         String clone = getSingle(options, "-clone");
@@ -231,7 +250,7 @@ public final class Main {
                 int fromId = resolveProject(connection, clone);
                 dao.cloneProject(fromId, projectId);
             } else if (json != null) {
-                // todo
+                runJSON(connection, projectId, json, Collections.emptyMap());
             }
         };
     }
@@ -256,7 +275,9 @@ public final class Main {
                 dao.setProjectDescription(projectId, description);
             }
             if (json != null) {
-                // todo
+                Map<Integer, String> userStates = dao.loadUserStates(projectId);
+                dao.cleanProject(projectId);
+                runJSON(connection, projectId, json, userStates);
             }
         };
     }
@@ -323,6 +344,7 @@ public final class Main {
         return usage("user|project ...");
     }
 
+    @SuppressWarnings({"UseOfSystemOutOrSystemErr", "CallToPrintStackTrace"})
     public static void main(String[] args) {
         try {
             List<String> argList = new ArrayList<>(Arrays.asList(args));
