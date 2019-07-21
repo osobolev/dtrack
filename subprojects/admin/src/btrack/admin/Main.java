@@ -8,9 +8,8 @@ import btrack.common.ConnectionProducer;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.FileSystem;
+import java.nio.file.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -20,13 +19,15 @@ import java.util.stream.Collectors;
 
 public final class Main {
 
-    private final Reader in;
-    private final PrintWriter pw;
+    private final FileSystem fs;
+    private final Reader stdin;
+    private final PrintWriter stdout;
     private final Supplier<String> getPassword;
 
-    public Main(Reader in, PrintWriter pw, Supplier<String> getPassword) {
-        this.in = in;
-        this.pw = pw;
+    public Main(FileSystem fs, Reader stdin, PrintWriter stdout, Supplier<String> getPassword) {
+        this.fs = fs;
+        this.stdin = stdin;
+        this.stdout = stdout;
         this.getPassword = getPassword;
     }
 
@@ -179,7 +180,7 @@ public final class Main {
             UserDao dao = new UserDao(connection);
             List<String> users = dao.listUsers();
             for (String user : users) {
-                pw.println(user);
+                stdout.println(user);
             }
         };
     }
@@ -190,11 +191,11 @@ public final class Main {
             int userId = resolveUser(connection, login);
             List<ProjectDTO> projects = dao.listUserAccess(userId);
             Map<Integer, String> projectStates = dao.loadUserStates(userId);
-            pw.println("User: " + login);
-            pw.println("Has access to projects:");
+            stdout.println("User: " + login);
+            stdout.println("Has access to projects:");
             for (ProjectDTO project : projects) {
                 String state = projectStates.get(project.id);
-                pw.println("    " + project.name + (state == null ? "" : ": initial state '" + state + "'"));
+                stdout.println("    " + project.name + (state == null ? "" : ": initial state '" + state + "'"));
             }
         };
     }
@@ -246,7 +247,7 @@ public final class Main {
         }
         case "state": {
             if (args.size() < 3)
-                return usage("user state login project [stateCode|-]");
+                return usage("user state login project stateCode|-");
             String login = args.remove(0);
             String project = args.remove(0);
             String state = args.remove(0);
@@ -270,9 +271,11 @@ public final class Main {
 
     private void runJSON(Connection connection, int projectId, String json, Map<Integer, String> userStates) throws IOException, SQLException, UsageException {
         if ("-".equals(json)) {
-            Importer.importProject(connection, projectId, in, userStates);
+            Importer.importProject(connection, projectId, stdin, userStates);
         } else {
-            Path path = Paths.get(json);
+            if (fs == null)
+                throw new UsageException("No access to file system");
+            Path path = fs.getPath(json);
             if (!Files.exists(path))
                 throw new UsageException("File " + json + " not found");
             try (BufferedReader rdr = Files.newBufferedReader(path)) {
@@ -337,7 +340,7 @@ public final class Main {
             ProjectDao dao = new ProjectDao(connection);
             List<String> users = dao.listProjects();
             for (String user : users) {
-                pw.println(user);
+                stdout.println(user);
             }
         };
     }
@@ -347,18 +350,18 @@ public final class Main {
             ProjectDao dao = new ProjectDao(connection);
             int projectId = resolveProject(connection, name);
             List<UserDTO> users = dao.listProjectAccess(projectId);
-            pw.println("Project: " + name);
+            stdout.println("Project: " + name);
             String description = dao.getProjectDescription(projectId);
             if (description != null) {
-                pw.println("Description: " + description);
+                stdout.println("Description: " + description);
             }
             Map<Integer, String> userStates = dao.loadUserStates(projectId);
-            pw.println("Users with access:");
+            stdout.println("Users with access:");
             for (UserDTO user : users) {
                 String state = userStates.get(user.id);
-                pw.println("    " + user.login + (state == null ? "" : ": initial state '" + state + "'"));
+                stdout.println("    " + user.login + (state == null ? "" : ": initial state '" + state + "'"));
             }
-            pw.println("States:");
+            stdout.println("States:");
             List<StateDTO> states = dao.listStates(projectId);
             Map<String, List<TransitionDTO>> transitions = dao.listTransitions(projectId);
             for (StateDTO state : states) {
@@ -369,17 +372,17 @@ public final class Main {
                 } else {
                     toStr = "";
                 }
-                pw.println("  " + (state.isDefault ? "X" : " ") + " " + state.code + toStr);
+                stdout.println("  " + (state.isDefault ? "X" : " ") + " " + state.code + toStr);
             }
-            pw.println("Priorities:");
+            stdout.println("Priorities:");
             List<PriorityDTO> priorities = dao.listPriorities(projectId);
             for (PriorityDTO priority : priorities) {
-                pw.println("  " + (priority.isDefault ? "X" : " ") + " " + priority.code);
+                stdout.println("  " + (priority.isDefault ? "X" : " ") + " " + priority.code);
             }
-            pw.println("Reports:");
+            stdout.println("Reports:");
             List<ReportDTO> reports = dao.listReports(projectId, false);
             for (ReportDTO report : reports) {
-                pw.println("    #" + report.num + ": " + report.name);
+                stdout.println("    #" + report.num + ": " + report.name);
             }
         };
     }
@@ -389,9 +392,11 @@ public final class Main {
         return connection -> {
             int projectId = resolveProject(connection, name);
             if (json == null || "-".equals(json)) {
-                Exporter.exportProject(connection, projectId, pw);
+                Exporter.exportProject(connection, projectId, stdout);
             } else {
-                Path file = Paths.get(json);
+                if (fs == null)
+                    throw new UsageException("No access to file system");
+                Path file = fs.getPath(json);
                 Files.createDirectories(file.getParent());
                 try (PrintWriter pw = new PrintWriter(Files.newBufferedWriter(file))) {
                     Exporter.exportProject(connection, projectId, pw);
@@ -404,7 +409,7 @@ public final class Main {
         switch (command) {
         case "add": {
             if (args.isEmpty())
-                return usage("project add name [-d description] [-clone origName] [-json file]");
+                return usage("project add name [-d description] [-clone origName] [-json file|-]");
             String project = args.remove(0);
             Map<String, List<String>> options = parseOptions(args, "-d", "-clone", "-json");
             return projectAdd(project, options);
@@ -418,7 +423,7 @@ public final class Main {
         }
         case "update": {
             if (args.isEmpty())
-                return usage("project update name [-d description] [-json file]");
+                return usage("project update name [-d description] [-json file|-]");
             String project = args.remove(0);
             Map<String, List<String>> options = parseOptions(args, "-d", "-json");
             return projectUpdate(project, options);
@@ -436,13 +441,13 @@ public final class Main {
         }
         case "export": {
             if (args.isEmpty())
-                return usage("project export name [-json file]");
+                return usage("project export name [-json file|-]");
             String project = args.remove(0);
             Map<String, List<String>> options = parseOptions(args, "-json");
             return projectExport(project, options);
         }
         }
-        return usage("project add|remove|update|list|show [name] [options]");
+        return usage("project add|remove|update|list|show|export [name] [options]");
     }
 
     private static <T> T usage(String help) throws UsageException {
@@ -499,11 +504,11 @@ public final class Main {
                 connection.commit();
             }
         } catch (UsageException ue) {
-            pw.println(ue.getMessage());
+            stdout.println(ue.getMessage());
         } catch (Exception ex) {
-            ex.printStackTrace(pw);
+            ex.printStackTrace(stdout);
         } finally {
-            pw.flush();
+            stdout.flush();
         }
     }
 
@@ -514,30 +519,29 @@ public final class Main {
             return DriverManager.getConnection(appConfig.jdbcUrl, appConfig.jdbcUser, appConfig.jdbcPassword);
         };
 
+        Reader stdin;
+        PrintWriter stdout;
+        Supplier<String> getPassword;
         Console console = System.console();
-        Main main;
         if (console == null) {
-            InputStreamReader in = new InputStreamReader(System.in, StandardCharsets.UTF_8);
-            PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
-            main = new Main(
-                in, pw,
-                () -> {
-                    pw.print("Password: ");
-                    pw.flush();
-                    return new Scanner(in).nextLine();
-                }
-            );
+            stdin = new InputStreamReader(System.in, StandardCharsets.UTF_8);
+            stdout = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
+            getPassword = () -> {
+                stdout.print("Password: ");
+                stdout.flush();
+                return new Scanner(stdin).nextLine();
+            };
         } else {
-            main = new Main(
-                console.reader(), console.writer(),
-                () -> {
-                    char[] chars = console.readPassword("Password: ");
-                    if (chars == null)
-                        return null;
-                    return new String(chars);
-                }
-            );
+            stdin = console.reader();
+            stdout = console.writer();
+            getPassword = () -> {
+                char[] chars = console.readPassword("Password: ");
+                if (chars == null)
+                    return null;
+                return new String(chars);
+            };
         }
+        Main main = new Main(FileSystems.getDefault(), stdin, stdout, getPassword);
         main.admin(dataSource, args);
     }
 }
