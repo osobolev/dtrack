@@ -33,20 +33,20 @@
                 <span class="ml-4">Статус: <strong>${bug.state}</strong></span>
                 <span class="ml-4">Исполнитель:</span>
                 <span class="dropdown">
-                    <a class="nav-link dropdown-toggle pl-1" href="#" data-toggle="dropdown" style="display: inline;">
+                    <a class="nav-link dropdown-toggle pl-1" href="#" data-toggle="dropdown">
                         ${bug.assignedUser!"не выбран"}
                     </a>
                     <div class="dropdown-menu">
-                        <#if bug.isAssigned()>
-                            <a class="dropdown-item" href="javascript:void(0);" onclick="assignUser('${bug.assignedUserId}', '')">
-                                Сбросить
-                            </a>
-                        </#if>
                         <#list users as u>
                             <a class="dropdown-item" href="javascript:void(0);" onclick="assignUser('${bug.assignedUserId}', '${u.id}')">
                                 ${u.login}
                             </a>
                         </#list>
+                        <#if bug.isAssigned()>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="assignUser('${bug.assignedUserId}', '')">
+                                Сбросить
+                            </a>
+                        </#if>
                     </div>
                 </span>
                 <a class="btn btn-secondary" style="margin-left: 20px;" href="${bug.editLink}">Редактировать</a>
