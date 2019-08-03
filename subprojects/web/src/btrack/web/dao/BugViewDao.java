@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public final class BugViewDao extends BaseDao {
 
@@ -234,7 +235,7 @@ public final class BugViewDao extends BaseDao {
         return new ChangeBuilder(connection).loadBugHistory(bugNum, bugId, linkFactory);
     }
 
-    public void listPossibleAssignees(int projectId, Integer toSkip, List<UserBean> result) throws SQLException {
+    public void listPossibleAssignees(int projectId, Set<Integer> toSkip, List<UserBean> result) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select u.id, u.login" +
             "  from users u" +
@@ -245,7 +246,7 @@ public final class BugViewDao extends BaseDao {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     int id = rs.getInt(1);
-                    if (toSkip != null && toSkip.intValue() == id)
+                    if (toSkip.contains(id))
                         continue;
                     String login = rs.getString(2);
                     result.add(new UserBean(id, login));

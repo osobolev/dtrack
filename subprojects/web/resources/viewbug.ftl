@@ -28,22 +28,27 @@
                 <br>
                 <small>Изменен ${bug.lastUpdated} пользователем ${bug.lastUpdatedBy}</small>
             </div>
-            <div>
-                <span class="align-middle">Приоритет: <strong>${bug.priority}</strong></span>
-                <span class="align-middle" style="margin-left: 20px;">Статус: <strong>${bug.state}</strong></span>
-                <form method="post" action="${bug.assignLink}" id="assignForm" style="display: inline;">
-                    <#if bug.assignedUserId??>
-                        <input type="hidden" value="${bug.assignedUserId}" name="oldUserId">
-                    </#if>
-                    <span class="align-middle" style="margin-left: 20px;">Исполнитель:
-                    <select name="newUserId" id="newUserId" onchange="onAssignedChange()">
-                        <option value=""<#if bug.isNotAssigned()> selected</#if>>не выбран</option>
+            <div class="row align-items-center">
+                <span class="ml-4">Приоритет: <strong>${bug.priority}</strong></span>
+                <span class="ml-4">Статус: <strong>${bug.state}</strong></span>
+                <span class="ml-4">Исполнитель:</span>
+                <span class="dropdown">
+                    <a class="nav-link dropdown-toggle pl-1" href="#" data-toggle="dropdown" style="display: inline;">
+                        ${bug.assignedUser!"не выбран"}
+                    </a>
+                    <div class="dropdown-menu">
+                        <#if bug.isAssigned()>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="assignUser('${bug.assignedUserId}', '')">
+                                Сбросить
+                            </a>
+                        </#if>
                         <#list users as u>
-                            <option value="${u.id}"<#if bug.isAssigned(u)> selected</#if>>${u.login}</option>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="assignUser('${bug.assignedUserId}', '${u.id}')">
+                                ${u.login}
+                            </a>
                         </#list>
-                    </select>
-                    </span>
-                </form>
+                    </div>
+                </span>
                 <a class="btn btn-secondary" style="margin-left: 20px;" href="${bug.editLink}">Редактировать</a>
             </div>
             <form id="moveBug" method="post" action="${bug.moveLink}" style="margin-top: 5px;">
@@ -168,6 +173,13 @@
             return;
         var form = $(e.target).parent();
         form.submit();
+    }
+
+    function assignUser(oldUserId, newUserId) {
+        var link = '${bug.assignLink}?oldUserId=' + oldUserId + '&newUserId=' + newUserId;
+        $.post(link, function () {
+            window.location.reload();
+        });
     }
 
     $('#collapseComment').on('shown.bs.collapse', function () {

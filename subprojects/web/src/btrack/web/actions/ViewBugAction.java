@@ -7,10 +7,7 @@ import freemarker.template.TemplateException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class ViewBugAction extends Action {
@@ -40,12 +37,13 @@ public final class ViewBugAction extends Action {
         List<ChangeBean> comments = allChanges.stream().filter(ChangeBean::hasComments).collect(Collectors.toList());
         changes.add(new ChangeListBean("comments", "Комментарии", comments));
         changes.add(new ChangeListBean("changes", "Все изменения", allChanges));
+        Set<Integer> toSkip = new HashSet<>();
+        if (bug.assignedUserId != null) {
+            toSkip.add(bug.assignedUserId);
+        }
         List<UserBean> users = new ArrayList<>();
-        Integer toSkip;
-        if (bug.getAssignedUserId() != null && bug.getAssignedUserId().intValue() == request.getUserId()) {
-            toSkip = null;
-        } else {
-            toSkip = request.getUserId();
+        if (!Objects.equals(bug.assignedUserId, request.getUserId())) {
+            toSkip.add(request.getUserId());
             users.add(new UserBean(request.getUserId(), "Назначить мне"));
         }
         dao.listPossibleAssignees(request.projectId, toSkip, users);

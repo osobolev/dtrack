@@ -15,7 +15,7 @@ public final class BugBean {
     private final String lastUpdatedBy;
     public final String stateCode;
     private final String state;
-    private final Integer assignedUserId;
+    public final Integer assignedUserId;
     private final String assignedUser;
     private final LinkFactory linkFactory;
 
@@ -88,20 +88,16 @@ public final class BugBean {
         return state;
     }
 
-    public Integer getAssignedUserId() {
-        return assignedUserId;
+    public String getAssignedUserId() {
+        return assignedUserId == null ? "" : assignedUserId.toString();
     }
 
     public String getAssignedUser() {
         return assignedUser;
     }
 
-    public boolean isNotAssigned() {
-        return assignedUserId == null;
-    }
-
-    public boolean isAssigned(UserBean user) {
-        return assignedUserId != null && assignedUserId.intValue() == user.id;
+    public boolean isAssigned() {
+        return assignedUserId != null;
     }
 
     public String getViewLink() {
