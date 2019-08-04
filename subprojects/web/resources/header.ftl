@@ -28,7 +28,9 @@
                 </div>
             </li>
             <li class="nav-item active">
-                <button type="button" class="btn btn-primary" onclick="location.href='${project.newBugUrl}';">Новый баг</button>
+                <form style="display: inline;" method="get" action="${project.newBugUrl}">
+                    <button class="btn btn-primary">Новый баг</button>
+                </form>
             </li>
             <#else>
             <li class="nav-item">
