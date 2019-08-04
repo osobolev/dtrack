@@ -22,8 +22,8 @@
 <#include "header.ftl">
 <div class="container pb-2 mt-2">
     <h3>Отчет #${report.reportNum}: ${report.title}</h3>
-    <div class="pb-3"></div>
     <#list bugGroups as bugs>
+    <div class="pb-3"></div>
     <table id="bugs${bugs?counter}" class="table table-bordered table-hover" style="width: 100%;">
         <thead>
         <tr>
