@@ -9,6 +9,7 @@ public final class BugBean {
     private final String html;
     public final String priorityCode;
     private final String priority;
+    private final String priorityColor;
     private final LocalDateTime created;
     private final String createdBy;
     private final LocalDateTime lastUpdated;
@@ -19,12 +20,13 @@ public final class BugBean {
     private final String assignedUser;
     private final LinkFactory linkFactory;
 
-    public BugBean(int bugNum, String title, String html, String priorityCode, String priority, LocalDateTime created, String createdBy, LocalDateTime lastUpdated, String lastUpdatedBy, String stateCode, String state, Integer assignedUserId, String assignedUser, LinkFactory linkFactory) {
+    public BugBean(int bugNum, String title, String html, String priorityCode, String priority, String priorityColor, LocalDateTime created, String createdBy, LocalDateTime lastUpdated, String lastUpdatedBy, String stateCode, String state, Integer assignedUserId, String assignedUser, LinkFactory linkFactory) {
         this.bugNum = bugNum;
         this.title = title;
         this.html = html;
         this.priorityCode = priorityCode;
         this.priority = priority;
+        this.priorityColor = priorityColor;
         this.created = created;
         this.createdBy = createdBy;
         this.lastUpdated = lastUpdated;
@@ -54,6 +56,10 @@ public final class BugBean {
 
     public String getPriority() {
         return priority;
+    }
+
+    public String getPriorityColor() {
+        return priorityColor;
     }
 
     public String getCreated() {

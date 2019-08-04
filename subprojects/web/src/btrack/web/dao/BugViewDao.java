@@ -153,7 +153,7 @@ public final class BugViewDao extends BaseDao {
     private List<BugBean> doListBugs(LinkFactory linkFactory, boolean needsFullText, String where, String orderBy, Conditioner conditioner) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
             "select b.visible_id, b.created, b.modified, uc.login, um.login," +
-            "       b.state_code, s.name, b.priority_code, p.name, b.assigned_user_id, ua.login," +
+            "       b.state_code, s.name, b.priority_code, p.name, p.color, b.assigned_user_id, ua.login," +
             "       b.short_text" + (needsFullText ? ", b.full_text" : "") +
             "  from bugs b" +
             "       join users uc on b.create_user_id = uc.id" +
@@ -177,12 +177,13 @@ public final class BugViewDao extends BaseDao {
                     String state = rs.getString(7);
                     String priorityCode = rs.getString(8);
                     String priority = rs.getString(9);
-                    Integer assignedUserId = getInt(rs, 10);
-                    String assigned = rs.getString(11);
-                    String title = rs.getString(12);
-                    String html = needsFullText ? rs.getString(13) : null;
+                    String priorityColor = rs.getString(10);
+                    Integer assignedUserId = getInt(rs, 11);
+                    String assigned = rs.getString(12);
+                    String title = rs.getString(13);
+                    String html = needsFullText ? rs.getString(14) : null;
                     bugs.add(new BugBean(
-                        bugNum, title, html, priorityCode, priority,
+                        bugNum, title, html, priorityCode, priority, priorityColor,
                         created.toLocalDateTime(), createdBy,
                         modified.toLocalDateTime(), modifiedBy,
                         stateCode, state, assignedUserId, assigned, linkFactory

@@ -29,34 +29,42 @@
                 <small>Изменен ${bug.lastUpdated} пользователем ${bug.lastUpdatedBy}</small>
             </div>
             <div class="row align-items-center">
-                <span class="ml-4">Приоритет: <strong>${bug.priority}</strong></span>
-                <span class="ml-4">Статус: <strong>${bug.state}</strong></span>
-                <span class="ml-4">Исполнитель:</span>
+                <span class="ml-4 mr-2">Приоритет:</span>
+                <button type="button" class="btn" style="background-color: ${bug.priorityColor};">${bug.priority}</button>
+
+                <span class="ml-5 mr-2">Статус:</span>
                 <span class="dropdown">
-                    <a class="nav-link dropdown-toggle pl-1" href="#" data-toggle="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" href="#" data-toggle="dropdown">${bug.state}</button>
+                    <div class="dropdown-menu">
+                        <#list transitions as t>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="moveBug('${t.toCode}')">
+                                ${t.name}
+                            </a>
+                        </#list>
+                    </div>
+                </span>
+
+                <span class="ml-5 mr-2">Исполнитель:</span>
+                <span class="dropdown">
+                    <button class="btn btn-info dropdown-toggle" href="#" data-toggle="dropdown">
                         ${bug.assignedUser!"не выбран"}
-                    </a>
+                    </button>
                     <div class="dropdown-menu">
                         <#list users as u>
-                            <a class="dropdown-item" href="javascript:void(0);" onclick="assignUser('${bug.assignedUserId}', '${u.id}')">
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="assignUser(${u.id})">
                                 ${u.login}
                             </a>
                         </#list>
                         <#if bug.isAssigned()>
-                            <a class="dropdown-item" href="javascript:void(0);" onclick="assignUser('${bug.assignedUserId}', '')">
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="assignUser('')">
                                 Сбросить
                             </a>
                         </#if>
                     </div>
                 </span>
-                <a class="btn btn-secondary" style="margin-left: 20px;" href="${bug.editLink}">Редактировать</a>
+
+                <a class="btn btn-secondary ml-5" href="${bug.editLink}">Редактировать</a>
             </div>
-            <form id="moveBug" method="post" action="${bug.moveLink}" style="margin-top: 5px;">
-                <input type="hidden" name="from" value="${bug.stateCode}">
-                <#list transitions as t>
-                    <button type="submit" name="to" value="${t.toCode}" class="btn btn-primary">${t.name}</button>
-                </#list>
-            </form>
         </div>
         <div class="card-body">
             ${bug.html?no_esc}
@@ -175,8 +183,15 @@
         form.submit();
     }
 
-    function assignUser(oldUserId, newUserId) {
-        var link = '${bug.assignLink}?oldUserId=' + oldUserId + '&newUserId=' + newUserId;
+    function assignUser(newUserId) {
+        var link = '${bug.assignLink}?oldUserId=${bug.assignedUserId}&newUserId=' + newUserId;
+        $.post(link, function () {
+            window.location.reload();
+        });
+    }
+
+    function moveBug(newState) {
+        var link = '${bug.moveLink}?from=${bug.stateCode}&to=' + newState;
         $.post(link, function () {
             window.location.reload();
         });
