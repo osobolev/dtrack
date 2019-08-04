@@ -122,9 +122,9 @@ final class RouterServlet extends BaseServlet {
                     } else if ("deleteComment.html".equals(page)) {
                         return new DeleteCommentAction(num, request);
                     } else if ("assign.html".equals(page)) {
-                        return new AssignAction(bugId, num, request);
+                        return new AssignAction(bugId, request);
                     } else if ("move.html".equals(page)) {
-                        return new MoveStateAction(bugId, num, request);
+                        return new MoveStateAction(bugId, request);
                     }
                     return new ViewBugAction(bugId, request);
                 case FILE:

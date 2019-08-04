@@ -22,10 +22,6 @@ public final class ViewBugAction extends Action {
 
     @Override
     public void get(Context ctx, HttpServletResponse resp) throws SQLException, ValidationException, IOException, TemplateException, NoAccessException {
-        render(ctx, resp, null);
-    }
-
-    void render(Context ctx, HttpServletResponse resp, String error) throws SQLException, NoAccessException, IOException, TemplateException {
         BugViewDao dao = new BugViewDao(ctx.connection);
         BugBean bug = dao.loadBug(bugId, request);
         if (bug == null)
@@ -54,7 +50,6 @@ public final class ViewBugAction extends Action {
         params.put("attachments", attachments);
         params.put("changes", changes);
         params.put("users", users);
-        params.put("error", error);
         TemplateUtil.process("viewbug.ftl", params, resp.getWriter());
     }
 }

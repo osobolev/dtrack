@@ -2,6 +2,7 @@ package btrack.web.actions;
 
 import btrack.web.dao.BugEditDao;
 import btrack.web.dao.BugViewDao;
+import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,12 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 public final class AssignAction extends Action {
 
     private final int bugId;
-    private final int bugNum;
     private final ProjectInfo request;
 
-    public AssignAction(int bugId, int bugNum, ProjectInfo request) {
+    public AssignAction(int bugId, ProjectInfo request) {
         this.bugId = bugId;
-        this.bugNum = bugNum;
         this.request = request;
     }
 
@@ -39,12 +38,15 @@ public final class AssignAction extends Action {
         Integer[] changeBox = new Integer[1];
         BugEditDao dao = new BugEditDao(ctx.connection);
         boolean ok = dao.changeAssignedUser(bugId, request.getUserId(), changeBox, oldUserId, newUserId);
+        JSONObject object = new JSONObject();
         if (ok) {
             ctx.connection.commit();
-            resp.sendRedirect(request.getBugUrl(bugNum));
+            object.put("status", "ok");
         } else {
+            object.put("status", "error");
             String error = "Другой пользователь уже изменил исполнителя";
-            new ViewBugAction(bugId, request).render(ctx, resp, error);
+            object.put("message", error);
         }
+        object.write(resp.getWriter());
     }
 }

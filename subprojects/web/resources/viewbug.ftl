@@ -3,7 +3,6 @@
 <#-- @ftlvariable name="attachments" type="java.util.List<btrack.web.data.AttachmentBean>" -->
 <#-- @ftlvariable name="changes" type="java.util.List<btrack.web.data.ChangeListBean>" -->
 <#-- @ftlvariable name="users" type="java.util.List<btrack.web.data.UserBean>" -->
-<#-- @ftlvariable name="error" type="java.lang.String" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -20,9 +19,7 @@
     <div class="card mb-2">
         <div class="card-header">
             <h3 style="border-bottom: 1px solid gray; padding-bottom: 5px;">#${bug.bugNum}: ${bug.title}</h3>
-            <#if error??>
-                <h4 class="text-danger">${error}</h4>
-            </#if>
+            <h4 id='errorMessage' class="text-danger" style="display: none;"></h4>
             <div style="float: right;">
                 <small>Создан ${bug.created} пользователем ${bug.createdBy}</small>
                 <br>
@@ -179,22 +176,37 @@
     function confirmDeleteComment(e) {
         if (!confirm('Действительно удалить комментарий?'))
             return;
-        var form = $(e.target).parent();
+        const form = $(e.target).parent();
         form.submit();
     }
 
+    function showError(message) {
+        const em = $('#errorMessage');
+        em.text(message);
+        em.show();
+    }
+
     function assignUser(newUserId) {
-        var link = '${bug.assignLink}?oldUserId=${bug.assignedUserId}&newUserId=' + newUserId;
-        $.post(link, function () {
-            window.location.reload();
-        });
+        const link = '${bug.assignLink}?oldUserId=${bug.assignedUserId}&newUserId=' + newUserId;
+        $.post(link, function (resp) {
+            console.log(resp);
+            if (resp.status === 'error') {
+                showError(resp.message);
+            } else {
+                location.reload();
+            }
+        }, 'json');
     }
 
     function moveBug(newState) {
-        var link = '${bug.moveLink}?from=${bug.stateCode}&to=' + newState;
-        $.post(link, function () {
-            window.location.reload();
-        });
+        const link = '${bug.moveLink}?from=${bug.stateCode}&to=' + newState;
+        $.post(link, function (resp) {
+            if (resp.status === 'error') {
+                showError(resp.message);
+            } else {
+                location.reload();
+            }
+        }, 'json');
     }
 
     $('#collapseComment').on('shown.bs.collapse', function () {

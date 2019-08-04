@@ -52,8 +52,8 @@
     });
 
     function favourite(event, reportLink) {
-        var src = $(event.target).attr('src');
-        var page;
+        const src = $(event.target).attr('src');
+        let page;
         if (src === 'star.png') {
             $(event.target).attr('src', 'no_star.png');
             page = 'unlike.html';

@@ -1,5 +1,5 @@
 function configTable(elem, pageSize, what, columns) {
-    var capWhat = what.charAt(0).toUpperCase() + what.substring(1);
+    const capWhat = what.charAt(0).toUpperCase() + what.substring(1);
     elem.DataTable({
         "language": {
             "decimal": "",
@@ -30,14 +30,14 @@ function configTable(elem, pageSize, what, columns) {
         "autoWidth": false,
         "stateSave": true,
         "stateSaveCallback": function (settings, data) {
-            var order = data['order'];
+            const order = data['order'];
             if (!order)
                 return;
-            var query = '';
-            for (var i = 0; i < order.length; i++) {
-                var col = order[i];
-                var colIndex = col[0];
-                var dir = col[1];
+            let query = '';
+            for (let i = 0; i < order.length; i++) {
+                const col = order[i];
+                const colIndex = col[0];
+                const dir = col[1];
                 query += '&' + colIndex + '=' + dir;
             }
             if (query.length > 0) {
@@ -46,16 +46,16 @@ function configTable(elem, pageSize, what, columns) {
             window.location.hash = '#' + query;
         },
         "stateLoadCallback": function (settings, callback) {
-            var hash = window.location.hash;
-            var orders = [];
+            const hash = window.location.hash;
+            const orders = [];
             if (hash && hash.length > 1) {
-                var parts = hash.substring(1).split('&');
-                for (var i = 0; i < parts.length; i++) {
-                    var part = parts[i].split('=');
+                const parts = hash.substring(1).split('&');
+                for (let i = 0; i < parts.length; i++) {
+                    const part = parts[i].split('=');
                     if (part.length < 2)
                         continue;
-                    var colIndex = parseInt(part[0]);
-                    var order = part[1];
+                    const colIndex = parseInt(part[0]);
+                    const order = part[1];
                     orders.push([colIndex, order]);
                 }
             }
@@ -76,9 +76,9 @@ function configSummer(elem, height) {
 }
 
 function filesChosen(filesElem, labelElem) {
-    var fs = filesElem.get(0).files;
-    var buf = '';
-    for (var i = 0; i < fs.length; i++) {
+    const fs = filesElem.get(0).files;
+    let buf = '';
+    for (let i = 0; i < fs.length; i++) {
         if (buf.length > 0) {
             buf += ', ';
         }

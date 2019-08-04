@@ -66,10 +66,10 @@
     }
 
     function removeAttachment(event) {
-        var li = $(event.target).parent();
-        var field = li.find('input[type=hidden]');
-        var butt = li.find('.att-butt');
-        var fname = li.find('span[class=bugFile]');
+        const li = $(event.target).parent();
+        const field = li.find('input[type=hidden]');
+        const butt = li.find('.att-butt');
+        const fname = li.find('span[class=bugFile]');
         if (field.val() === 'true') {
             fname.css('text-decoration', 'line-through');
             field.val('false');
