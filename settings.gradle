@@ -3,7 +3,7 @@ rootProject.name = 'dtrack'
 def add(name) {
     def dir = file("subprojects/$name")
     include name
-    project(":${name}").projectDir = dir
+    project(":$name").projectDir = dir
 }
 
 add('common')
