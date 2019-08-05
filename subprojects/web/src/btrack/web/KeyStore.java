@@ -19,7 +19,7 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 final class KeyStore {
 
@@ -27,6 +27,7 @@ final class KeyStore {
     private static final String RSA = "RSA";
     private static final String USER_ID = "userId";
     private static final String USER_DISPLAY = "userDisplay";
+    static final Duration DURATION = Duration.ofDays(3653);
 
     private static KeyStore instance = null;
     
@@ -75,9 +76,9 @@ final class KeyStore {
 
     String createToken(UserInfo loginInfo) throws JoseException {
         JwtClaims claims = new JwtClaims();
-        claims.setClaim(USER_ID, loginInfo.id);
+        claims.setClaim(USER_ID, String.valueOf(loginInfo.id));
         claims.setClaim(USER_DISPLAY, loginInfo.displayName);
-        claims.setExpirationTimeMinutesInTheFuture(TimeUnit.DAYS.toMinutes(365 * 10));
+        claims.setExpirationTimeMinutesInTheFuture(DURATION.toMinutes());
         claims.setGeneratedJwtId();
         claims.setIssuedAtToNow();
 

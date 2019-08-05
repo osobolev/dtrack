@@ -25,7 +25,7 @@ final class RootServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        UserInfo user = UserInfo.get(req);
+        UserInfo user = UserInfo.get(req, logger);
         String webRoot = RequestInfo.getWebRoot(req);
         if (user == null) {
             resp.sendRedirect(webRoot + "/login.html");

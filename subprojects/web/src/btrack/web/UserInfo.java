@@ -11,7 +11,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.concurrent.TimeUnit;
 
 public final class UserInfo implements Serializable {
 
@@ -38,7 +37,7 @@ public final class UserInfo implements Serializable {
         return null;
     }
 
-    public static UserInfo get(HttpServletRequest req) {
+    public static UserInfo get(HttpServletRequest req, Logger logger) {
         UserInfo userInfo = (UserInfo) req.getSession().getAttribute(ATTRIBUTE);
         if (userInfo != null)
             return userInfo;
@@ -53,7 +52,7 @@ public final class UserInfo implements Serializable {
                     req.getSession().setAttribute(ATTRIBUTE, cookieInfo);
                     return cookieInfo;
                 } catch (Exception ex) {
-                    // ignore
+                    logger.error(ex);
                 }
             }
         }
@@ -67,7 +66,7 @@ public final class UserInfo implements Serializable {
             String token = ks.createToken(this);
             Cookie cookie = new Cookie(COOKIE, URLEncoder.encode(token, "UTF-8"));
             cookie.setPath("/");
-            cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(365));
+            cookie.setMaxAge((int) KeyStore.DURATION.getSeconds());
             cookie.setHttpOnly(true);
             resp.addCookie(cookie);
         }

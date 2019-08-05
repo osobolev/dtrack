@@ -28,7 +28,7 @@ abstract class BaseServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         try (Connection connection = dataSource.getConnection()) {
-            UserInfo user = UserInfo.get(req);
+            UserInfo user = UserInfo.get(req, logger);
             Action action = getAction(connection, req, user);
             if (action == null) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
