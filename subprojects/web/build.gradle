@@ -9,6 +9,7 @@ dependencies {
     compile 'commons-fileupload:commons-fileupload:1.4'
     compile 'com.zaxxer:HikariCP:3.3.1'
     compile 'org.json:json:20180813'
+    compile 'org.bitbucket.b_c:jose4j:0.6.2'
     compile 'com.github.osobolev.app-delivery:apploader-common:3.0'
 
     compile project(':common')

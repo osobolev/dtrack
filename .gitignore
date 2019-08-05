@@ -3,3 +3,4 @@ distr/
 build/
 .gradle/
 out/
+*.key

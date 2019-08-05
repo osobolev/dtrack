@@ -23,32 +23,34 @@ public final class LoginAction extends Action {
         this.request = request;
     }
 
-    private void render(HttpServletResponse resp, String login, String redirect, String error) throws IOException, TemplateException {
+    private void render(HttpServletResponse resp, String login, boolean remember, String redirect, String error) throws IOException, TemplateException {
         Map<String, Object> params = new HashMap<>();
         params.put("redirect", redirect);
         params.put("error", error);
         params.put("login", login == null ? "" : login);
+        params.put("remember", remember);
         request.putTo(params);
         TemplateUtil.process("login.ftl", params, resp.getWriter());
     }
 
     @Override
     public void get(Context ctx, HttpServletResponse resp) throws Exception {
-        render(resp, null, redirectTo, null);
+        render(resp, null, true, redirectTo, null);
     }
 
     @Override
     public void post(Context ctx, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String login = req.getParameter("login");
         String password = req.getParameter("password");
+        boolean rememberMe = req.getParameter("rememberMe") != null;
         byte[] passHash = AppConfig.hash(login, password);
         BugViewDao dao = new BugViewDao(ctx.connection);
         Integer userId = dao.checkLogin(debug, login, passHash);
         String redirect = req.getParameter("redirect");
         if (userId == null) {
-            render(resp, login, redirect, "Неправильный логин или пароль");
+            render(resp, login, rememberMe, redirect, "Неправильный логин или пароль");
         } else {
-            req.getSession().setAttribute(UserInfo.ATTRIBUTE, new UserInfo(userId.intValue(), login));
+            new UserInfo(userId.intValue(), login).login(req, resp, rememberMe);
             String to;
             if (redirect == null) {
                 to = request.getWebRoot() + "/";

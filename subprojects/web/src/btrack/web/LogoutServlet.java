@@ -12,7 +12,7 @@ final class LogoutServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getSession().removeAttribute(UserInfo.ATTRIBUTE);
+        UserInfo.logout(req, resp);
         String webRoot = RequestInfo.getWebRoot(req);
         resp.sendRedirect(webRoot + "/login.html");
     }

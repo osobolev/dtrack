@@ -1,6 +1,7 @@
 <#-- @ftlvariable name="error" type="java.lang.String" -->
 <#-- @ftlvariable name="redirect" type="java.lang.String" -->
 <#-- @ftlvariable name="login" type="java.lang.String" -->
+<#-- @ftlvariable name="remember" type="boolean" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -28,6 +29,10 @@
                     <input type="password" class="form-control" placeholder="Пароль" name="password">
                 </div>
                 <button type="submit" class="btn-primary form-control">Вход</button>
+                <div class="mt-2" style="text-align: center;">
+                    <input type="checkbox" name="rememberMe" style="vertical-align: middle;"<#if remember> checked</#if>>
+                    <label class="form-check-label">Запомнить меня</label>
+                </div>
             </form>
         </div>
     </div>
