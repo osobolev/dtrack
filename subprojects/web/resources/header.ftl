@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="skipReports" type="boolean" -->
-<#-- @ftlvariable name="login" type="btrack.web.actions.LoginInfo" -->
-<#-- @ftlvariable name="project" type="btrack.web.actions.ProjectInfo" -->
+<#-- @ftlvariable name="login" type="dtrack.web.actions.LoginInfo" -->
+<#-- @ftlvariable name="project" type="dtrack.web.actions.ProjectInfo" -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="navbar-collapse collapse">
         <ul class="navbar-nav mr-auto">

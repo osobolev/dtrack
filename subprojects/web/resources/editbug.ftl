@@ -1,6 +1,6 @@
-<#-- @ftlvariable name="bug" type="btrack.web.data.BugBean" -->
-<#-- @ftlvariable name="attachments" type="java.util.List<btrack.web.data.AttachmentBean>" -->
-<#-- @ftlvariable name="priorities" type="java.util.List<btrack.web.data.PriorityBean>" -->
+<#-- @ftlvariable name="bug" type="dtrack.web.data.BugBean" -->
+<#-- @ftlvariable name="attachments" type="java.util.List<dtrack.web.data.AttachmentBean>" -->
+<#-- @ftlvariable name="priorities" type="java.util.List<dtrack.web.data.PriorityBean>" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>

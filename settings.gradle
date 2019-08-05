@@ -1,8 +1,7 @@
-rootProject.name = 'btrack'
+rootProject.name = 'dtrack'
 
 def add(name) {
-    def path = "subprojects/$name"
-    def dir = file(path)
+    def dir = file("subprojects/$name")
     include name
     project(":${name}").projectDir = dir
 }

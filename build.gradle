@@ -1,5 +1,5 @@
 subprojects {
-    group 'btrack'
+    group 'dtrack'
     version '1.0-SNAPSHOT'
 
     apply plugin: 'java'

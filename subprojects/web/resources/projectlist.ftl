@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="login" type="btrack.web.actions.LoginInfo" -->
+<#-- @ftlvariable name="login" type="dtrack.web.actions.LoginInfo" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>

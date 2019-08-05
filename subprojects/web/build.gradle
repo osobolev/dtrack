@@ -22,5 +22,5 @@ dependencies {
 
 jar.manifest.attributes(
     'Class-Path': configurations.runtime.collect { it.name }.sort().join(' '),
-    'Main-Class': 'btrack.web.Main'
+    'Main-Class': 'dtrack.web.Main'
 )

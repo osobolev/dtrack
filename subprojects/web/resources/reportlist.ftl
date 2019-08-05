@@ -1,6 +1,6 @@
-<#-- @ftlvariable name="stats" type="java.util.List<btrack.web.data.StatsBean>" -->
-<#-- @ftlvariable name="reports" type="java.util.List<btrack.web.data.ReportBean>" -->
-<#-- @ftlvariable name="project" type="btrack.web.actions.ProjectInfo" -->
+<#-- @ftlvariable name="stats" type="java.util.List<dtrack.web.data.StatsBean>" -->
+<#-- @ftlvariable name="reports" type="java.util.List<dtrack.web.data.ReportBean>" -->
+<#-- @ftlvariable name="project" type="dtrack.web.actions.ProjectInfo" -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
