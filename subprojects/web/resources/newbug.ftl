@@ -6,9 +6,9 @@
     <meta charset="UTF-8">
     <title>Новый баг</title>
     <#include "head.ftl">
-    <link href="summernote-bs4.css" rel="stylesheet">
-    <script src="summernote-bs4.js"></script>
-    <script src="lang/summernote-ru-RU.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-bs4.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-bs4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/lang/summernote-ru-RU.min.js"></script>
 </head>
 <body>
 <#include "header.ftl">

@@ -7,9 +7,9 @@
     <meta charset="UTF-8">
     <title>Список багов</title>
     <#include "head.ftl">
-    <link rel="stylesheet" type="text/css" href="DataTables-1.10.18/css/dataTables.bootstrap4.min.css"/>
-    <script type="text/javascript" src="DataTables-1.10.18/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="DataTables-1.10.18/js/dataTables.bootstrap4.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.18/css/dataTables.bootstrap4.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.18/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.18/js/dataTables.bootstrap4.min.js"></script>
     <style>
         <#list priorities as p>
         .table-hover tbody tr.bugPriority${p.id} {
