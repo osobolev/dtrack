@@ -125,6 +125,17 @@ public final class Main {
         return maybeUserId.intValue();
     }
 
+    private static List<Integer> resolveUsers(Connection connection, List<String> logins) throws UsageException, SQLException {
+        List<Integer> userIds = new ArrayList<>();
+        if (logins != null) {
+            for (String login : logins) {
+                int userId = resolveUser(connection, login);
+                userIds.add(userId);
+            }
+        }
+        return userIds;
+    }
+
     private static Action userRemove(String login) {
         return connection -> {
             UserDao dao = new UserDao(connection);
@@ -139,7 +150,7 @@ public final class Main {
         return connection -> {
             int userId = resolveUser(connection, login);
             List<Integer> addIds = resolveProjects(connection, add);
-            List<Integer> removeIds = resolveProjects(connection, add);
+            List<Integer> removeIds = resolveProjects(connection, remove);
             UserDao dao = new UserDao(connection);
             for (Integer addId : addIds) {
                 dao.addUserAccess(userId, addId.intValue());
@@ -407,6 +418,23 @@ public final class Main {
         };
     }
 
+    private static Action projectAccess(String name, List<String> add, List<String> remove) throws UsageException {
+        if (!Collections.disjoint(add, remove))
+            return help("Added and removed users intersect");
+        return connection -> {
+            int projectId = resolveProject(connection, name);
+            List<Integer> addIds = resolveUsers(connection, add);
+            List<Integer> removeIds = resolveUsers(connection, remove);
+            UserDao dao = new UserDao(connection);
+            for (Integer addId : addIds) {
+                dao.addUserAccess(addId.intValue(), projectId);
+            }
+            for (Integer removeId : removeIds) {
+                dao.removeUserAccess(removeId.intValue(), projectId);
+            }
+        };
+    }
+
     private Action project(String command, List<String> args) throws UsageException {
         switch (command) {
         case "add": {
@@ -448,8 +476,30 @@ public final class Main {
             Map<String, List<String>> options = parseOptions(args, "-json");
             return projectExport(project, options);
         }
+        case "access": {
+            if (args.size() >= 2) {
+                boolean ok = true;
+                String project = args.remove(0);
+                List<String> add = new ArrayList<>();
+                List<String> remove = new ArrayList<>();
+                for (String arg : args) {
+                    if (arg.startsWith("+")) {
+                        add.add(arg.substring(1));
+                    } else if (arg.startsWith("-")) {
+                        remove.add(arg.substring(1));
+                    } else {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok) {
+                    return projectAccess(project, add, remove);
+                }
+            }
+            return usage("project access name {+user|-user}");
         }
-        return usage("project add|remove|update|list|show|export [name] [options]");
+        }
+        return usage("project add|remove|update|list|show|export|access [name] [options]");
     }
 
     private static <T> T usage(String help) throws UsageException {
