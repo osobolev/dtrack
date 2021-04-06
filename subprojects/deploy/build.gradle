@@ -13,7 +13,7 @@ task webFiles(type: Copy) {
 }
 
 task copyJars(type: Copy) {
-    from project.configurations.distr
+    from configurations.distr
     from 'config'
     into "$dest"
 }

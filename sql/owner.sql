@@ -1,3 +1,2 @@
 ﻿CREATE USER dtrack PASSWORD 'dtrack';
-CREATE SCHEMA AUTHORIZATION dtrack;
 CREATE DATABASE dtrack OWNER dtrack;

@@ -1,14 +1,14 @@
 dependencies {
-    compile 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.5'
 
-    compile project(':common')
+    implementation project(':common')
 
-    runtime 'org.postgresql:postgresql:42.2.5'
+    runtimeOnly 'org.postgresql:postgresql:42.2.5'
 
-    testCompile project(':dao_test')
+    testImplementation project(':dao_test')
 }
 
 jar.manifest.attributes(
-    'Class-Path': configurations.runtime.collect { it.name }.sort().join(' '),
+    'Class-Path': configurations.runtimeClasspath.collect { it.name }.sort().join(' '),
     'Main-Class': 'dtrack.admin.Main'
 )

@@ -3,23 +3,23 @@ apply plugin: 'war'
 project.webAppDirName = 'web'
 
 dependencies {
-    compile 'org.eclipse.jetty:jetty-servlet:9.4.19.v20190610'
-    compile 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20190610.1'
-    compile 'org.freemarker:freemarker:2.3.28'
-    compile 'commons-fileupload:commons-fileupload:1.4'
-    compile 'com.zaxxer:HikariCP:3.3.1'
-    compile 'org.json:json:20180813'
-    compile 'org.bitbucket.b_c:jose4j:0.6.2'
+    implementation 'org.eclipse.jetty:jetty-servlet:9.4.19.v20190610'
+    implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20190610.1'
+    implementation 'org.freemarker:freemarker:2.3.28'
+    implementation 'commons-fileupload:commons-fileupload:1.4'
+    implementation 'com.zaxxer:HikariCP:3.3.1'
+    implementation 'org.json:json:20180813'
+    implementation 'org.bitbucket.b_c:jose4j:0.6.2'
 
-    compile project(':common')
+    implementation project(':common')
 
-    runtime 'org.postgresql:postgresql:42.2.5'
-    runtime 'org.slf4j:slf4j-nop:1.7.26'
+    runtimeOnly 'org.postgresql:postgresql:42.2.5'
+    runtimeOnly 'org.slf4j:slf4j-nop:1.7.26'
 
-    testCompile project(':dao_test')
+    testImplementation project(':dao_test')
 }
 
 jar.manifest.attributes(
-    'Class-Path': configurations.runtime.collect { it.name }.sort().join(' '),
+    'Class-Path': configurations.runtimeClasspath.collect { it.name }.sort().join(' '),
     'Main-Class': 'dtrack.web.Main'
 )

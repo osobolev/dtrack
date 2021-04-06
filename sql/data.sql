@@ -33,5 +33,5 @@ insert into reports (project_id, visible_id, name, simple_query) values (1, 1, '
 insert into reports (project_id, visible_id, name, simple_query) values (1, 2, 'Мои задачи на тестирование', 'b.assigned_user_id = $user or (b.assigned_user_id is null and b.state_code = "testing")');
 insert into reports (project_id, visible_id, name, simple_query) values (1, 3, 'Мои задачи на разработку', 'b.assigned_user_id = $user or (b.assigned_user_id is null and b.state_code in ("new", "rework"))');
 insert into reports (project_id, visible_id, name, simple_query) values (1, 4, 'Все активные', 'b.state_code <> "closed"');
-insert into reports (project_id, visible_id, name, simple_query) values (1, 5, 'Все зввершенные', 'b.state_code = "closed"');
+insert into reports (project_id, visible_id, name, simple_query) values (1, 5, 'Все завершенные', 'b.state_code = "closed"');
 insert into reports (project_id, visible_id, name, json_query) values (1, 6, 'Мои + остальные активные', '["b.assigned_user_id = $user", "(b.assigned_user_id <> $user or b.assigned_user_id is null) and b.state_code <> ''closed''"]');

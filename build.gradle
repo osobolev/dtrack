@@ -2,7 +2,7 @@ subprojects {
     group 'dtrack'
     version '1.0-SNAPSHOT'
 
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     
     sourceCompatibility = 1.8
     compileJava.options.encoding = 'UTF-8'
