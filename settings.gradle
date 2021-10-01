@@ -1,4 +1,4 @@
-rootProject.name = 'dtrack'
+rootProject.name = "dtrack"
 
 def add(name) {
     def dir = file("subprojects/$name")
