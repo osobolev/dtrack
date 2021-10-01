@@ -14,7 +14,7 @@ import java.util.Map;
 
 public final class TemplateUtil {
 
-    private static final Configuration CONFIGURATION = new Configuration(Configuration.VERSION_2_3_28);
+    private static final Configuration CONFIGURATION = new Configuration(Configuration.VERSION_2_3_31);
 
     public static void init(String dir) throws IOException {
         if (dir == null) {
