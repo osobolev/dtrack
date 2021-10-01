@@ -1,9 +1,9 @@
 dependencies {
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation("com.google.code.gson:gson:2.8.8")
 
     implementation project(':common')
 
-    runtimeOnly 'org.postgresql:postgresql:42.2.5'
+    runtimeOnly("org.postgresql:postgresql:42.2.24")
 
     testImplementation project(':dao_test')
 }

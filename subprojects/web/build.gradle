@@ -3,18 +3,18 @@ apply plugin: 'war'
 project.webAppDirName = 'web'
 
 dependencies {
-    implementation 'org.eclipse.jetty:jetty-servlet:9.4.19.v20190610'
-    implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20190610.1'
-    implementation 'org.freemarker:freemarker:2.3.28'
-    implementation 'commons-fileupload:commons-fileupload:1.4'
-    implementation 'com.zaxxer:HikariCP:3.3.1'
-    implementation 'org.json:json:20180813'
-    implementation 'org.bitbucket.b_c:jose4j:0.6.2'
+    implementation("org.eclipse.jetty:jetty-servlet:9.4.43.v20210629")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20200713.1")
+    implementation("org.freemarker:freemarker:2.3.31")
+    implementation("commons-fileupload:commons-fileupload:1.4")
+    implementation("com.zaxxer:HikariCP:4.0.3")
+    implementation("org.json:json:20210307")
+    implementation("org.bitbucket.b_c:jose4j:0.7.9")
 
     implementation project(':common')
 
-    runtimeOnly 'org.postgresql:postgresql:42.2.5'
-    runtimeOnly 'org.slf4j:slf4j-nop:1.7.26'
+    runtimeOnly("org.postgresql:postgresql:42.2.24")
+    runtimeOnly("org.slf4j:slf4j-nop:1.7.32")
 
     testImplementation project(':dao_test')
 }
