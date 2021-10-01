@@ -1,6 +1,6 @@
-apply plugin: 'war'
+apply(plugin: "war")
 
-project.webAppDirName = 'web'
+project.webAppDirName = "web"
 
 dependencies {
     implementation("org.eclipse.jetty:jetty-servlet:9.4.43.v20210629")
@@ -11,15 +11,15 @@ dependencies {
     implementation("org.json:json:20210307")
     implementation("org.bitbucket.b_c:jose4j:0.7.9")
 
-    implementation project(':common')
+    implementation(project(":common"))
 
     runtimeOnly("org.postgresql:postgresql:42.2.24")
     runtimeOnly("org.slf4j:slf4j-nop:1.7.32")
 
-    testImplementation project(':dao_test')
+    testImplementation(project(":dao_test"))
 }
 
 jar.manifest.attributes(
-    'Class-Path': configurations.runtimeClasspath.collect { it.name }.sort().join(' '),
-    'Main-Class': 'dtrack.web.Main'
+    "Class-Path": configurations.runtimeClasspath.collect { it.name }.sort().join(" "),
+    "Main-Class": "dtrack.web.Main"
 )

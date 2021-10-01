@@ -2,12 +2,12 @@ rootProject.name = 'dtrack'
 
 def add(name) {
     def dir = file("subprojects/$name")
-    include name
+    include(name)
     project(":$name").projectDir = dir
 }
 
-add('common')
-add('dao_test')
-add('web')
-add('admin')
-add('deploy')
+add("common")
+add("dao_test")
+add("web")
+add("admin")
+add("deploy")

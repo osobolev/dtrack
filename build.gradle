@@ -1,16 +1,16 @@
 subprojects {
-    group 'dtrack'
-    version '1.0-SNAPSHOT'
+    group = "dtrack"
+    version = "1.0-SNAPSHOT"
 
-    apply plugin: 'java-library'
+    apply(plugin: "java-library")
     
-    sourceCompatibility = 1.8
-    compileJava.options.encoding = 'UTF-8'
-    compileTestJava.options.encoding = 'UTF-8'
+    sourceCompatibility = "1.8"
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
 
-    sourceSets.main.java.srcDirs = ['src']
-    sourceSets.main.resources.srcDirs = ['resources']
-    sourceSets.test.java.srcDirs = ['test']
+    sourceSets.main.java.srcDirs = ["src"]
+    sourceSets.main.resources.srcDirs = ["resources"]
+    sourceSets.test.java.srcDirs = ["test"]
 
     repositories {
         mavenLocal()
@@ -18,8 +18,8 @@ subprojects {
     }
 }
 
-project(':') {
+project(":") {
     task clean(type: Delete) {
-        delete 'distr'
+        delete("distr")
     }
 }
