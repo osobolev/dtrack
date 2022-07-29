@@ -1,3 +1,7 @@
+plugins {
+    id("com.github.ben-manes.versions") version "0.42.0"
+}
+
 subprojects {
     group = "dtrack"
     version = "1.0-SNAPSHOT"
@@ -13,7 +17,6 @@ subprojects {
     sourceSets.test.java.srcDirs = ["test"]
 
     repositories {
-        mavenLocal()
         mavenCentral()
     }
 }

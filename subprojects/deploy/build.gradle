@@ -7,15 +7,17 @@ dependencies {
 
 def dest = "$rootDir/distr"
 
-task webFiles(type: Copy) {
+tasks.register("webFiles", Copy) {
     from("../web/web")
     into("$dest/root")
 }
 
-task copyJars(type: Copy) {
+tasks.register("copyJars", Copy) {
     from(configurations.distr)
     from("config")
     into("$dest")
 }
 
-task distr(dependsOn: [webFiles, copyJars])
+tasks.register("distr") {
+    dependsOn(webFiles, copyJars)
+}
