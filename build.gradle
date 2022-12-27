@@ -1,5 +1,32 @@
 plugins {
-    id("com.github.ben-manes.versions") version "0.42.0"
+    id("com.github.ben-manes.versions") version "0.44.0"
+}
+
+def getMajor(version, majorDepth) {
+    int p = -1;
+    for (int i = 0; i < majorDepth; i++) {
+        p = version.indexOf('.', p + 1)
+        if (p < 0) break
+    }
+    return p < 0 ? "" : version.substring(0, p)
+}
+
+def getMajorDepth(mod) {
+    if (mod.group == "org.slf4j") return 2
+    return 1
+}
+
+tasks.withType(com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask).configureEach {
+    resolutionStrategy {
+        componentSelection {
+            all {
+                def majorDepth = getMajorDepth(candidate)
+                if (getMajor(candidate.version, majorDepth) != getMajor(currentVersion, majorDepth)) {
+                    reject("Major update")
+                }
+            }
+        }
+    }
 }
 
 subprojects {
