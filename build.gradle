@@ -1,12 +1,12 @@
 plugins {
-    id("com.github.ben-manes.versions") version "0.44.0"
+    id("com.github.ben-manes.versions") version "0.45.0"
 }
 
 def getMajor(version, majorDepth) {
     int p = -1;
     for (int i = 0; i < majorDepth; i++) {
         p = version.indexOf('.', p + 1)
-        if (p < 0) break
+        if (p < 0) return version
     }
     return p < 0 ? "" : version.substring(0, p)
 }

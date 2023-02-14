@@ -96,7 +96,7 @@ final class KeyStore {
             .setAllowedClockSkewInSeconds(30)
             .setVerificationKey(jsonWebKey.getKey())
             .setJwsAlgorithmConstraints(new AlgorithmConstraints(
-                AlgorithmConstraints.ConstraintType.WHITELIST, KEY_ALGORITHM
+                AlgorithmConstraints.ConstraintType.PERMIT, KEY_ALGORITHM
             ))
             .build();
         JwtClaims claims = jwtConsumer.processToClaims(token);
