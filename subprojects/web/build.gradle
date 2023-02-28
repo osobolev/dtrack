@@ -3,7 +3,7 @@ apply(plugin: "war")
 project.webAppDirName = "web"
 
 dependencies {
-    implementation("org.eclipse.jetty:jetty-servlet:9.4.50.v20221201")
+    implementation("org.eclipse.jetty:jetty-servlet:9.4.51.v20230217")
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1")
     implementation("org.freemarker:freemarker:2.3.32")
     implementation("commons-fileupload:commons-fileupload:1.5")
@@ -13,7 +13,7 @@ dependencies {
 
     implementation(project(":common"))
 
-    runtimeOnly("org.postgresql:postgresql:42.5.3")
+    runtimeOnly("org.postgresql:postgresql:42.5.4")
     runtimeOnly("org.slf4j:slf4j-nop:1.7.36")
 
     testImplementation(project(":dao_test"))
