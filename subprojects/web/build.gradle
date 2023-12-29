@@ -9,11 +9,11 @@ dependencies {
     implementation("commons-fileupload:commons-fileupload:1.5")
     implementation("com.zaxxer:HikariCP:4.0.3")
     implementation("org.json:json:20220924")
-    implementation("org.bitbucket.b_c:jose4j:0.9.3")
+    implementation("org.bitbucket.b_c:jose4j:0.9.4")
 
     implementation(project(":common"))
 
-    runtimeOnly("org.postgresql:postgresql:42.7.0")
+    runtimeOnly("org.postgresql:postgresql:42.7.1")
     runtimeOnly("org.slf4j:slf4j-nop:1.7.36")
 
     testImplementation(project(":dao_test"))
