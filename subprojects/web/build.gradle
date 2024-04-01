@@ -1,6 +1,8 @@
 apply(plugin: "war")
 
-project.webAppDirName = "web"
+tasks.war {
+    webAppDirectory.set(file("web"))
+}
 
 dependencies {
     implementation("org.eclipse.jetty:jetty-servlet:9.4.53.v20231009")
