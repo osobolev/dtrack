@@ -5,7 +5,7 @@ dependencies {
 
     runtimeOnly("org.postgresql:postgresql:42.7.3")
 
-    testImplementation(project(":dao_test"))
+    manualImplementation(project(":dao_test"))
 }
 
 jar.manifest.attributes(

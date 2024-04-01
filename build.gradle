@@ -43,9 +43,24 @@ subprojects {
     compileJava.options.encoding = "UTF-8"
     compileTestJava.options.encoding = "UTF-8"
 
-    sourceSets.main.java.srcDirs = ["src"]
-    sourceSets.main.resources.srcDirs = ["resources"]
-    sourceSets.test.java.srcDirs = ["test"]
+    sourceSets {
+        main {
+            java.srcDirs = ["src"]
+            resources.srcDirs = ["resources"]
+        }
+        manual {
+            java.srcDirs = ["test"]
+            resources.srcDirs = ["testResources"]
+        }
+    }
+
+    configurations["manualImplementation"].extendsFrom(configurations["implementation"])
+    configurations["manualRuntimeOnly"].extendsFrom(configurations["runtimeOnly"])
+    configurations["manualCompileOnly"].extendsFrom(configurations["compileOnly"])
+
+    dependencies {
+        "manualImplementation"(sourceSets["main"].output)
+    }
 
     repositories {
         mavenCentral()
