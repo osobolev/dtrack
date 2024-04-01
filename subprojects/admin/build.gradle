@@ -3,7 +3,7 @@ dependencies {
 
     implementation(project(":common"))
 
-    runtimeOnly("org.postgresql:postgresql:42.7.1")
+    runtimeOnly("org.postgresql:postgresql:42.7.3")
 
     testImplementation(project(":dao_test"))
 }

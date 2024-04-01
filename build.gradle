@@ -13,6 +13,8 @@ def getMajor(version, majorDepth) {
 
 def getMajorDepth(mod) {
     if (mod.group == "org.slf4j") return 2
+    if (mod.group == "org.json") return 0
+    if (mod.group == "com.googlecode.owasp-java-html-sanitizer") return 0
     return 1
 }
 
