@@ -2,7 +2,8 @@ package dtrack.web.actions;
 
 import dtrack.web.dao.BugEditDao;
 import dtrack.web.dao.BugViewDao;
-import org.json.JSONObject;
+import smalljson.JSONObject;
+import smalljson.JSONWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +48,6 @@ public final class AssignAction extends Action {
             String error = "Другой пользователь уже изменил исполнителя";
             object.put("message", error);
         }
-        object.write(resp.getWriter());
+        JSONWriter.writeTo(object, resp.getWriter());
     }
 }

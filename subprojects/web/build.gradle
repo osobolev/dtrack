@@ -10,7 +10,7 @@ dependencies {
     implementation("org.freemarker:freemarker:2.3.34")
     implementation("commons-fileupload:commons-fileupload:1.5")
     implementation("com.zaxxer:HikariCP:4.0.3")
-    implementation("org.json:json:20240303")
+    implementation("io.github.osobolev:small-json:1.2")
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
     implementation(project(":common"))

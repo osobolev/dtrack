@@ -5,9 +5,8 @@ import dtrack.web.dao.ReportDao;
 import dtrack.web.data.BugBean;
 import dtrack.web.data.PriorityBean;
 import dtrack.web.data.ReportBean;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import smalljson.JSONArray;
+import smalljson.JSONObject;
 
 import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
@@ -15,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static smalljson.JSONFactory.JSON;
 
 public final class ViewReportAction extends Action {
 
@@ -114,12 +115,12 @@ public final class ViewReportAction extends Action {
             bugs = performQuery(dao, false, where, null);
         } else if (value instanceof JSONObject) {
             JSONObject object = (JSONObject) value;
-            String where = object.optString("where");
+            String where = object.opt("where", String.class);
             if (where != null) {
-                String orderBy = object.optString("orderBy");
+                String orderBy = object.opt("orderBy", String.class);
                 bugs = performQuery(dao, false, where, orderBy);
             } else {
-                JSONArray subGroups = object.optJSONArray("groups");
+                JSONArray subGroups = object.opt("groups", JSONArray.class);
                 if (subGroups != null) {
                     for (Object subGroup : subGroups) {
                         loadGroup(dao, subGroup, groups);
@@ -151,8 +152,7 @@ public final class ViewReportAction extends Action {
         if (report.simpleQuery != null) {
             groups.add(performQuery(dao, true, report.simpleQuery, null));
         } else {
-            JSONTokener tok = new JSONTokener(report.jsonQuery);
-            loadGroup(dao, tok.nextValue(), groups);
+            loadGroup(dao, JSON.parse(report.jsonQuery), groups);
         }
         List<PriorityBean> priorities = dao.listPriorities(request.projectId, null);
         Map<String, Object> params = new HashMap<>();
