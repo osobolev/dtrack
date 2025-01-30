@@ -5,7 +5,7 @@ tasks.war {
 }
 
 dependencies {
-    implementation("org.eclipse.jetty:jetty-servlet:9.4.56.v20240826")
+    implementation("org.eclipse.jetty:jetty-servlet:9.4.57.v20241219")
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     implementation("org.freemarker:freemarker:2.3.34")
     implementation("commons-fileupload:commons-fileupload:1.5")
@@ -15,8 +15,9 @@ dependencies {
 
     implementation(project(":common"))
 
-    runtimeOnly("org.postgresql:postgresql:42.7.4")
+    runtimeOnly("org.postgresql:postgresql:42.7.5")
     runtimeOnly("org.slf4j:slf4j-nop:2.0.16")
+    runtimeOnly("commons-io:commons-io:2.18.0")
 
     manualImplementation(project(":dao_test"))
 }
