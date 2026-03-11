@@ -15,7 +15,7 @@ dependencies {
 
     implementation(project(":common"))
 
-    runtimeOnly("org.postgresql:postgresql:42.7.9")
+    runtimeOnly("org.postgresql:postgresql:42.7.10")
     runtimeOnly("org.slf4j:slf4j-nop:2.0.17")
     runtimeOnly("commons-io:commons-io:2.21.0")
 
