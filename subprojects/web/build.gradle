@@ -6,7 +6,7 @@ tasks.war {
 
 dependencies {
     implementation("org.eclipse.jetty:jetty-servlet:9.4.58.v20250814")
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260102.1")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1")
     implementation("org.freemarker:freemarker:2.3.34")
     implementation("commons-fileupload:commons-fileupload:1.6.0")
     implementation("com.zaxxer:HikariCP:4.0.3")
