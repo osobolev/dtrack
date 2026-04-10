@@ -3,11 +3,11 @@ plugins {
 }
 
 dependencies {
-    implementation("com.google.code.gson:gson:2.13.2")
+    implementation(libs.gson)
 
     implementation(project(":common"))
 
-    runtimeOnly("org.postgresql:postgresql:42.7.10")
+    runtimeOnly(libs.postgres.jdbc)
 
     manualImplementation(project(":dao_test"))
 }

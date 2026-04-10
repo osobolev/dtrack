@@ -8,19 +8,19 @@ tasks.war {
 }
 
 dependencies {
-    implementation("org.eclipse.jetty:jetty-servlet:9.4.58.v20250814")
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1")
-    implementation("org.freemarker:freemarker:2.3.34")
-    implementation("commons-fileupload:commons-fileupload:1.6.0")
-    implementation("com.zaxxer:HikariCP:4.0.3")
-    implementation("io.github.osobolev:small-json:1.4")
-    implementation("org.bitbucket.b_c:jose4j:0.9.6")
+    implementation(libs.jetty)
+    implementation(libs.owasp.sanitizer)
+    implementation(libs.freemarker)
+    implementation(libs.commons.fileupload)
+    implementation(libs.hikari)
+    implementation(libs.small.json)
+    implementation(libs.jose4j)
 
     implementation(project(":common"))
 
-    runtimeOnly("org.postgresql:postgresql:42.7.10")
-    runtimeOnly("org.slf4j:slf4j-nop:2.0.17")
-    runtimeOnly("commons-io:commons-io:2.21.0")
+    runtimeOnly(libs.postgres.jdbc)
+    runtimeOnly(libs.slf4j.nop)
+    runtimeOnly(libs.commons.io)
 
     manualImplementation(project(":dao_test"))
 }
