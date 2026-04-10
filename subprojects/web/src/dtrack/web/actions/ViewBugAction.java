@@ -3,8 +3,8 @@ package dtrack.web.actions;
 import dtrack.web.dao.BugViewDao;
 import dtrack.web.data.*;
 import freemarker.template.TemplateException;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;

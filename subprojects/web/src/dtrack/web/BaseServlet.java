@@ -5,10 +5,10 @@ import dtrack.web.actions.Action;
 import dtrack.web.actions.Context;
 import dtrack.web.actions.NoAccessException;
 import dtrack.web.actions.ValidationException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
 

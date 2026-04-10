@@ -1,8 +1,7 @@
 package dtrack.web.actions;
 
 import dtrack.web.dao.BugViewDao;
-
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 public final class AttachmentAction extends Action {
 

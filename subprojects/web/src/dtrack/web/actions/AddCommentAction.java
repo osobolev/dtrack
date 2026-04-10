@@ -1,8 +1,8 @@
 package dtrack.web.actions;
 
 import dtrack.web.dao.BugEditDao;
+import jakarta.servlet.http.HttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
 import java.util.Map;
 

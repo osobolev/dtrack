@@ -3,9 +3,9 @@ package dtrack.web.actions;
 import dtrack.web.dao.BugEditDao;
 import dtrack.web.dao.BugViewDao;
 import dtrack.web.data.PriorityBean;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;

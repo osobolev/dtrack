@@ -2,11 +2,10 @@ package dtrack.web.actions;
 
 import dtrack.web.dao.BugEditDao;
 import dtrack.web.dao.BugViewDao;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import smalljson.JSONObject;
 import smalljson.JSONWriter;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 public final class AssignAction extends Action {
 

@@ -20,7 +20,6 @@ dependencies {
 
     runtimeOnly(libs.postgres.jdbc)
     runtimeOnly(libs.slf4j.nop)
-    runtimeOnly(libs.commons.io)
 
     manualImplementation(project(":dao_test"))
 }

@@ -1,8 +1,7 @@
 package dtrack.web.actions;
 
 import dtrack.web.dao.BugEditDao;
-
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public final class DeleteCommentAction extends Action {
 

@@ -6,9 +6,9 @@ import dtrack.web.data.AttachmentBean;
 import dtrack.web.data.BugBean;
 import dtrack.web.data.PriorityBean;
 import freemarker.template.TemplateException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;

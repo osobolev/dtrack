@@ -5,10 +5,10 @@ import dtrack.web.dao.ReportDao;
 import dtrack.web.data.BugBean;
 import dtrack.web.data.PriorityBean;
 import dtrack.web.data.ReportBean;
+import jakarta.servlet.http.HttpServletResponse;
 import smalljson.JSONArray;
 import smalljson.JSONObject;
 
-import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
