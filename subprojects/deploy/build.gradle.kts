@@ -2,26 +2,26 @@ plugins {
     id("lib")
 }
 
-configurations { distr }
+val distr by configurations.creating
 
 dependencies {
     distr(project(":web"))
     distr(project(":admin"))
 }
 
-def dest = "$rootDir/distr"
+val dest = "$rootDir/distr"
 
-tasks.register("webFiles", Copy) {
+tasks.register("webFiles", Copy::class) {
     from("../web/web")
     into("$dest/root")
 }
 
-tasks.register("copyJars", Copy) {
-    from(configurations.distr)
+tasks.register("copyJars", Copy::class) {
+    from(distr)
     from("config")
     into("$dest")
 }
 
 tasks.register("distr") {
-    dependsOn(webFiles, copyJars)
+    dependsOn("webFiles", "copyJars")
 }

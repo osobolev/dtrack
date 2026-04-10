@@ -1,8 +1,7 @@
 plugins {
     id("lib")
+    id("war")
 }
-
-apply(plugin: "war")
 
 tasks.war {
     webAppDirectory.set(file("web"))
@@ -26,7 +25,11 @@ dependencies {
     manualImplementation(project(":dao_test"))
 }
 
-jar.manifest.attributes(
-    "Class-Path": configurations.runtimeClasspath.collect { it.name }.sort().join(" "),
-    "Main-Class": "dtrack.web.Main"
-)
+tasks.jar {
+    manifest {
+        attributes(
+            "Class-Path" to configurations.runtimeClasspath.map { conf -> conf.files.map { f -> f.name }.sorted().joinToString(" ") },
+            "Main-Class" to "dtrack.web.Main"
+        )
+    }
+}

@@ -2,13 +2,13 @@ plugins {
     id("com.github.ben-manes.versions") version "0.53.0"
 }
 
-def requiredMajor(mod) {
+fun requiredMajor(mod: ModuleComponentIdentifier): String {
     if (mod.group == "org.eclipse.jetty") return "9."
     if (mod.module == "HikariCP") return "4."
     return ""
 }
 
-tasks.withType(com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask).configureEach {
+tasks.withType(com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask::class).configureEach {
     rejectVersionIf {
         candidate.version.contains("-a") || 
         candidate.version.contains("-b") ||
@@ -16,8 +16,6 @@ tasks.withType(com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
     }
 }
 
-project(":") {
-    task clean(type: Delete) {
-        delete("distr")
-    }
+tasks.register("clean", Delete::class) {
+    delete("distr")
 }
