@@ -1,6 +1,6 @@
 plugins {
     id("lib")
-    id("war")
+    `war`
 }
 
 tasks.war {
