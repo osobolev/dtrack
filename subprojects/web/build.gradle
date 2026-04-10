@@ -1,3 +1,7 @@
+plugins {
+    id("lib")
+}
+
 apply(plugin: "war")
 
 tasks.war {

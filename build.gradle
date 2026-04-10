@@ -16,45 +16,6 @@ tasks.withType(com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
     }
 }
 
-subprojects {
-    group = "dtrack"
-    version = "1.0-SNAPSHOT"
-
-    apply(plugin: "java-library")
-    
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(8)
-        }
-        sourceCompatibility = "1.8"
-    }
-    compileJava.options.encoding = "UTF-8"
-    compileTestJava.options.encoding = "UTF-8"
-
-    sourceSets {
-        main {
-            java.srcDirs = ["src"]
-            resources.srcDirs = ["resources"]
-        }
-        manual {
-            java.srcDirs = ["test"]
-            resources.srcDirs = ["testResources"]
-        }
-    }
-
-    configurations["manualImplementation"].extendsFrom(configurations["implementation"])
-    configurations["manualRuntimeOnly"].extendsFrom(configurations["runtimeOnly"])
-    configurations["manualCompileOnly"].extendsFrom(configurations["compileOnly"])
-
-    dependencies {
-        "manualImplementation"(sourceSets["main"].output)
-    }
-
-    repositories {
-        mavenCentral()
-    }
-}
-
 project(":") {
     task clean(type: Delete) {
         delete("distr")
