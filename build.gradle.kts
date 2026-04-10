@@ -3,8 +3,7 @@ plugins {
 }
 
 fun requiredMajor(mod: ModuleComponentIdentifier): String {
-    if (mod.group == "org.eclipse.jetty") return "9."
-    if (mod.module == "HikariCP") return "4."
+    if (mod.group == "org.eclipse.jetty") return "11." // Version >= 12 requires Java 17
     return ""
 }
 
