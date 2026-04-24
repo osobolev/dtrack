@@ -1,5 +1,5 @@
 [libraries]
-gson = "com.google.code.gson:gson:2.13.2"
+gson = "com.google.code.gson:gson:2.14.0"
 small-json = "io.github.osobolev:small-json:1.4"
 
 jetty = "org.eclipse.jetty:jetty-servlet:11.0.26"
