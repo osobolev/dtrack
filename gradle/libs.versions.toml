@@ -9,7 +9,7 @@ jose4j = "org.bitbucket.b_c:jose4j:0.9.6"
 freemarker = "org.freemarker:freemarker:2.3.34"
 owasp-sanitizer = "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1"
 
-hikari = "com.zaxxer:HikariCP:7.0.2"
-postgres-jdbc = "org.postgresql:postgresql:42.7.11"
+hikari = "com.zaxxer:HikariCP:7.1.0"
+postgres-jdbc = "org.postgresql:postgresql:42.7.13"
 
 slf4j-nop = "org.slf4j:slf4j-nop:2.0.18"
