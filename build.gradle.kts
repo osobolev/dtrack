@@ -1,7 +1,3 @@
-plugins {
-    id("com.github.ben-manes.versions") version "0.54.0"
-}
-
 fun requiredMajor(mod: ModuleComponentIdentifier): String {
     if (mod.group == "org.eclipse.jetty") return "11." // Version >= 12 requires Java 17
     return ""
