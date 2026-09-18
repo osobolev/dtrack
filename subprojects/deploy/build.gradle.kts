@@ -2,7 +2,7 @@ plugins {
     id("lib")
 }
 
-val distr by configurations.creating
+val distr = configurations.create("distr")
 
 dependencies {
     distr(project(":web"))
