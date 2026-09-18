@@ -4,7 +4,7 @@ small-json = "io.github.osobolev:small-json:1.4"
 
 jetty = "org.eclipse.jetty:jetty-servlet:11.0.26"
 commons-fileupload = "org.apache.commons:commons-fileupload2-jakarta-servlet6:2.0.0-M5"
-jose4j = "org.bitbucket.b_c:jose4j:0.9.6"
+jose4j = "org.bitbucket.b_c:jose4j:0.9.7"
 
 freemarker = "org.freemarker:freemarker:2.3.35"
 owasp-sanitizer = "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1"
