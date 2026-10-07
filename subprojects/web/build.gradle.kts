@@ -4,7 +4,7 @@ plugins {
 }
 
 tasks.war {
-    webAppDirectory.set(file("web"))
+    webAppDirectory = file("web")
 }
 
 dependencies {
