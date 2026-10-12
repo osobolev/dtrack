@@ -7,7 +7,7 @@ commons-fileupload = "org.apache.commons:commons-fileupload2-jakarta-servlet6:2.
 jose4j = "org.bitbucket.b_c:jose4j:0.9.7"
 
 freemarker = "org.freemarker:freemarker:2.3.35"
-owasp-sanitizer = "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260924.2"
+owasp-sanitizer = "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20261011.1"
 
 hikari = "com.zaxxer:HikariCP:7.1.0"
 postgres-jdbc = "org.postgresql:postgresql:42.7.14"
